@@ -327,6 +327,7 @@ public class FormRepositoryImpl implements FormRepositoryCustom {
                 .where(form.education.school.address.contains(keyword)
                         .or(form.education.school.location.eq(keyword))
                         .and(form.status.in(round)))
+                .orderBy(form.applicant.name.asc())
                 .fetch();
     }
 
