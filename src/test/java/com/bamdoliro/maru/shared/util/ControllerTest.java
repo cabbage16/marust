@@ -265,6 +265,9 @@ public abstract class ControllerTest {
     @MockBean
     protected UpdateOriginalTypeUseCase updateOriginalTypeUseCase;
 
+    @MockBean
+    protected GenerateAllAdmissionTicketUseCase generateAllAdmissionTicketUseCase;
+
     protected String toJson(Object object) throws JsonProcessingException {
         return objectMapper.writeValueAsString(object);
     }

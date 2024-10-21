@@ -72,6 +72,7 @@ public class FormController {
     private final QueryFormUrlUseCase queryFormUrlUseCase;
     private final SelectSecondPassUseCase selectSecondPassUseCase;
     private final UpdateOriginalTypeUseCase updateOriginalTypeUseCase;
+    private final GenerateAllAdmissionTicketUseCase generateAllAdmissionTicketUseCase;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
@@ -223,6 +224,15 @@ public class FormController {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(generateAdmissionTicketUseCase.execute(user));
+    }
+
+    @GetMapping("/admission-ticket/all")
+    public ResponseEntity<Resource> generateAllAdmissionTicket(
+            @AuthenticationPrincipal(authority = Authority.ADMIN) User user
+    ) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(generateAllAdmissionTicketUseCase.execute());
     }
 
     @GetMapping("/proof-of-application")
