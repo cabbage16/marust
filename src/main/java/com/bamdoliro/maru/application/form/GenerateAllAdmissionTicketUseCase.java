@@ -26,7 +26,7 @@ import static com.bamdoliro.maru.shared.constants.Schedule.*;
 
 @RequiredArgsConstructor
 @UseCase
-public class GenerateAllAdmissionUseCase {
+public class GenerateAllAdmissionTicketUseCase {
 
     private final FormRepository formRepository;
     private final ProcessTemplateService processTemplateService;

@@ -72,7 +72,7 @@ public class FormController {
     private final QueryFormUrlUseCase queryFormUrlUseCase;
     private final SelectSecondPassUseCase selectSecondPassUseCase;
     private final UpdateOriginalTypeUseCase updateOriginalTypeUseCase;
-    private final GenerateAllAdmissionUseCase generateAllAdmissionUseCase;
+    private final GenerateAllAdmissionTicketUseCase generateAllAdmissionTicketUseCase;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
@@ -232,7 +232,7 @@ public class FormController {
     ) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
-                .body(generateAllAdmissionUseCase.execute());
+                .body(generateAllAdmissionTicketUseCase.execute());
     }
 
     @GetMapping("/proof-of-application")
