@@ -1438,9 +1438,43 @@ class FormControllerTest extends RestDocsTestSupport {
 
                 .andExpect(status().isNotFound())
 
-                .andDo(restDocs.document());
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("Bearer token")
+                        )
+                ));
 
         verify(generateAdmissionTicketUseCase, times(1)).execute(user);
+    }
+
+    @Test
+    void 수험표_전체를_발급받는다() throws Exception {
+        User user = UserFixture.createAdminUser();
+        MockMultipartFile file = new MockMultipartFile(
+                "admission-ticket-all",
+                "admission-ticket-all.pdf",
+                MediaType.APPLICATION_PDF_VALUE,
+                "<<file>>".getBytes()
+        );
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        given(generateAllAdmissionTicketUseCase.execute()).willReturn(new ByteArrayResource(file.getBytes()));
+
+        mockMvc.perform(get("/form/admission-ticket/all")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_PDF))
+
+                .andExpect(status().isOk())
+
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("Bearer token")
+                        )
+                ));
+
+        verify(generateAllAdmissionTicketUseCase, times(1)).execute();
     }
 
     @Test
@@ -1868,7 +1902,7 @@ class FormControllerTest extends RestDocsTestSupport {
         willDoNothing().given(selectSecondPassUseCase).execute();
 
         mockMvc.perform(patch("/form/second-round/select")
-                .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader()))
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader()))
 
                 .andExpect(status().isNoContent())
 
@@ -1890,7 +1924,7 @@ class FormControllerTest extends RestDocsTestSupport {
         willThrow(new MissingTotalScoreException()).given(selectSecondPassUseCase).execute();
 
         mockMvc.perform(patch("/form/second-round/select")
-                .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader()))
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader()))
 
                 .andExpect(status().isConflict())
 
