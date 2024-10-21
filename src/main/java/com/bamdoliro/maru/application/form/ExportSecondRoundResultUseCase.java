@@ -16,6 +16,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -54,63 +55,71 @@ public class ExportSecondRoundResultUseCase {
             examinationNumberCell.setCellValue(form.getExaminationNumber());
             examinationNumberCell.setCellStyle(defaultCellStyle);
 
-            Cell typeCell = row.createCell(2);
+            Cell originalTypeCell = row.createCell(2);
+            originalTypeCell.setCellValue(form.getOriginalType().getDescription());
+            originalTypeCell.setCellStyle(defaultCellStyle);
+
+            Cell typeCell = row.createCell(3);
             typeCell.setCellValue(form.getType().getDescription());
             typeCell.setCellStyle(defaultCellStyle);
 
-            Cell resultCell = row.createCell(3);
+            Cell resultCell = row.createCell(4);
             resultCell.setCellValue(form.getStatus().getDescription());
             resultCell.setCellStyle(defaultCellStyle);
 
-            Cell nameCell = row.createCell(4);
+            Cell nameCell = row.createCell(5);
             nameCell.setCellValue(form.getApplicant().getName());
             nameCell.setCellStyle(defaultCellStyle);
 
-            Cell genderCell = row.createCell(5);
+            Cell genderCell = row.createCell(6);
             genderCell.setCellValue(form.getApplicant().getGender().getDescription());
             genderCell.setCellStyle(defaultCellStyle);
 
-            Cell locationCell = row.createCell(6);
+            Cell birthdayCell = row.createCell(7);
+            birthdayCell.setCellValue(form.getApplicant().getBirthday().format(DateTimeFormatter.BASIC_ISO_DATE));
+            birthdayCell.setCellStyle(defaultCellStyle);
+
+            Cell locationCell = row.createCell(8);
             locationCell.setCellValue(form.getEducation().getSchool().getLocation());
             locationCell.setCellStyle(defaultCellStyle);
 
-            Cell graduationCell = row.createCell(7);
+            Cell graduationCell = row.createCell(9);
             graduationCell.setCellValue(form.getEducation().getGraduationTypeToString());
             graduationCell.setCellStyle(defaultCellStyle);
 
-            Cell schoolCell = row.createCell(8);
+            Cell schoolCell = row.createCell(10);
             schoolCell.setCellValue(form.getEducation().getSchool().getName());
             schoolCell.setCellStyle(defaultCellStyle);
 
-            Cell schoolCodeCell = row.createCell(9);
+            Cell schoolCodeCell = row.createCell(11);
             schoolCodeCell.setCellValue(form.getEducation().getSchool().getCode());
             schoolCodeCell.setCellStyle(defaultCellStyle);
 
-            Cell subjectGradeScoreCell = row.createCell(10);
+            Cell subjectGradeScoreCell = row.createCell(12);
             subjectGradeScoreCell.setCellValue(MathUtil.roundTo(form.getScore().getSubjectGradeScore(), 3));
             subjectGradeScoreCell.setCellStyle(rightCellStyle);
 
-            Cell attendanceScoreCell = row.createCell(11);
+            Cell attendanceScoreCell = row.createCell(13);
             attendanceScoreCell.setCellValue(form.getScore().getAttendanceScore());
             attendanceScoreCell.setCellStyle(rightCellStyle);
 
-            Cell volunteerScoreCell = row.createCell(12);
+            Cell volunteerScoreCell = row.createCell(14);
             volunteerScoreCell.setCellValue(form.getScore().getVolunteerScore());
             volunteerScoreCell.setCellStyle(rightCellStyle);
 
-            Cell bonusScoreCell = row.createCell(13);
+            Cell bonusScoreCell = row.createCell(15);
             bonusScoreCell.setCellValue(form.getScore().getBonusScore());
             bonusScoreCell.setCellStyle(rightCellStyle);
 
-            Cell depthInterviewScoreCell = row.createCell(14);
+            Cell depthInterviewScoreCell = row.createCell(16);
             depthInterviewScoreCell.setCellValue(form.getScore().getDepthInterviewScore());
             depthInterviewScoreCell.setCellStyle(rightCellStyle);
 
-            Cell ncsScoreCell = row.createCell(15);
+            Cell ncsScoreCell = row.createCell(17);
             ncsScoreCell.setCellValue(form.getScore().getNcsScore());
             ncsScoreCell.setCellStyle(rightCellStyle);
 
-            Cell codingTestScoreCell = row.createCell(16);
+            Cell codingTestScoreCell = row.createCell(18);
             if (form.getType().isMeister()) {
                 codingTestScoreCell.setCellValue(form.getScore().getCodingTestScore());
                 codingTestScoreCell.setCellStyle(rightCellStyle);
@@ -118,7 +127,7 @@ public class ExportSecondRoundResultUseCase {
                 codingTestScoreCell.setCellStyle(emptyCellStyle);
             }
 
-            Cell totalScoreCell = row.createCell(17);
+            Cell totalScoreCell = row.createCell(19);
             totalScoreCell.setCellValue(MathUtil.roundTo(form.getScore().getTotalScore(), 3));
             totalScoreCell.setCellStyle(rightCellStyle);
         }

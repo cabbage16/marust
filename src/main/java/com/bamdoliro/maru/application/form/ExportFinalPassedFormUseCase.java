@@ -15,6 +15,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -71,7 +72,7 @@ public class ExportFinalPassedFormUseCase {
             genderCell.setCellStyle(defaultCellStyle);
 
             Cell birthdayCell = row.createCell(8);
-            birthdayCell.setCellValue(form.getApplicant().getBirthday());
+            birthdayCell.setCellValue(form.getApplicant().getBirthday().format(DateTimeFormatter.BASIC_ISO_DATE));
             birthdayCell.setCellStyle(dateCellStyle);
 
             Cell locationCell = row.createCell(9);

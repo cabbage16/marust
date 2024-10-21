@@ -16,6 +16,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -68,66 +69,70 @@ public class ExportResultUseCase {
             genderCell.setCellValue(form.getApplicant().getGender().getDescription());
             genderCell.setCellStyle(defaultCellStyle);
 
-            Cell locationCell = row.createCell(7);
+            Cell birthdayCell = row.createCell(7);
+            birthdayCell.setCellValue(form.getApplicant().getBirthday().format(DateTimeFormatter.BASIC_ISO_DATE));
+            birthdayCell.setCellStyle(defaultCellStyle);
+
+            Cell locationCell = row.createCell(8);
             locationCell.setCellValue(form.getEducation().getSchool().getLocation());
             locationCell.setCellStyle(defaultCellStyle);
 
-            Cell graduationCell = row.createCell(8);
+            Cell graduationCell = row.createCell(9);
             graduationCell.setCellValue(form.getEducation().getGraduationTypeToString());
             graduationCell.setCellStyle(defaultCellStyle);
 
-            Cell schoolCell = row.createCell(9);
+            Cell schoolCell = row.createCell(10);
             schoolCell.setCellValue(form.getEducation().getSchool().getName());
             schoolCell.setCellStyle(defaultCellStyle);
 
-            Cell schoolCodeCell = row.createCell(10);
+            Cell schoolCodeCell = row.createCell(11);
             schoolCodeCell.setCellValue(form.getEducation().getSchool().getCode());
             schoolCodeCell.setCellStyle(defaultCellStyle);
 
-            Cell subjectCount21 = row.createCell(11);
+            Cell subjectCount21 = row.createCell(12);
             subjectCount21.setCellValue(subjectMap.getSubjectListOf(2,1).size());
             subjectCount21.setCellStyle(defaultCellStyle);
 
-            Cell subjectTotalScore21 = row.createCell(12);
+            Cell subjectTotalScore21 = row.createCell(13);
             subjectTotalScore21.setCellValue(subjectMap.getSubjectListOf(2,1).totalScore());
             subjectTotalScore21.setCellStyle(defaultCellStyle);
 
-            Cell subjectCount22 = row.createCell(13);
+            Cell subjectCount22 = row.createCell(14);
             subjectCount22.setCellValue(subjectMap.getSubjectListOf(2,2).size());
             subjectCount22.setCellStyle(defaultCellStyle);
 
-            Cell subjectTotalScore22 = row.createCell(14);
+            Cell subjectTotalScore22 = row.createCell(15);
             subjectTotalScore22.setCellValue(subjectMap.getSubjectListOf(2,2).totalScore());
             subjectTotalScore22.setCellStyle(defaultCellStyle);
 
-            Cell subjectCount31 = row.createCell(15);
+            Cell subjectCount31 = row.createCell(16);
             subjectCount31.setCellValue(subjectMap.getSubjectListOf(3,1).size());
             subjectCount31.setCellStyle(defaultCellStyle);
 
-            Cell subjectTotalScore31 = row.createCell(16);
+            Cell subjectTotalScore31 = row.createCell(17);
             subjectTotalScore31.setCellValue(subjectMap.getSubjectListOf(3,1).totalScore());
             subjectTotalScore31.setCellStyle(defaultCellStyle);
 
-            Cell subjectGradeScoreCell = row.createCell(17);
+            Cell subjectGradeScoreCell = row.createCell(18);
             subjectGradeScoreCell.setCellValue(MathUtil.roundTo(form.getScore().getSubjectGradeScore(), 3));
             subjectGradeScoreCell.setCellStyle(rightCellStyle);
 
-            Cell attendanceScoreCell = row.createCell(18);
+            Cell attendanceScoreCell = row.createCell(19);
             attendanceScoreCell.setCellValue(form.getScore().getAttendanceScore());
             attendanceScoreCell.setCellStyle(rightCellStyle);
 
-            Cell volunteerScoreCell = row.createCell(19);
+            Cell volunteerScoreCell = row.createCell(20);
             volunteerScoreCell.setCellValue(form.getScore().getVolunteerScore());
             volunteerScoreCell.setCellStyle(rightCellStyle);
 
-            Cell bonusScoreCell = row.createCell(20);
+            Cell bonusScoreCell = row.createCell(21);
             bonusScoreCell.setCellValue(form.getScore().getBonusScore());
             bonusScoreCell.setCellStyle(rightCellStyle);
 
-            Cell depthInterviewScoreCell = row.createCell(21);
-            Cell ncsScoreCell = row.createCell(22);
-            Cell codingTestScoreCell = row.createCell(23);
-            Cell totalScoreCell = row.createCell(24);
+            Cell depthInterviewScoreCell = row.createCell(22);
+            Cell ncsScoreCell = row.createCell(23);
+            Cell codingTestScoreCell = row.createCell(24);
+            Cell totalScoreCell = row.createCell(25);
             totalScoreCell.setCellStyle(rightCellStyle);
 
             if (form.tookSecondRound()) {
