@@ -73,6 +73,7 @@ public class FormController {
     private final SelectSecondPassUseCase selectSecondPassUseCase;
     private final UpdateOriginalTypeUseCase updateOriginalTypeUseCase;
     private final GenerateAllAdmissionTicketUseCase generateAllAdmissionTicketUseCase;
+    private final DownloadAdmissionAndPledgeUseCase downloadAdmissionAndPledgeUseCase;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
@@ -330,5 +331,14 @@ public class FormController {
             @AuthenticationPrincipal(authority = Authority.ADMIN) User user
     ) {
         updateOriginalTypeUseCase.execute();
+    }
+
+    @GetMapping("/admission-and-pledge")
+    public ResponseEntity<Resource>  downloadAdmissionAndPledge(
+            @AuthenticationPrincipal(authority = Authority.USER) User user
+    ) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(downloadAdmissionAndPledgeUseCase.execute(user));
     }
 }
