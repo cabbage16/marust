@@ -1219,6 +1219,27 @@ class FormControllerTest extends RestDocsTestSupport {
     }
 
     @Test
+    void 최종합격자가_아닌_지원자가_입학등록원_및_금연서약서를_업로드하면_에러가_발생한다() throws Exception {
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new InvalidFormStatusException()).when(uploadAdmissionAndPledgeUseCase).execute(user);
+
+        mockMvc.perform(multipart("/form/admission-and-pledge")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+
+                .andExpect(status().isConflict())
+
+                .andDo(restDocs.document());
+
+        verify(uploadAdmissionAndPledgeUseCase, times(1)).execute(user);
+    }
+
+    @Test
     void 입학등록원_및_금연서약서_업로드가_실패한다() throws Exception {
         User user = UserFixture.createUser();
 
@@ -1227,10 +1248,10 @@ class FormControllerTest extends RestDocsTestSupport {
         doThrow(new FailedToSaveException()).when(uploadAdmissionAndPledgeUseCase).execute(user);
 
         mockMvc.perform(multipart("/form/admission-and-pledge")
-                .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-        )
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
 
                 .andExpect(status().isInternalServerError())
 
