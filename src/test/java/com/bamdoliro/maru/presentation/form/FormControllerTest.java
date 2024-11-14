@@ -1145,6 +1145,75 @@ class FormControllerTest extends RestDocsTestSupport {
     }
 
     @Test
+    void 최종합격자가_입학등록원_및_금연서약서를_다운받는다() throws Exception {
+        User user = UserFixture.createUser();
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "file.pdf",
+                MediaType.APPLICATION_PDF_VALUE,
+                "<<file>>".getBytes()
+        );
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        given(downloadAdmissionAndPledgeUseCase.execute(user)).willReturn(new ByteArrayResource(file.getBytes()));
+
+        mockMvc.perform(get("/form/admission-and-pledge")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_PDF)
+                )
+                .andExpect(status().isOk())
+
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("Bearer token")
+                        )
+                ));
+
+        verify(downloadAdmissionAndPledgeUseCase, times(1)).execute(user);
+    }
+
+    @Test
+    void 최종합격자가_아닌_사람이_입학등록원_및_금연서약서를_다운받으면_에러가_발생한다() throws Exception {
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new InvalidFormStatusException()).when(downloadAdmissionAndPledgeUseCase).execute(user);
+
+        mockMvc.perform(get("/form/admission-and-pledge")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isConflict())
+
+                .andDo(restDocs.document());
+
+        verify(downloadAdmissionAndPledgeUseCase, times(1)).execute(user);
+    }
+
+    @Test
+    void 입학등록원_및_금연서약서를_다운받을_때_pdf변환에_실패했다면_에러가_발생한다() throws Exception {
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new FailedToExportPdfException()).when(downloadAdmissionAndPledgeUseCase).execute(user);
+
+        mockMvc.perform(get("/form/admission-and-pledge")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+
+                .andExpect(status().isInternalServerError())
+
+                .andDo(restDocs.document());
+
+        verify(downloadAdmissionAndPledgeUseCase, times(1)).execute(user);
+    }
+
+    @Test
     void 원서를_pdf로_다운받는다() throws Exception {
         User user = UserFixture.createUser();
         MockMultipartFile file = new MockMultipartFile(
