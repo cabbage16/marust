@@ -57,6 +57,8 @@ public class FormController {
     private final UploadIdentificationPictureUseCase uploadIdentificationPictureUseCase;
     private final UploadFormUseCase uploadFormUseCase;
     private final ExportFormUseCase exportFormUseCase;
+    private final DownloadAdmissionAndPledgeUseCase downloadAdmissionAndPledgeUseCase;
+    private final UploadAdmissionAndPledgeUseCase uploadAdmissionAndPledgeUseCase;
     private final QueryAllFormUseCase queryAllFormUseCase;
     private final QueryFirstFormResultUseCase queryFirstFormResultUseCase;
     private final QueryFinalFormResultUseCase queryFinalFormResultUseCase;
@@ -73,7 +75,6 @@ public class FormController {
     private final SelectSecondPassUseCase selectSecondPassUseCase;
     private final UpdateOriginalTypeUseCase updateOriginalTypeUseCase;
     private final GenerateAllAdmissionTicketUseCase generateAllAdmissionTicketUseCase;
-    private final DownloadAdmissionAndPledgeUseCase downloadAdmissionAndPledgeUseCase;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
@@ -186,6 +187,24 @@ public class FormController {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(exportFormUseCase.execute(user));
+    }
+
+    @GetMapping(value = "/admission-and-pledge")
+    public ResponseEntity<Resource>  downloadAdmissionAndPledge(
+            @AuthenticationPrincipal(authority = Authority.USER) User user
+    ) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(downloadAdmissionAndPledgeUseCase.execute(user));
+    }
+
+    @PostMapping(value = "/admission-and-pledge")
+    public SingleCommonResponse<UrlResponse> uploadAdmissionAndPledge(
+            @AuthenticationPrincipal(authority = Authority.USER) User user
+    ) {
+        return SingleCommonResponse.ok(
+                uploadAdmissionAndPledgeUseCase.execute(user)
+        );
     }
 
     @GetMapping
@@ -331,14 +350,5 @@ public class FormController {
             @AuthenticationPrincipal(authority = Authority.ADMIN) User user
     ) {
         updateOriginalTypeUseCase.execute();
-    }
-
-    @GetMapping("/admission-and-pledge")
-    public ResponseEntity<Resource>  downloadAdmissionAndPledge(
-            @AuthenticationPrincipal(authority = Authority.USER) User user
-    ) {
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(downloadAdmissionAndPledgeUseCase.execute(user));
     }
 }
