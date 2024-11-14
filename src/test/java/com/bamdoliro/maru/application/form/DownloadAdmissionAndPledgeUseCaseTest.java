@@ -81,7 +81,7 @@ public class DownloadAdmissionAndPledgeUseCaseTest {
     }
 
     @Test
-    void 입학등록원_및_금연서약서를_다운받을_때_모종의_이유로_변환_과정에서_실패하면_에러가_발생한() {
+    void 입학등록원_및_금연서약서를_다운받을_때_모종의_이유로_변환_과정에서_실패하면_에러가_발생한다() {
         //given
         User user = UserFixture.createUser();
         Form form = FormFixture.createForm(FormType.REGULAR);
