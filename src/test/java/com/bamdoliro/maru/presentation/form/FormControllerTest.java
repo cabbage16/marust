@@ -7,16 +7,8 @@ import com.bamdoliro.maru.domain.form.domain.type.FormType;
 import com.bamdoliro.maru.domain.form.exception.*;
 import com.bamdoliro.maru.domain.user.domain.User;
 import com.bamdoliro.maru.infrastructure.pdf.exception.FailedToExportPdfException;
-import com.bamdoliro.maru.infrastructure.s3.exception.EmptyFileException;
-import com.bamdoliro.maru.infrastructure.s3.exception.FailedToSaveException;
-import com.bamdoliro.maru.infrastructure.s3.exception.FileSizeLimitExceededException;
-import com.bamdoliro.maru.infrastructure.s3.exception.ImageSizeMismatchException;
-import com.bamdoliro.maru.infrastructure.s3.exception.MediaTypeMismatchException;
-import com.bamdoliro.maru.presentation.form.dto.request.PassOrFailFormListRequest;
-import com.bamdoliro.maru.presentation.form.dto.request.PassOrFailFormRequest;
-import com.bamdoliro.maru.presentation.form.dto.request.SubmitFinalFormRequest;
-import com.bamdoliro.maru.presentation.form.dto.request.SubmitFormRequest;
-import com.bamdoliro.maru.presentation.form.dto.request.UpdateFormRequest;
+import com.bamdoliro.maru.infrastructure.s3.exception.*;
+import com.bamdoliro.maru.presentation.form.dto.request.*;
 import com.bamdoliro.maru.presentation.form.dto.response.FormResultResponse;
 import com.bamdoliro.maru.presentation.form.dto.response.FormSimpleResponse;
 import com.bamdoliro.maru.shared.fixture.AuthFixture;
@@ -37,27 +29,14 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.BDDMockito.willThrow;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class FormControllerTest extends RestDocsTestSupport {
@@ -1211,6 +1190,53 @@ class FormControllerTest extends RestDocsTestSupport {
                 .andDo(restDocs.document());
 
         verify(downloadAdmissionAndPledgeUseCase, times(1)).execute(user);
+    }
+
+    @Test
+    void 입학등록원_및_금연서약서를_업로드한다() throws Exception {
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        given(uploadAdmissionAndPledgeUseCase.execute(user)).willReturn(SharedFixture.createAdmissionAndPledgeUrlResponse());
+
+        mockMvc.perform(multipart("/form/admission-and-pledge")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+
+                .andExpect(status().isOk())
+
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("Bearer token")
+                        )
+                ));
+
+        verify(uploadAdmissionAndPledgeUseCase, times(1)).execute(user);
+    }
+
+    @Test
+    void 입학등록원_및_금연서약서_업로드가_실패한다() throws Exception {
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new FailedToSaveException()).when(uploadAdmissionAndPledgeUseCase).execute(user);
+
+        mockMvc.perform(multipart("/form/admission-and-pledge")
+                .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+
+                .andExpect(status().isInternalServerError())
+
+                .andDo(restDocs.document());
+
+        verify(uploadAdmissionAndPledgeUseCase, times(1)).execute(user);
     }
 
     @Test
