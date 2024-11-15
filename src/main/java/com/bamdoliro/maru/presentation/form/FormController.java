@@ -50,6 +50,7 @@ public class FormController {
     private final ApproveFormUseCase approveFormUseCase;
     private final RejectFormUseCase rejectFormUseCase;
     private final ReceiveFormUseCase receiveFormUseCase;
+    private final EnterFormUseCase enterFormUseCase;
     private final QuerySubmittedFormUseCase querySubmittedFormUseCase;
     private final QueryFormUseCase queryFormUseCase;
     private final QueryFormStatusUseCase queryFormStatusUseCase;
@@ -118,6 +119,15 @@ public class FormController {
             @PathVariable(name = "form-id") Long formId
     ) {
         receiveFormUseCase.execute(formId);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PatchMapping("/{form-id}/enter")
+    public void enterForm(
+            @AuthenticationPrincipal(authority = Authority.ADMIN) User user,
+            @PathVariable(name = "form-id") Long formId
+    ) {
+        enterFormUseCase.execute(formId);
     }
 
     @GetMapping("/review")

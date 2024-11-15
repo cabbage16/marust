@@ -16,7 +16,8 @@ public enum FormStatus implements EnumProperty {
     FIRST_FAILED("1차 불합격"),
     PASSED("최종 합격"),
     FAILED("불합격"),
-    NO_SHOW("불참");
+    NO_SHOW("불참"),
+    ENTERED("입학");
 
     private final String description;
 }

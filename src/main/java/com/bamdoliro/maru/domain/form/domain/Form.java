@@ -131,6 +131,8 @@ public class Form extends BaseTimeEntity {
         this.status = FormStatus.NO_SHOW;
     }
 
+    public void enter() { this.status = FormStatus.ENTERED; }
+
     public void isApplicant(User user) {
         if (!this.user.equals(user)) {
             throw new AuthorityMismatchException();
@@ -147,11 +149,17 @@ public class Form extends BaseTimeEntity {
         return status.equals(FormStatus.REJECTED);
     }
 
-    public boolean isSubmitted() { return status.equals(FormStatus.SUBMITTED); }
+    public boolean isSubmitted() {
+        return status.equals(FormStatus.SUBMITTED);
+    }
 
-    public boolean isFinalSubmitted() { return status.equals(FormStatus.FINAL_SUBMITTED); }
+    public boolean isFinalSubmitted() {
+        return status.equals(FormStatus.FINAL_SUBMITTED);
+    }
 
-    public boolean isApproved() { return status.equals(FormStatus.APPROVED); }
+    public boolean isApproved() {
+        return status.equals(FormStatus.APPROVED);
+    }
 
     public boolean isReceived() {
         return isFirstPassed() != null || status.equals(FormStatus.RECEIVED);
@@ -163,6 +171,10 @@ public class Form extends BaseTimeEntity {
 
     public boolean isFirstPassedNow() {
         return status.equals(FormStatus.FIRST_PASSED);
+    }
+
+    public boolean isEntered() {
+        return status.equals(FormStatus.ENTERED);
     }
 
     public Boolean isFirstPassed() {
@@ -182,12 +194,13 @@ public class Form extends BaseTimeEntity {
     }
 
     public Boolean isPassed() {
-        if (isPassedNow()) {
+        if (isPassedNow() || isEntered()) {
             return true;
         }
 
         return isFailedNow() || isNoShow() ? false : null;
     }
+
 
     public boolean isFailedNow() {
         return status.equals(FormStatus.FAILED);
@@ -210,7 +223,7 @@ public class Form extends BaseTimeEntity {
             this.score.updateSubjectScore(subjectGradeScore);
 
             this.score.updateSecondRoundMeisterScoreToRegular();
-        } else if (type.isSocial()){
+        } else if (type.isSocial()) {
             this.type = FormType.REGULAR;
             Double subjectGradeScore = calculateFormScoreService.calculateSubjectGradeScore(this);
             this.score.updateSubjectScore(subjectGradeScore);
