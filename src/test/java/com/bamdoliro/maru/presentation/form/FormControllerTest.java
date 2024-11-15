@@ -1123,7 +1123,7 @@ class FormControllerTest extends RestDocsTestSupport {
     }
 
     @Test
-    void 최종합격자가_입학등록원_및_금연서약서를_다운받는다() throws Exception {
+    void 최종합격자가_입학등록원_및_금연서약서_양식을_다운받는다() throws Exception {
         User user = UserFixture.createUser();
         MockMultipartFile file = new MockMultipartFile(
                 "file",
@@ -1153,7 +1153,7 @@ class FormControllerTest extends RestDocsTestSupport {
     }
 
     @Test
-    void 최종합격자가_아닌_사람이_입학등록원_및_금연서약서를_다운받으면_에러가_발생한다() throws Exception {
+    void 최종합격자가_아닌_사람이_입학등록원_및_금연서약서_양식을_다운받으면_에러가_발생한다() throws Exception {
         User user = UserFixture.createUser();
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);

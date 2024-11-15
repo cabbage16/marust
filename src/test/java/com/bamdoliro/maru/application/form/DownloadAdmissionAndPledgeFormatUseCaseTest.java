@@ -43,7 +43,7 @@ public class DownloadAdmissionAndPledgeFormatUseCaseTest {
     private MergePdfService mergePdfService;
 
     @Test
-    void 최종합격한_지원자는_입학등록원_및_금연서약서를_pdf로_다운받는다() {
+    void 최종합격한_지원자는_입학등록원_및_금연서약서_양식을_pdf로_다운받는다() {
         //given
         User user = UserFixture.createUser();
         Form form = FormFixture.createForm(FormType.REGULAR);
@@ -64,7 +64,7 @@ public class DownloadAdmissionAndPledgeFormatUseCaseTest {
     }
 
     @Test
-    void 최종합격하지않은_지원자가_입학등록원_및_금연서약서를_다운받으면_에러가_발생한다() {
+    void 최종합격하지않은_지원자가_입학등록원_및_금연서약서_양식을_다운받으면_에러가_발생한다() {
         //given
         User user = UserFixture.createUser();
         Form form = FormFixture.createForm(FormType.REGULAR);
@@ -81,7 +81,7 @@ public class DownloadAdmissionAndPledgeFormatUseCaseTest {
     }
 
     @Test
-    void 입학등록원_및_금연서약서를_다운받을_때_모종의_이유로_변환_과정에서_실패하면_에러가_발생한다() {
+    void 입학등록원_및_금연서약서_양식을_다운받을_때_모종의_이유로_변환_과정에서_실패하면_에러가_발생한다() {
         //given
         User user = UserFixture.createUser();
         Form form = FormFixture.createForm(FormType.REGULAR);
