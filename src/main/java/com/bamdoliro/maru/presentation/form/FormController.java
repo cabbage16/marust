@@ -57,7 +57,7 @@ public class FormController {
     private final UploadIdentificationPictureUseCase uploadIdentificationPictureUseCase;
     private final UploadFormUseCase uploadFormUseCase;
     private final ExportFormUseCase exportFormUseCase;
-    private final DownloadAdmissionAndPledgeUseCase downloadAdmissionAndPledgeUseCase;
+    private final DownloadAdmissionAndPledgeFormatUseCase downloadAdmissionAndPledgeFormatUseCase;
     private final UploadAdmissionAndPledgeUseCase uploadAdmissionAndPledgeUseCase;
     private final QueryAllFormUseCase queryAllFormUseCase;
     private final QueryFirstFormResultUseCase queryFirstFormResultUseCase;
@@ -190,12 +190,12 @@ public class FormController {
     }
 
     @GetMapping(value = "/admission-and-pledge")
-    public ResponseEntity<Resource>  downloadAdmissionAndPledge(
+    public ResponseEntity<Resource> downloadAdmissionAndPledgeFormat(
             @AuthenticationPrincipal(authority = Authority.USER) User user
     ) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
-                .body(downloadAdmissionAndPledgeUseCase.execute(user));
+                .body(downloadAdmissionAndPledgeFormatUseCase.execute(user));
     }
 
     @PostMapping(value = "/admission-and-pledge")

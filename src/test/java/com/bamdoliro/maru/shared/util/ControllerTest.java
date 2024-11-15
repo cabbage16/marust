@@ -261,7 +261,7 @@ public abstract class ControllerTest {
     protected GenerateAllAdmissionTicketUseCase generateAllAdmissionTicketUseCase;
 
     @MockBean
-    protected DownloadAdmissionAndPledgeUseCase downloadAdmissionAndPledgeUseCase;
+    protected DownloadAdmissionAndPledgeFormatUseCase downloadAdmissionAndPledgeFormatUseCase;
 
     @MockBean
     protected UploadAdmissionAndPledgeUseCase uploadAdmissionAndPledgeUseCase;

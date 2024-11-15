@@ -25,10 +25,10 @@ import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class DownloadAdmissionAndPledgeUseCaseTest {
+public class DownloadAdmissionAndPledgeFormatUseCaseTest {
 
     @InjectMocks
-    private DownloadAdmissionAndPledgeUseCase downloadAdmissionAndPledgeUseCase;
+    private DownloadAdmissionAndPledgeFormatUseCase downloadAdmissionAndPledgeFormatUseCase;
 
     @Mock
     private FormFacade formFacade;
@@ -54,7 +54,7 @@ public class DownloadAdmissionAndPledgeUseCaseTest {
         willDoNothing().given(mergePdfService).execute(any(PdfMerger.class), any(ByteArrayOutputStream.class));
 
         //when
-        downloadAdmissionAndPledgeUseCase.execute(user);
+        downloadAdmissionAndPledgeFormatUseCase.execute(user);
 
         //then
         verify(formFacade, times(1)).getForm(user);
@@ -71,7 +71,7 @@ public class DownloadAdmissionAndPledgeUseCaseTest {
         given(formFacade.getForm(user)).willReturn(form);
 
         //when and then
-        assertThrows(InvalidFormStatusException.class, () -> downloadAdmissionAndPledgeUseCase.execute(user));
+        assertThrows(InvalidFormStatusException.class, () -> downloadAdmissionAndPledgeFormatUseCase.execute(user));
 
         //then
         verify(formFacade, times(1)).getForm(user);
@@ -91,7 +91,7 @@ public class DownloadAdmissionAndPledgeUseCaseTest {
         doThrow(FailedToExportPdfException.class).when(generatePdfService).execute(any(String.class));
 
         //when and then
-        assertThrows(FailedToExportPdfException.class, () -> downloadAdmissionAndPledgeUseCase.execute(user));
+        assertThrows(FailedToExportPdfException.class, () -> downloadAdmissionAndPledgeFormatUseCase.execute(user));
 
         //then
         verify(formFacade, times(1)).getForm(user);

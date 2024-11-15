@@ -30,7 +30,6 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
@@ -1135,7 +1134,7 @@ class FormControllerTest extends RestDocsTestSupport {
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        given(downloadAdmissionAndPledgeUseCase.execute(user)).willReturn(new ByteArrayResource(file.getBytes()));
+        given(downloadAdmissionAndPledgeFormatUseCase.execute(user)).willReturn(new ByteArrayResource(file.getBytes()));
 
         mockMvc.perform(get("/form/admission-and-pledge")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
@@ -1150,7 +1149,7 @@ class FormControllerTest extends RestDocsTestSupport {
                         )
                 ));
 
-        verify(downloadAdmissionAndPledgeUseCase, times(1)).execute(user);
+        verify(downloadAdmissionAndPledgeFormatUseCase, times(1)).execute(user);
     }
 
     @Test
@@ -1159,7 +1158,7 @@ class FormControllerTest extends RestDocsTestSupport {
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        doThrow(new InvalidFormStatusException()).when(downloadAdmissionAndPledgeUseCase).execute(user);
+        doThrow(new InvalidFormStatusException()).when(downloadAdmissionAndPledgeFormatUseCase).execute(user);
 
         mockMvc.perform(get("/form/admission-and-pledge")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
@@ -1169,7 +1168,7 @@ class FormControllerTest extends RestDocsTestSupport {
 
                 .andDo(restDocs.document());
 
-        verify(downloadAdmissionAndPledgeUseCase, times(1)).execute(user);
+        verify(downloadAdmissionAndPledgeFormatUseCase, times(1)).execute(user);
     }
 
     @Test
@@ -1178,7 +1177,7 @@ class FormControllerTest extends RestDocsTestSupport {
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        doThrow(new FailedToExportPdfException()).when(downloadAdmissionAndPledgeUseCase).execute(user);
+        doThrow(new FailedToExportPdfException()).when(downloadAdmissionAndPledgeFormatUseCase).execute(user);
 
         mockMvc.perform(get("/form/admission-and-pledge")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
@@ -1189,7 +1188,7 @@ class FormControllerTest extends RestDocsTestSupport {
 
                 .andDo(restDocs.document());
 
-        verify(downloadAdmissionAndPledgeUseCase, times(1)).execute(user);
+        verify(downloadAdmissionAndPledgeFormatUseCase, times(1)).execute(user);
     }
 
     @Test

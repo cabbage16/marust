@@ -21,7 +21,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @UseCase
-public class DownloadAdmissionAndPledgeUseCase {
+public class DownloadAdmissionAndPledgeFormatUseCase {
 
     private final MergePdfService mergePdfService;
     private final FormFacade formFacade;
