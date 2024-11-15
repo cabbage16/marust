@@ -7,19 +7,11 @@ import com.bamdoliro.maru.application.analysis.QuerySchoolStatusUseCase;
 import com.bamdoliro.maru.application.auth.LogInUseCase;
 import com.bamdoliro.maru.application.auth.LogOutUseCase;
 import com.bamdoliro.maru.application.auth.RefreshTokenUseCase;
-import com.bamdoliro.maru.application.fair.AttendAdmissionFairUseCase;
-import com.bamdoliro.maru.application.fair.CreateAdmissionFairUseCase;
-import com.bamdoliro.maru.application.fair.ExportAttendeeListUseCase;
-import com.bamdoliro.maru.application.fair.QueryFairDetailUseCase;
-import com.bamdoliro.maru.application.fair.QueryFairListUseCase;
+import com.bamdoliro.maru.application.fair.*;
 import com.bamdoliro.maru.application.form.*;
 import com.bamdoliro.maru.application.message.SendMessageUseCase;
 import com.bamdoliro.maru.application.notice.*;
-import com.bamdoliro.maru.application.question.CreateQuestionUseCase;
-import com.bamdoliro.maru.application.question.DeleteQuestionUseCase;
-import com.bamdoliro.maru.application.question.QueryQuestionListUseCase;
-import com.bamdoliro.maru.application.question.QueryQuestionUseCase;
-import com.bamdoliro.maru.application.question.UpdateQuestionUseCase;
+import com.bamdoliro.maru.application.question.*;
 import com.bamdoliro.maru.application.school.SearchSchoolUseCase;
 import com.bamdoliro.maru.application.user.SendVerificationUseCase;
 import com.bamdoliro.maru.application.user.SignUpUserUseCase;
@@ -267,6 +259,12 @@ public abstract class ControllerTest {
 
     @MockBean
     protected GenerateAllAdmissionTicketUseCase generateAllAdmissionTicketUseCase;
+
+    @MockBean
+    protected DownloadAdmissionAndPledgeFormatUseCase downloadAdmissionAndPledgeFormatUseCase;
+
+    @MockBean
+    protected UploadAdmissionAndPledgeUseCase uploadAdmissionAndPledgeUseCase;
 
     protected String toJson(Object object) throws JsonProcessingException {
         return objectMapper.writeValueAsString(object);
