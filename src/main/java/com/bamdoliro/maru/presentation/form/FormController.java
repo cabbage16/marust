@@ -122,12 +122,11 @@ public class FormController {
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PatchMapping("/{form-id}/enter")
+    @PatchMapping("/enter")
     public void enterForm(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user,
-            @PathVariable(name = "form-id") Long formId
+            @AuthenticationPrincipal(authority = Authority.USER) User user
     ) {
-        enterFormUseCase.execute(formId);
+        enterFormUseCase.execute(user);
     }
 
     @GetMapping("/review")
