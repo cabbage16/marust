@@ -59,7 +59,7 @@ public class DownloadAdmissionAndPledgeFormatUseCase {
     }
 
     private void validate(Form form) {
-        if (!form.isPassedNow())
+        if (!form.isPassedNow() && !form.isEntered())
             throw new InvalidFormStatusException();
     }
 }

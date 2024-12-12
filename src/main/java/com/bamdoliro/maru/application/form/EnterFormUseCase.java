@@ -4,24 +4,22 @@ import com.bamdoliro.maru.domain.form.domain.Form;
 import com.bamdoliro.maru.domain.form.exception.InvalidFormStatusException;
 import com.bamdoliro.maru.domain.form.service.FormFacade;
 import com.bamdoliro.maru.domain.user.domain.User;
-import com.bamdoliro.maru.infrastructure.s3.FileService;
-import com.bamdoliro.maru.infrastructure.s3.constants.FolderConstant;
-import com.bamdoliro.maru.infrastructure.s3.dto.response.UrlResponse;
 import com.bamdoliro.maru.shared.annotation.UseCase;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @UseCase
-public class UploadAdmissionAndPledgeUseCase {
+public class EnterFormUseCase {
 
-    private final FileService fileService;
     private final FormFacade formFacade;
 
-    public UrlResponse execute(User user) {
+    @Transactional
+    public void execute(User user) {
         Form form = formFacade.getForm(user);
         validate(form);
 
-        return fileService.getPresignedUrl(FolderConstant.ADMISSION_AND_PLEDGE, user.getUuid().toString());
+        form.enter();
     }
 
     private void validate(Form form) {

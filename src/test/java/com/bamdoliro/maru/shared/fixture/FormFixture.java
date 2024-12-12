@@ -32,16 +32,7 @@ import com.bamdoliro.maru.presentation.form.dto.request.ParentRequest;
 import com.bamdoliro.maru.presentation.form.dto.request.SubjectRequest;
 import com.bamdoliro.maru.presentation.form.dto.request.SubmitFormRequest;
 import com.bamdoliro.maru.presentation.form.dto.request.UpdateFormRequest;
-import com.bamdoliro.maru.presentation.form.dto.response.ApplicantResponse;
-import com.bamdoliro.maru.presentation.form.dto.response.AttendanceResponse;
-import com.bamdoliro.maru.presentation.form.dto.response.DocumentResponse;
-import com.bamdoliro.maru.presentation.form.dto.response.EducationResponse;
-import com.bamdoliro.maru.presentation.form.dto.response.FormResponse;
-import com.bamdoliro.maru.presentation.form.dto.response.FormSimpleResponse;
-import com.bamdoliro.maru.presentation.form.dto.response.FormUrlResponse;
-import com.bamdoliro.maru.presentation.form.dto.response.GradeResponse;
-import com.bamdoliro.maru.presentation.form.dto.response.ParentResponse;
-import com.bamdoliro.maru.presentation.form.dto.response.SubjectResponse;
+import com.bamdoliro.maru.presentation.form.dto.response.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -614,6 +605,15 @@ public class FormFixture {
                 formUrlVo.getExaminationNumber(),
                 formUrlVo.getName(),
                 "https://maru.bamdoliro.com/form.pdf"
+        );
+    }
+
+    public static AdmissionAndPledgeUrlResponse createAdmissionAndPledgeUrlResponse() {
+        FormUrlVo formUrlVo = createFormUrlVo();
+        return new AdmissionAndPledgeUrlResponse(
+                formUrlVo.getExaminationNumber(),
+                formUrlVo.getName(),
+                "https://maru.bamdoliro.com/admission-and-pledge.pdf"
         );
     }
 }
