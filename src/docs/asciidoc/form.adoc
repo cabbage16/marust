@@ -131,6 +131,27 @@ include::{snippets}/form-controller-test/원서를_반려한다/http-response.ad
 ===== 해당하는 원서가 없는 경우
 include::{snippets}/form-controller-test/원서를_반려할_때_원서가_없으면_에러가_발생한다/http-response.adoc[]
 
+=== 원서 입학등록
+최종합격한 유저는 입학등록원을 제출한 후 원서를 입학등록상태로 변경할 수 있습니다.
+
+==== 요청 형식
+===== Request Header
+include::{snippets}/form-controller-test/원서의_상태를_입학등록원_제출로_변경한다/request-headers.adoc[]
+
+==== 요청
+include::{snippets}/form-controller-test/원서의_상태를_입학등록원_제출로_변경한다/http-request.adoc[]
+
+==== 응답
+
+===== 정상 응답
+include::{snippets}/form-controller-test/원서의_상태를_입학등록원_제출로_변경한다/http-response.adoc[]
+
+===== 원서 상태가 적합하지 않은 경우
+include::{snippets}/form-controller-test/입학등록원을_제출했거나_최종합격한_지원자가_아닌_지원자가_원서의_상태를_변경하면_에러가_발생한다/http-response.adoc[]
+
+===== 원서가 존재하지 않는 경우
+include::{snippets}/form-controller-test/원서를_입학등록_상태로_변경할_때_원서가_없으면_에러가_발생한다/http-response.adoc[]
+
 === 원서 접수
 어드민은 서류 원본을 받은 후 원서를 검토해 최종 접수할 수 있습니다.
 
