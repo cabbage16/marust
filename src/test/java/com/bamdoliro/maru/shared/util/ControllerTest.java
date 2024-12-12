@@ -106,6 +106,9 @@ public abstract class ControllerTest {
     protected ReceiveFormUseCase receiveFormUseCase;
 
     @MockBean
+    protected EnterFormUseCase enterFormUseCase;
+
+    @MockBean
     protected QuerySubmittedFormUseCase querySubmittedFormUseCase;
 
     @MockBean

@@ -1260,6 +1260,69 @@ class FormControllerTest extends RestDocsTestSupport {
     }
 
     @Test
+    void 원서의_상태를_입학등록원_제출로_변경한다() throws Exception {
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        willDoNothing().given(enterFormUseCase).execute(user);
+
+        mockMvc.perform(patch("/form/enter")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+
+                .andExpect(status().isNoContent())
+
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("Bearer token")
+                        )
+                ));
+    }
+
+    @Test
+    void 입학등록원을_제출했거나_최종합격한_지원자가_아닌_지원자가_원서의_상태를_변경하면_에러가_발생한다() throws Exception {
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new InvalidFormStatusException()).when(enterFormUseCase).execute(user);
+
+        mockMvc.perform(patch("/form/enter")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+
+                .andExpect(status().isConflict())
+
+                .andDo(restDocs.document());
+
+        verify(enterFormUseCase, times(1)).execute(user);
+    }
+
+    @Test
+    void 원서를_입학등록_상태로_변경할_때_원서가_없으면_에러가_발생한다() throws Exception {
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new FormNotFoundException()).when(enterFormUseCase).execute(user);
+
+        mockMvc.perform(patch("/form/enter")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+
+                .andExpect(status().isNotFound())
+
+                .andDo(restDocs.document());
+
+        verify(enterFormUseCase, times(1)).execute(user);
+    }
+
+    @Test
     void 원서를_pdf로_다운받는다() throws Exception {
         User user = UserFixture.createUser();
         MockMultipartFile file = new MockMultipartFile(
