@@ -2110,4 +2110,40 @@ class FormControllerTest extends RestDocsTestSupport {
 
         verify(selectSecondPassUseCase, times(1)).execute();
     }
+
+    @Test
+    void 선택한_원서들의_입학등록원_및_금연서약서url을_조회한다() throws Exception {
+        User user = UserFixture.createAdminUser();
+        List<Long> idList = List.of(1L, 2L, 3L, 4L, 5L);
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        given(queryAdmissionAndPledgeUrlUseCase.execute(idList)).willReturn(
+                List.of(FormFixture.createAdmissionAndPledgeUrlResponse(),
+                        FormFixture.createAdmissionAndPledgeUrlResponse(),
+                        FormFixture.createAdmissionAndPledgeUrlResponse(),
+                        FormFixture.createAdmissionAndPledgeUrlResponse(),
+                        FormFixture.createAdmissionAndPledgeUrlResponse())
+        );
+
+        mockMvc.perform(get("/form/admission-and-pledge-url")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .param("id-list", "1,2,3,4,5")
+                        .accept(MediaType.APPLICATION_JSON))
+
+                .andExpect(status().isOk())
+
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("Bearer token")
+                        ),
+                        queryParameters(
+                                parameterWithName("id-list")
+                                        .description("조회할 원서 id 목록")
+                        )
+                ));
+
+        verify(queryAdmissionAndPledgeUrlUseCase, times(1)).execute(idList);
+    }
 }
