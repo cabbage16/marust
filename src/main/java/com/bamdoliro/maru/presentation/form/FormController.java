@@ -8,10 +8,7 @@ import com.bamdoliro.maru.infrastructure.s3.dto.response.UrlResponse;
 import com.bamdoliro.maru.presentation.form.dto.request.PassOrFailFormListRequest;
 import com.bamdoliro.maru.presentation.form.dto.request.SubmitFormRequest;
 import com.bamdoliro.maru.presentation.form.dto.request.UpdateFormRequest;
-import com.bamdoliro.maru.presentation.form.dto.response.FormResponse;
-import com.bamdoliro.maru.presentation.form.dto.response.FormResultResponse;
-import com.bamdoliro.maru.presentation.form.dto.response.FormSimpleResponse;
-import com.bamdoliro.maru.presentation.form.dto.response.FormUrlResponse;
+import com.bamdoliro.maru.presentation.form.dto.response.*;
 import com.bamdoliro.maru.shared.auth.AuthenticationPrincipal;
 import com.bamdoliro.maru.shared.auth.Authority;
 import com.bamdoliro.maru.shared.response.CommonResponse;
@@ -76,6 +73,7 @@ public class FormController {
     private final SelectSecondPassUseCase selectSecondPassUseCase;
     private final UpdateOriginalTypeUseCase updateOriginalTypeUseCase;
     private final GenerateAllAdmissionTicketUseCase generateAllAdmissionTicketUseCase;
+    private final QueryAdmissionAndPledgeUrlUseCase queryAdmissionAndPledgeUrlUseCase;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
@@ -168,7 +166,7 @@ public class FormController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = "/identification-picture")
+    @PostMapping( "/identification-picture")
     public SingleCommonResponse<UrlResponse> uploadIdentificationPicture(
             @AuthenticationPrincipal(authority = Authority.USER) User user
     ) {
@@ -178,7 +176,7 @@ public class FormController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = "/form-document")
+    @PostMapping("/form-document")
     public SingleCommonResponse<UrlResponse> uploadFormDocument(
             @AuthenticationPrincipal(authority = Authority.USER) User user
     ) {
@@ -187,7 +185,7 @@ public class FormController {
         );
     }
 
-    @GetMapping(value = "/export")
+    @GetMapping("/export")
     public ResponseEntity<Resource> exportForm(
             @AuthenticationPrincipal(authority = Authority.USER) User user,
             Model model
@@ -198,7 +196,7 @@ public class FormController {
                 .body(exportFormUseCase.execute(user));
     }
 
-    @GetMapping(value = "/admission-and-pledge")
+    @GetMapping( "/admission-and-pledge")
     public ResponseEntity<Resource> downloadAdmissionAndPledgeFormat(
             @AuthenticationPrincipal(authority = Authority.USER) User user
     ) {
@@ -207,7 +205,7 @@ public class FormController {
                 .body(downloadAdmissionAndPledgeFormatUseCase.execute(user));
     }
 
-    @PostMapping(value = "/admission-and-pledge")
+    @PostMapping("/admission-and-pledge")
     public SingleCommonResponse<UrlResponse> uploadAdmissionAndPledge(
             @AuthenticationPrincipal(authority = Authority.USER) User user
     ) {
@@ -343,6 +341,17 @@ public class FormController {
     ) {
         return CommonResponse.ok(
                 queryFormUrlUseCase.execute(formIdList)
+        );
+    }
+
+
+    @GetMapping("/admission-and-pledge-url")
+    public ListCommonResponse<AdmissionAndPledgeUrlResponse> getAdmissionAndPledgeUrl(
+            @AuthenticationPrincipal(authority = Authority.ADMIN) User user,
+            @RequestParam(name = "id-list") List<Long> formIdList
+    ) {
+        return CommonResponse.ok(
+                queryAdmissionAndPledgeUrlUseCase.execute(formIdList)
         );
     }
 
