@@ -679,7 +679,22 @@ include::{snippets}/form-controller-test/선택한_원서의_원서url을_조회
 ===== 정상 응답
 include::{snippets}/form-controller-test/선택한_원서의_원서url을_조회한다/http-response.adoc[]
 
+=== 선택한 원서의 입락등록원 및 금연서약서 url 조회
+어드민은 선택한 원서의 입학등록원 및 금연서약서 url을 조회할 수 있습니다.
 
+==== 요청 형식
+===== Request Header
+include::{snippets}/form-controller-test/선택한_원서들의_입학등록원_및_금연서약서url을_조회한다/request-headers.adoc[]
+
+===== Query Parameter
+include::{snippets}/form-controller-test/선택한_원서들의_입학등록원_및_금연서약서url을_조회한다/query-parameters.adoc[]
+
+==== 요청
+include::{snippets}/form-controller-test/선택한_원서들의_입학등록원_및_금연서약서url을_조회한다/http-request.adoc[]
+
+==== 응답
+===== 정상 응답
+include::{snippets}/form-controller-test/선택한_원서들의_입학등록원_및_금연서약서url을_조회한다/http-response.adoc[]
 
 === 2차 합격 자동 처리
 
