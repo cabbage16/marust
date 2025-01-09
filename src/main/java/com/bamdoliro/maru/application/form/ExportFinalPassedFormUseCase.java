@@ -27,7 +27,7 @@ public class ExportFinalPassedFormUseCase {
     private final XlsxService xlsxService;
 
     public Resource execute() throws IOException {
-        List<Form> formList = formFacade.getSortedFormList(FormStatus.PASSED);
+        List<Form> formList = formFacade.getSortedFormList(FormStatus.ENTERED);
         Workbook workbook = xlsxService.openTemplate("최종합격자");
         Sheet sheet = workbook.getSheetAt(0);
 
