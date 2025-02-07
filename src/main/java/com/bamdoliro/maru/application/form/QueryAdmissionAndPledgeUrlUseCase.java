@@ -22,7 +22,7 @@ public class QueryAdmissionAndPledgeUrlUseCase {
                 .map(vo -> new AdmissionAndPledgeUrlResponse(
                         vo.getExaminationNumber(),
                         vo.getName(),
-                        fileService.getPresignedUrl(FolderConstant.ADMISSION_AND_PLEDGE, vo.getUuid()).getDownloadUrl()
+                        fileService.getDownloadPresignedUrl(FolderConstant.ADMISSION_AND_PLEDGE, vo.getUuid())
                 )).toList();
     }
 }
