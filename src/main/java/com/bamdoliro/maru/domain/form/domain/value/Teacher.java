@@ -1,10 +1,7 @@
 package com.bamdoliro.maru.domain.form.domain.value;
 
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.Embedded;
+import com.bamdoliro.maru.infrastructure.persistence.converter.StringEncryptedConverter;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,18 +13,19 @@ import lombok.NoArgsConstructor;
 @Embeddable
 public class Teacher {
 
-    @Column(name = "teacher_name", nullable = true, length = 20)
+    @Convert(converter = StringEncryptedConverter.class)
+    @Column(name = "teacher_name", nullable = true)
     private String name;
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "value", column = @Column(name = "teacher_phone_number", nullable = true, length = 11)),
+            @AttributeOverride(name = "value", column = @Column(name = "teacher_phone_number", nullable = true)),
     })
     private PhoneNumber phoneNumber;
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "value", column = @Column(name = "teacher_mobile_phone_number", nullable = true, length = 11)),
+            @AttributeOverride(name = "value", column = @Column(name = "teacher_mobile_phone_number", nullable = true)),
     })
     private PhoneNumber mobilePhoneNumber;
 }
