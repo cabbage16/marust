@@ -8,9 +8,9 @@ import com.amazonaws.services.s3.model.*;
 import com.bamdoliro.maru.infrastructure.s3.dto.response.UrlResponse;
 import com.bamdoliro.maru.infrastructure.s3.exception.FailedToSaveException;
 import com.bamdoliro.maru.infrastructure.s3.validator.FileValidator;
+import com.bamdoliro.maru.infrastructure.s3.dto.request.FileMetadata;
 import com.bamdoliro.maru.shared.config.properties.S3Properties;
 import lombok.RequiredArgsConstructor;
-import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,9 +29,10 @@ public class FileService {
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucket;
 
-    @Deprecated
+
+    /** @deprecated */
     public UrlResponse execute(MultipartFile file, String folder, String fileName, FileValidator validator) {
-        validator.validate(file);
+//        validator.validate(file);
         String fullFileName = createFileName(folder, fileName);
 
         try {
@@ -53,9 +54,10 @@ public class FileService {
         );
     }
 
-    public String getUploadPresignedUrl(String folder, String fileName) {
+    public String getUploadPresignedUrl(String folder, String fileName, FileMetadata fileMetadata, FileValidator validator) {
+        validator.validate(fileMetadata);
         String fullFileName = createFileName(folder, fileName);
-        GeneratePresignedUrlRequest request = getGenerateUploadPresignedUrlRequest(bucket, fullFileName);
+        GeneratePresignedUrlRequest request = getGenerateUploadPresignedUrlRequest(bucket, fullFileName, fileMetadata);
 
         return amazonS3Client.generatePresignedUrl(request).toString();
     }
@@ -67,19 +69,20 @@ public class FileService {
         return request != null ? amazonS3Client.generatePresignedUrl(request).toString() : null;
     }
 
-    public UrlResponse getPresignedUrl(String folder, String fileName) {
+    public UrlResponse getPresignedUrl(String folder, String fileName, FileMetadata request, FileValidator validator) {
         return new UrlResponse(
-                getUploadPresignedUrl(folder, fileName),
+                getUploadPresignedUrl(folder, fileName, request, validator),
                 getDownloadPresignedUrl(folder, fileName)
         );
     }
 
-    private GeneratePresignedUrlRequest getGenerateUploadPresignedUrlRequest(String bucket, String fileName) {
+    private GeneratePresignedUrlRequest getGenerateUploadPresignedUrlRequest(String bucket, String fileName, FileMetadata fileMetadata) {
         GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucket, fileName)
                 .withMethod(HttpMethod.PUT)
                 .withExpiration(getPresignedUrlExpiration(3));
 
-        request.putCustomRequestHeader(Headers.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
+        request.putCustomRequestHeader(Headers.CONTENT_TYPE, fileMetadata.getMediaType().toString());
+        request.putCustomRequestHeader(Headers.CONTENT_LENGTH, fileMetadata.getFileSize().toString());
 
         return request;
     }

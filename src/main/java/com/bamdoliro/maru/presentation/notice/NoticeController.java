@@ -2,8 +2,8 @@ package com.bamdoliro.maru.presentation.notice;
 
 import com.bamdoliro.maru.application.notice.*;
 import com.bamdoliro.maru.domain.user.domain.User;
+import com.bamdoliro.maru.infrastructure.s3.dto.request.FileMetadata;
 import com.bamdoliro.maru.presentation.notice.dto.request.NoticeRequest;
-import com.bamdoliro.maru.presentation.notice.dto.request.UploadFileRequest;
 import com.bamdoliro.maru.presentation.notice.dto.response.NoticeResponse;
 import com.bamdoliro.maru.presentation.notice.dto.response.NoticeSimpleResponse;
 import com.bamdoliro.maru.presentation.notice.dto.response.UploadFileResponse;
@@ -17,6 +17,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("/notice")
@@ -43,10 +45,10 @@ public class NoticeController {
     @PostMapping("/file")
     public ListCommonResponse<UploadFileResponse> uploadFile(
             @AuthenticationPrincipal(authority = Authority.ADMIN) User user,
-            @RequestBody @Valid UploadFileRequest request
-    ) {
+            @RequestBody @Valid List<FileMetadata> metadataList
+            ) {
         return SingleCommonResponse.ok(
-                uploadFileUseCase.execute(request)
+                uploadFileUseCase.execute(metadataList)
         );
     }
 
