@@ -24,6 +24,3 @@ public class StringEncryptedConverter implements AttributeConverter<String, Stri
         return encryptor.decrypt(dbData);
     }
 }
-
-// l6pQc06QoRgqHM80oHb8YB2MOqIhzj0w
-// 8Ec4dp03bCD47I0DZai9MiOnynlmZ7OW
