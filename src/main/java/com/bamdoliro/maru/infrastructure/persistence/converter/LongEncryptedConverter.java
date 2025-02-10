@@ -26,5 +26,4 @@ public class LongEncryptedConverter implements AttributeConverter<Long, String> 
         }
         return Long.valueOf(encryptor.decrypt(dbData));
     }
-
 }

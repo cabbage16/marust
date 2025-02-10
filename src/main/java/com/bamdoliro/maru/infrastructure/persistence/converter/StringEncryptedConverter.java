@@ -13,14 +13,10 @@ public class StringEncryptedConverter implements AttributeConverter<String, Stri
 
     @Override
     public String convertToDatabaseColumn(String attribute) {
-        System.out.println("attribute = " + attribute);
-        System.out.println("encryptor = " + encryptor.encrypt(attribute));
         return encryptor.encrypt(attribute);
     }
     @Override
     public String convertToEntityAttribute(String dbData) {
-        System.out.println("dbData = " + dbData);
-        System.out.println("decryptor = " + encryptor.decrypt(dbData));
         return encryptor.decrypt(dbData);
     }
 }
