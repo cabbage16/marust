@@ -51,6 +51,11 @@ spring:
     multipart:
       max-file-size: 10MB
 
+  jasypt:
+    encryptor:
+      key: ${ENCRYPTION_PASSWORD}
+      salt: ${ENCRYPTION_SALT}
+
 jwt:
   refresh-expiration-time: 1296000000 # 15일
   access-expiration-time: 3600000 # 1시간
@@ -113,5 +118,6 @@ spring:
       host: localhost
       port: 6379
       password: bamdoliro
+
 
 debug: false

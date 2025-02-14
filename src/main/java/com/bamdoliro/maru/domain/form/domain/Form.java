@@ -11,19 +11,9 @@ import com.bamdoliro.maru.domain.form.domain.value.Parent;
 import com.bamdoliro.maru.domain.form.domain.value.Score;
 import com.bamdoliro.maru.domain.form.service.CalculateFormScoreService;
 import com.bamdoliro.maru.domain.user.domain.User;
+import com.bamdoliro.maru.infrastructure.persistence.converter.LongEncryptedConverter;
 import com.bamdoliro.maru.shared.entity.BaseTimeEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
@@ -37,6 +27,7 @@ public class Form extends BaseTimeEntity {
     @Id
     private Long id;
 
+    @Convert(converter = LongEncryptedConverter.class)
     @Column(nullable = true, unique = true)
     private Long examinationNumber;
 
