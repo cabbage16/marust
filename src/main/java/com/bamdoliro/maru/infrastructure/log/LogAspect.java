@@ -6,7 +6,6 @@ import com.bamdoliro.maru.domain.user.domain.type.Authority;
 import com.bamdoliro.maru.domain.user.service.UserFacade;
 import com.bamdoliro.maru.infrastructure.persistence.log.AdminLoginLogRepository;
 import com.bamdoliro.maru.presentation.auth.dto.request.LogInRequest;
-import com.bamdoliro.maru.presentation.auth.dto.response.TokenResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
@@ -33,12 +32,20 @@ public class LogAspect {
 
         if (user.getAuthority() == Authority.ADMIN) {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-            String clientIp = request.getRemoteAddr();
+            String clientIp = request.getHeader("X-Forwarded-For");
+
+            if (clientIp != null)
+                clientIp = clientIp.split(",")[0];
+            else
+                clientIp = request.getRemoteAddr();
+
             String userAgent = request.getHeader("User-Agent");
+
+            if (userAgent == null)
+                userAgent = "Unknown";
 
             AdminLoginLog log = new AdminLoginLog(phoneNumber, clientIp, userAgent, user);
             adminLoginLogRepository.save(log);
-
         }
     }
 }
