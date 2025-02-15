@@ -1,6 +1,9 @@
 package com.bamdoliro.maru.application.form;
 
+import com.bamdoliro.maru.domain.form.domain.Form;
+import com.bamdoliro.maru.domain.form.exception.InvalidFormStatusException;
 import com.bamdoliro.maru.domain.user.domain.User;
+import com.bamdoliro.maru.infrastructure.persistence.form.FormRepository;
 import com.bamdoliro.maru.infrastructure.s3.FileService;
 import com.bamdoliro.maru.infrastructure.s3.constants.FolderConstant;
 import com.bamdoliro.maru.infrastructure.s3.dto.request.FileMetadata;
@@ -11,6 +14,8 @@ import com.bamdoliro.maru.shared.annotation.UseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 
+import java.util.Optional;
+
 import static com.bamdoliro.maru.shared.constants.FileConstant.MB;
 
 @RequiredArgsConstructor
@@ -18,8 +23,12 @@ import static com.bamdoliro.maru.shared.constants.FileConstant.MB;
 public class UploadFormUseCase {
 
     private final FileService fileService;
+    private final FormRepository formRepository;
 
     public UrlResponse execute(User user, FileMetadata fileMetadata) {
+        Optional<Form> form = formRepository.findByUser(user);
+        form.ifPresent(this::validateFormStatus);
+
         return fileService.getPresignedUrl(FolderConstant.FORM, user.getUuid().toString(), fileMetadata, metadata -> {
             if (!metadata.getMediaType().equals(MediaType.APPLICATION_PDF)) {
                 throw new MediaTypeMismatchException();
@@ -29,5 +38,11 @@ public class UploadFormUseCase {
                 throw new FileSizeLimitExceededException();
             }
         });
+    }
+
+    private void validateFormStatus(Form form) {
+        if (!form.isRejected()) {
+            throw new InvalidFormStatusException();
+        }
     }
 }
