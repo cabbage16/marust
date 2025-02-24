@@ -344,4 +344,13 @@ public class FormRepositoryImpl implements FormRepositoryCustom {
                 .orderBy(form.applicant.name.asc())
                 .fetch();
     }
+
+    @Override
+    public List<Long> findAllExaminationNumber() {
+        return queryFactory
+                .select(form.examinationNumber)
+                .from(form)
+                .orderBy(form.examinationNumber.desc())
+                .fetch();
+    }
 }
