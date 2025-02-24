@@ -3,6 +3,7 @@ package com.bamdoliro.maru.application.notice;
 import com.bamdoliro.maru.infrastructure.s3.FileService;
 import com.bamdoliro.maru.infrastructure.s3.constants.FolderConstant;
 import com.bamdoliro.maru.infrastructure.s3.dto.request.FileMetadata;
+import com.bamdoliro.maru.infrastructure.s3.exception.FileCountLimitExceededException;
 import com.bamdoliro.maru.presentation.notice.dto.response.UploadFileResponse;
 import com.bamdoliro.maru.shared.annotation.UseCase;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class UploadFileUseCase {
 
     public void validate(List<FileMetadata> metadataList) {
         if (metadataList.isEmpty() || metadataList.size() > 3) {
-            throw new IllegalArgumentException("metadataList must contain 1~3 elements");
+            throw new FileCountLimitExceededException(3);
         }
     }
 }

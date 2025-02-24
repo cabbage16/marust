@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.http.MediaType;
 
 @Getter
 @NoArgsConstructor
@@ -15,8 +14,8 @@ public class FileMetadata {
     @NotBlank(message = "필수값입니다.")
     private String fileName;
 
-    @NotNull(message = "필수값입니다.")
-    private MediaType mediaType;
+    @NotBlank(message = "필수값입니다.")
+    private String mediaType;
 
     @NotNull(message = "필수값입니다.")
     private Long fileSize;

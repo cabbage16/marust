@@ -50,7 +50,7 @@ public class FileService {
                 .withMethod(HttpMethod.PUT)
                 .withExpiration(getPresignedUrlExpiration(3));
 
-        request.putCustomRequestHeader(Headers.CONTENT_TYPE, fileMetadata.getMediaType().toString());
+        request.putCustomRequestHeader(Headers.CONTENT_TYPE, fileMetadata.getMediaType());
         request.putCustomRequestHeader(Headers.CONTENT_LENGTH, fileMetadata.getFileSize().toString());
 
         return request;
