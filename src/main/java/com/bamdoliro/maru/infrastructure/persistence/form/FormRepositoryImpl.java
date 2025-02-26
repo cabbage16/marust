@@ -341,4 +341,13 @@ public class FormRepositoryImpl implements FormRepositoryCustom {
                 .where(form.education.school.location.eq("부산광역시").not())
                 .fetch();
     }
+
+    @Override
+    public List<Long> findAllExaminationNumber() {
+        return queryFactory
+                .select(form.examinationNumber)
+                .from(form)
+                .orderBy(form.examinationNumber.desc())
+                .fetch();
+    }
 }
