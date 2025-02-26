@@ -26,7 +26,6 @@ public class FormRepositoryImpl implements FormRepositoryCustom {
         return queryFactory
                 .selectFrom(form)
                 .where(eqStatus(status))
-                .orderBy(form.examinationNumber.asc())
                 .fetch();
     }
 
@@ -327,7 +326,6 @@ public class FormRepositoryImpl implements FormRepositoryCustom {
                 .where(form.education.school.address.contains(keyword)
                         .or(form.education.school.location.eq(keyword))
                         .and(form.status.in(round)))
-                .orderBy(form.applicant.name.asc())
                 .fetch();
     }
 
@@ -341,7 +339,6 @@ public class FormRepositoryImpl implements FormRepositoryCustom {
                 ))
                 .from(form)
                 .where(form.education.school.location.eq("부산광역시").not())
-                .orderBy(form.applicant.name.asc())
                 .fetch();
     }
 }
