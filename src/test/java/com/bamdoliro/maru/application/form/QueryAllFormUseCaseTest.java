@@ -40,6 +40,8 @@ class QueryAllFormUseCaseTest {
                 FormFixture.createForm(FormType.MULTI_CHILDREN)
         );
 
+        formList.forEach(form -> form.assignExaminationNumber(1001L));
+
         given(formRepository.findByStatus(null)).willReturn(formList);
 
         // when
@@ -61,6 +63,8 @@ class QueryAllFormUseCaseTest {
                 FormFixture.createForm(FormType.MULTI_CHILDREN)
         );
 
+        formList.forEach(form -> form.assignExaminationNumber(1001L));
+
         given(formRepository.findByStatus(null)).willReturn(formList);
 
         // when
@@ -81,6 +85,8 @@ class QueryAllFormUseCaseTest {
                 FormFixture.createForm(FormType.MEISTER_TALENT),
                 FormFixture.createForm(FormType.MULTI_CHILDREN)
         );
+
+        formList.forEach(form -> form.assignExaminationNumber(1001L));
 
         given(formRepository.findByStatus(null)).willReturn(formList);
 
