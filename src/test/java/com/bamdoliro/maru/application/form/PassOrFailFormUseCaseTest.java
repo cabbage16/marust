@@ -11,11 +11,11 @@ import com.bamdoliro.maru.presentation.form.dto.request.PassOrFailFormListReques
 import com.bamdoliro.maru.presentation.form.dto.request.PassOrFailFormRequest;
 import com.bamdoliro.maru.shared.fixture.FormFixture;
 import com.bamdoliro.maru.shared.fixture.UserFixture;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
