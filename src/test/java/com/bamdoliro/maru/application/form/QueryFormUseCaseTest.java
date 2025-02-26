@@ -7,6 +7,7 @@ import com.bamdoliro.maru.domain.form.exception.FormNotFoundException;
 import com.bamdoliro.maru.domain.form.service.FormFacade;
 import com.bamdoliro.maru.domain.user.domain.User;
 import com.bamdoliro.maru.infrastructure.s3.FileService;
+import com.bamdoliro.maru.infrastructure.s3.constants.FolderConstant;
 import com.bamdoliro.maru.presentation.form.dto.response.FormResponse;
 import com.bamdoliro.maru.shared.fixture.FormFixture;
 import com.bamdoliro.maru.shared.fixture.SharedFixture;
@@ -46,7 +47,8 @@ class QueryFormUseCaseTest {
 
         
         given(formFacade.getForm(id)).willReturn(form);
-        given(fileService.getPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createFormUrlResponse());
+        given(fileService.getDownloadPresignedUrl(FolderConstant.IDENTIFICATION_PICTURE, any(String.class))).willReturn(SharedFixture.createIdentificationPictureUrlResponse().getDownloadUrl());
+        given(fileService.getDownloadPresignedUrl(FolderConstant.FORM, any(String.class))).willReturn(SharedFixture.createFormUrlResponse().getDownloadUrl());
 
         // when
         FormResponse response = queryFormUseCase.execute(user, id);

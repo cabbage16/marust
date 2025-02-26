@@ -41,7 +41,7 @@ public class QueryAdmissionAndPledgeUrlUseCaseTest {
                 FormFixture.createFormUrlVo(),
                 FormFixture.createFormUrlVo()
         ));
-        given(fileService.getPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createAdmissionAndPledgeUrlResponse());
+        given(fileService.getDownloadPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createAdmissionAndPledgeUrlResponse().getDownloadUrl());
 
         // when
         List<AdmissionAndPledgeUrlResponse> responseList = queryAdmissionAndPledgeUrlUseCase.execute(idList);

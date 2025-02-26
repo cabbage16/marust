@@ -59,7 +59,7 @@ class ExportFormUseCaseTest {
         given(formFacade.getForm(user)).willReturn(form);
         given(processTemplateService.execute(any(String.class), any())).willReturn("html");
         given(generatePdfService.execute(any(String.class))).willReturn(new ByteArrayOutputStream());
-        given(fileService.getPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createFormUrlResponse());
+        given(fileService.getDownloadPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createIdentificationPictureUrlResponse().getDownloadUrl());
         willDoNothing().given(mergePdfService).execute(any(PdfMerger.class), any(ByteArrayOutputStream.class));
 
         // when
@@ -70,7 +70,7 @@ class ExportFormUseCaseTest {
         verify(processTemplateService, times(4)).execute(any(String.class), any());
         verify(generatePdfService, times(4)).execute(any(String.class));
         verify(mergePdfService, times(4)).execute(any(PdfMerger.class), any(ByteArrayOutputStream.class));
-        verify(fileService, times(1)).getPresignedUrl(any(String.class), any(String.class));
+        verify(fileService, times(1)).getDownloadPresignedUrl(any(String.class), any(String.class));
     }
 
     @Test
@@ -81,7 +81,7 @@ class ExportFormUseCaseTest {
         given(formFacade.getForm(user)).willReturn(form);
         given(processTemplateService.execute(any(String.class), any())).willReturn("html");
         given(generatePdfService.execute(any(String.class))).willReturn(new ByteArrayOutputStream());
-        given(fileService.getPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createFormUrlResponse());
+        given(fileService.getDownloadPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createIdentificationPictureUrlResponse().getDownloadUrl());
         willDoNothing().given(mergePdfService).execute(any(PdfMerger.class), any(ByteArrayOutputStream.class));
 
         // when
@@ -92,7 +92,7 @@ class ExportFormUseCaseTest {
         verify(processTemplateService, times(5)).execute(any(String.class), any());
         verify(generatePdfService, times(5)).execute(any(String.class));
         verify(mergePdfService, times(5)).execute(any(PdfMerger.class), any(ByteArrayOutputStream.class));
-        verify(fileService, times(1)).getPresignedUrl(any(String.class), any(String.class));
+        verify(fileService, times(1)).getDownloadPresignedUrl(any(String.class), any(String.class));
     }
 
     @Test
@@ -102,7 +102,7 @@ class ExportFormUseCaseTest {
         Form form = FormFixture.createForm(FormType.REGULAR);
         given(formFacade.getForm(user)).willReturn(form);
         given(processTemplateService.execute(any(String.class), any())).willReturn("html");
-        given(fileService.getPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createFormUrlResponse());
+        given(fileService.getDownloadPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createIdentificationPictureUrlResponse().getDownloadUrl());
         doThrow(FailedToExportPdfException.class).when(generatePdfService).execute(any(String.class));
 
         // when and then
@@ -113,6 +113,6 @@ class ExportFormUseCaseTest {
         verify(processTemplateService, times(1)).execute(any(String.class), any());
         verify(generatePdfService, times(1)).execute(any(String.class));
         verify(mergePdfService, never()).execute(any(PdfMerger.class), any(ByteArrayOutputStream.class));
-        verify(fileService, times(1)).getPresignedUrl(any(String.class), any(String.class));
+        verify(fileService, times(1)).getDownloadPresignedUrl(any(String.class), any(String.class));
     }
 }

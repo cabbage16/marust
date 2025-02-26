@@ -40,7 +40,7 @@ class QueryFormUrlUseCaseTest {
                 FormFixture.createFormUrlVo(),
                 FormFixture.createFormUrlVo()
         ));
-        given(fileService.getPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createFormUrlResponse());
+        given(fileService.getDownloadPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createFormUrlResponse().getDownloadUrl());
 
         // when
         List<FormUrlResponse> responseList = queryFormUrlUseCase.execute(idList);
