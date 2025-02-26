@@ -34,7 +34,6 @@ public class FormRepositoryImpl implements FormRepositoryCustom {
         return queryFactory
                 .selectFrom(form)
                 .where(eqType(type))
-                .orderBy(form.examinationNumber.asc())
                 .fetch();
     }
 
@@ -45,7 +44,6 @@ public class FormRepositoryImpl implements FormRepositoryCustom {
         return queryFactory
                 .selectFrom(form)
                 .where(form.type.in(matchingFormTypes))
-                .orderBy(form.examinationNumber.asc())
                 .fetch();
     }
 
@@ -56,7 +54,6 @@ public class FormRepositoryImpl implements FormRepositoryCustom {
         return queryFactory
                 .selectFrom(form)
                 .where(form.originalType.in(matchingFormTypes))
-                .orderBy(form.examinationNumber.asc())
                 .fetch();
     }
 
@@ -202,7 +199,6 @@ public class FormRepositoryImpl implements FormRepositoryCustom {
                 .where(form.status.eq(FormStatus.FIRST_PASSED)
                         .or(form.status.eq(FormStatus.FIRST_FAILED))
                 )
-                .orderBy(form.examinationNumber.asc())
                 .fetch();
     }
 
@@ -245,7 +241,6 @@ public class FormRepositoryImpl implements FormRepositoryCustom {
                 .where(form.status.eq(FormStatus.FAILED)
                         .or(form.status.eq(FormStatus.PASSED))
                 )
-                .orderBy(form.examinationNumber.asc())
                 .fetch();
     }
 
@@ -268,7 +263,6 @@ public class FormRepositoryImpl implements FormRepositoryCustom {
                 ))
                 .from(form)
                 .where(form.id.in(idList))
-                .orderBy(form.examinationNumber.asc())
                 .fetch();
     }
 
@@ -347,7 +341,6 @@ public class FormRepositoryImpl implements FormRepositoryCustom {
         return queryFactory
                 .select(form.examinationNumber)
                 .from(form)
-                .orderBy(form.examinationNumber.desc())
                 .fetch();
     }
 }
