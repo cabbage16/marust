@@ -35,6 +35,7 @@ public class UpdateSecondRoundScoreUseCase {
         Sheet sheet = workbook.getSheetAt(0);
 
         List<Form> formList = formRepository.findByStatus(FormStatus.FIRST_PASSED);
+        formList.sort(Comparator.comparing(Form::getExaminationNumber));
         List<SecondScoreVo> secondScoreVoList = getSecondScoreVoList(sheet);
         validateList(formList, secondScoreVoList);
 
