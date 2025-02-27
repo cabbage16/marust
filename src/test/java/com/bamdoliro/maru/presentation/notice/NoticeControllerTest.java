@@ -2,9 +2,10 @@ package com.bamdoliro.maru.presentation.notice;
 
 import com.bamdoliro.maru.domain.notice.exception.NoticeNotFoundException;
 import com.bamdoliro.maru.domain.user.domain.User;
+import com.bamdoliro.maru.infrastructure.s3.dto.request.FileMetadata;
 import com.bamdoliro.maru.infrastructure.s3.exception.FailedToSaveException;
+import com.bamdoliro.maru.infrastructure.s3.exception.FileCountLimitExceededException;
 import com.bamdoliro.maru.presentation.notice.dto.request.NoticeRequest;
-import com.bamdoliro.maru.presentation.notice.dto.request.UploadFileRequest;
 import com.bamdoliro.maru.presentation.notice.dto.response.DownloadFileResponse;
 import com.bamdoliro.maru.presentation.notice.dto.response.NoticeResponse;
 import com.bamdoliro.maru.presentation.notice.dto.response.NoticeSimpleResponse;
@@ -20,8 +21,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 
+import java.util.Collections;
 import java.util.List;
 
+import static com.bamdoliro.maru.shared.constants.FileConstant.MB;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.*;
@@ -234,22 +237,23 @@ class NoticeControllerTest extends RestDocsTestSupport {
 
     @Test
     void 공지사항_파일을_업로드한다() throws Exception {
-        UploadFileRequest request = new UploadFileRequest(List.of(
-                "공지사항 파일.pdf",
-                "공지사항 파일.hwp"
+        List<FileMetadata> metadataList = Collections.nCopies(2, new FileMetadata(
+                "notice-file.pdf",
+                MediaType.APPLICATION_PDF_VALUE,
+                10 * MB
         ));
         User user = UserFixture.createAdminUser();
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        given(uploadFileUseCase.execute(any(UploadFileRequest.class))).willReturn(List.of(
+        given(uploadFileUseCase.execute(anyList())).willReturn(List.of(
                 new UploadFileResponse(
                         SharedFixture.createNoticeFileUrlResponse(),
-                        "공지사항 파일.pdf"
+                        "notice-file.pdf"
                 ),
                 new UploadFileResponse(
                         SharedFixture.createNoticeFileUrlResponse(),
-                        "공지사항 파일.hwp"
+                        "notice-file.pdf"
                 )
         ));
 
@@ -257,7 +261,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(request))
+                        .content(toJson(metadataList))
                 )
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(
@@ -266,34 +270,61 @@ class NoticeControllerTest extends RestDocsTestSupport {
                                         .description("Bearer token")
                         ),
                         requestFields(
-                                fieldWithPath("fileNameList")
-                                        .type(JsonFieldType.ARRAY)
-                                        .description("파일 이름 목록(최대 3개)")
+                                fieldWithPath("[].fileName")
+                                        .description("파일 이름"),
+                                fieldWithPath("[].mediaType")
+                                        .description("MIME 타입"),
+                                fieldWithPath("[].fileSize")
+                                        .description("파일 용량")
                         )
                 ));
+
+        verify(uploadFileUseCase, times(1)).execute(anyList());
+    }
+
+    @Test
+    void 공지사항_파일을_4개_이상_업로드하면_에러가_발생한다() throws Exception {
+        List<FileMetadata> metadataList = Collections.nCopies(4, new FileMetadata());
+        User user = UserFixture.createAdminUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        given(uploadFileUseCase.execute(anyList())).willThrow(new FileCountLimitExceededException(3));
+
+        mockMvc.perform(post("/notice/file")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(metadataList))
+                )
+                .andExpect(status().isBadRequest())
+                .andDo(restDocs.document());
+
+        verify(uploadFileUseCase, times(1)).execute(anyList());
     }
 
     @Test
     void 공지사항_파일_업로드가_실패한다() throws Exception {
-        UploadFileRequest request = new UploadFileRequest(List.of(
-                "공지사항 파일.pdf",
-                "공지사항 파일.hwp"
+        List<FileMetadata> metadataList = Collections.nCopies(2, new FileMetadata(
+                "notice-file.pdf",
+                MediaType.APPLICATION_PDF_VALUE,
+                10 * MB
         ));
         User user = UserFixture.createAdminUser();
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        willThrow(new FailedToSaveException()).given(uploadFileUseCase).execute(any(UploadFileRequest.class));
+        given(uploadFileUseCase.execute(anyList())).willThrow(new FailedToSaveException());
 
         mockMvc.perform(multipart("/notice/file")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(request))
+                        .content(toJson(metadataList))
                 )
                 .andExpect(status().isInternalServerError())
                 .andDo(restDocs.document());
 
-        verify(uploadFileUseCase, times(1)).execute(any(UploadFileRequest.class));
+        verify(uploadFileUseCase, times(1)).execute(anyList());
     }
 }

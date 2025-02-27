@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.times;
@@ -47,8 +48,8 @@ class QueryFormUseCaseTest {
 
         
         given(formFacade.getForm(id)).willReturn(form);
-        given(fileService.getDownloadPresignedUrl(FolderConstant.IDENTIFICATION_PICTURE, any(String.class))).willReturn(SharedFixture.createIdentificationPictureUrlResponse().getDownloadUrl());
-        given(fileService.getDownloadPresignedUrl(FolderConstant.FORM, any(String.class))).willReturn(SharedFixture.createFormUrlResponse().getDownloadUrl());
+        given(fileService.getDownloadPresignedUrl(eq(FolderConstant.IDENTIFICATION_PICTURE), any(String.class))).willReturn(SharedFixture.createIdentificationPictureUrlResponse().getDownloadUrl());
+        given(fileService.getDownloadPresignedUrl(eq(FolderConstant.FORM), any(String.class))).willReturn(SharedFixture.createFormUrlResponse().getDownloadUrl());
 
         // when
         FormResponse response = queryFormUseCase.execute(user, id);
