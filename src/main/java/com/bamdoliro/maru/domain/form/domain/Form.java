@@ -77,6 +77,7 @@ public class Form extends BaseTimeEntity {
         this.grade = grade;
         this.document = document;
         this.type = type;
+        this.originalType = type;
         this.user = user;
         this.changedToRegular = false;
         this.status = FormStatus.SUBMITTED;
@@ -231,6 +232,7 @@ public class Form extends BaseTimeEntity {
         this.grade = grade;
         this.document = document;
         this.type = type;
+        this.originalType = type;
         this.status = FormStatus.FINAL_SUBMITTED;
     }
 
