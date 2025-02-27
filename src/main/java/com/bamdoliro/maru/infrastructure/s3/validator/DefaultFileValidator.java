@@ -15,7 +15,7 @@ public class DefaultFileValidator {
     public static void validate(FileMetadata metadata, Set<MediaType> allowedTypes, int maxSize) {
         try {
             MediaType mediaType = MediaType.parseMediaType(metadata.getMediaType());
-            if (allowedTypes.stream().anyMatch(allowedType -> allowedType.includes(mediaType))) {
+            if (allowedTypes.stream().noneMatch(allowedType -> allowedType.includes(mediaType))) {
                 throw new MediaTypeMismatchException();
             }
         } catch (org.springframework.http.InvalidMediaTypeException e) {

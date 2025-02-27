@@ -25,9 +25,8 @@ public class UploadFileUseCase {
                 .map(metadata1 -> {
                     String fileName = UUID.randomUUID() + "_" + metadata1.getFileName();
                     return new UploadFileResponse(
-                            fileService.getPresignedUrl(FolderConstant.NOTICE_FILE, fileName, metadata1, metadata2 -> {
-                                DefaultFileValidator.validate(metadata2, Set.of(MediaType.ALL));
-                            }),
+                            fileService.getPresignedUrl(FolderConstant.NOTICE_FILE, fileName, metadata1, metadata2 ->
+                                    DefaultFileValidator.validate(metadata2, Set.of(MediaType.ALL))),
                             fileName
                     );
                 })
