@@ -1,11 +1,13 @@
 package com.bamdoliro.maru.application.analysis;
 
+import com.bamdoliro.maru.domain.form.domain.Form;
 import com.bamdoliro.maru.infrastructure.persistence.form.FormRepository;
 import com.bamdoliro.maru.presentation.analysis.dto.request.SchoolStatusRequest;
 import com.bamdoliro.maru.presentation.analysis.dto.response.SchoolStatusResponse;
 import com.bamdoliro.maru.shared.annotation.UseCase;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -22,12 +24,14 @@ public class QuerySchoolStatusUseCase {
             return formRepository.findSchoolByAddress(request.getStatusList(), keyword)
                     .stream()
                     .map(SchoolStatusResponse::new)
+                    .sorted(Comparator.comparing(SchoolStatusResponse::getApplicantName))
                     .toList();
         }
 
         return formRepository.findNotBusanSchool(request.getStatusList())
                 .stream()
                 .map(SchoolStatusResponse::new)
+                .sorted(Comparator.comparing(SchoolStatusResponse::getApplicantName))
                 .toList();
     }
 }
