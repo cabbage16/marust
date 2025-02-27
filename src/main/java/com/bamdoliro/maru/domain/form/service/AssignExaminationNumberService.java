@@ -19,8 +19,10 @@ public class AssignExaminationNumberService {
 
     private Long getNextExaminationNumber(FormType type) {
         Long startNumber = getStartNumber(type);
-        return formRepository.findMaxExaminationNumber(startNumber, startNumber+1000)
-                .orElse(startNumber)+1;
+        return formRepository.findAllExaminationNumber().stream()
+                .filter(num -> num >= startNumber && num <= startNumber + 1000)
+                .max(Long::compareTo)
+                .orElse(startNumber) + 1;
     }
 
     private Long getStartNumber(FormType type) {

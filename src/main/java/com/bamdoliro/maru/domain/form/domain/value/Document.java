@@ -1,6 +1,8 @@
 package com.bamdoliro.maru.domain.form.domain.value;
 
+import com.bamdoliro.maru.infrastructure.persistence.converter.StringEncryptedConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -13,9 +15,11 @@ import lombok.NoArgsConstructor;
 @Embeddable
 public class Document {
 
-    @Column(nullable = false, length = 1600)
+    @Convert(converter = StringEncryptedConverter.class)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String coverLetter;
 
-    @Column(nullable = false, length = 1600)
+    @Convert(converter = StringEncryptedConverter.class)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String statementOfPurpose;
 }

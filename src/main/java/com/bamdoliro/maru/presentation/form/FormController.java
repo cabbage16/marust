@@ -32,6 +32,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -71,7 +73,6 @@ public class FormController {
     private final PassOrFailFormUseCase passOrFailFormUseCase;
     private final QueryFormUrlUseCase queryFormUrlUseCase;
     private final SelectSecondPassUseCase selectSecondPassUseCase;
-    private final UpdateOriginalTypeUseCase updateOriginalTypeUseCase;
     private final GenerateAllAdmissionTicketUseCase generateAllAdmissionTicketUseCase;
     private final QueryAdmissionAndPledgeUrlUseCase queryAdmissionAndPledgeUrlUseCase;
 
@@ -362,12 +363,5 @@ public class FormController {
             @AuthenticationPrincipal(authority = Authority.ADMIN) User user
     ) {
         selectSecondPassUseCase.execute();
-    }
-
-    @PatchMapping("/original-type")
-    public void updateOriginalType(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user
-    ) {
-        updateOriginalTypeUseCase.execute();
     }
 }

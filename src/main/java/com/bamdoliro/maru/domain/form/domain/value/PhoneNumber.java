@@ -1,5 +1,7 @@
 package com.bamdoliro.maru.domain.form.domain.value;
 
+import com.bamdoliro.maru.infrastructure.persistence.converter.StringEncryptedConverter;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 public class PhoneNumber {
 
+    @Convert(converter = StringEncryptedConverter.class)
     private String value;
 
     @Override

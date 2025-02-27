@@ -258,9 +258,6 @@ public abstract class ControllerTest {
     protected AuthenticationExtractor authenticationExtractor;
 
     @MockBean
-    protected UpdateOriginalTypeUseCase updateOriginalTypeUseCase;
-
-    @MockBean
     protected GenerateAllAdmissionTicketUseCase generateAllAdmissionTicketUseCase;
 
     @MockBean
