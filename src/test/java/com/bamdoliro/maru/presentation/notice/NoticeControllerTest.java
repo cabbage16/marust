@@ -273,7 +273,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
                                 fieldWithPath("[].fileName")
                                         .description("파일 이름"),
                                 fieldWithPath("[].mediaType")
-                                        .description("MIME 타입"),
+                                        .description("미디어 타입"),
                                 fieldWithPath("[].fileSize")
                                         .description("파일 용량")
                         )

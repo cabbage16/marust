@@ -914,7 +914,7 @@ class FormControllerTest extends RestDocsTestSupport {
                                 fieldWithPath("fileName")
                                         .description("파일 이름"),
                                 fieldWithPath("mediaType")
-                                        .description("MIME 타입"),
+                                        .description("미디어 타입"),
                                 fieldWithPath("fileSize")
                                         .description("파일 용량")
                         )
@@ -1035,7 +1035,7 @@ class FormControllerTest extends RestDocsTestSupport {
                                 fieldWithPath("fileName")
                                         .description("파일 이름"),
                                 fieldWithPath("mediaType")
-                                        .description("MIME 타입"),
+                                        .description("미디어 타입"),
                                 fieldWithPath("fileSize")
                                         .description("파일 용량")
                         )
@@ -1220,6 +1220,14 @@ class FormControllerTest extends RestDocsTestSupport {
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("Bearer token")
+                        ),
+                        requestFields(
+                                fieldWithPath("fileName")
+                                        .description("파일 이름"),
+                                fieldWithPath("mediaType")
+                                        .description("미디어 타입"),
+                                fieldWithPath("fileSize")
+                                        .description("파일 용량")
                         )
                 ));
 
