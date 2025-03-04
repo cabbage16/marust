@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,7 +28,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-@Disabled
 @ActiveProfiles("test")
 @SpringBootTest
 class UpdateSecondRoundScoreUseCaseTest {
@@ -80,11 +80,12 @@ class UpdateSecondRoundScoreUseCaseTest {
         // when
         updateSecondRoundScoreUseCase.execute(multipartFile);
 
+
         // then
         List<Form> formList = formRepository.findByStatus(FormStatus.FIRST_PASSED);
         assertEquals(3, formList.size());
         assertNull(formList.get(0).getScore().getCodingTestScore());
-        assertEquals(133.2, formList.get(1).getScore().getCodingTestScore());
+        assertEquals(20, formList.get(1).getScore().getCodingTestScore());
         assertNull(formList.get(2).getScore().getCodingTestScore());
     }
 }

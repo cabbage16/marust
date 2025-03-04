@@ -4,6 +4,7 @@ import com.bamdoliro.maru.domain.fair.domain.Fair;
 import com.bamdoliro.maru.infrastructure.persistence.fair.FairRepository;
 import com.bamdoliro.maru.presentation.fair.dto.request.AttendAdmissionFairRequest;
 import com.bamdoliro.maru.shared.fixture.FairFixture;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

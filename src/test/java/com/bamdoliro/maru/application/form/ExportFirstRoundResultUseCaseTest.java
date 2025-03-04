@@ -20,7 +20,6 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.IOException;
 import java.util.List;
 
-@Disabled
 @ActiveProfiles("test")
 @SpringBootTest
 class ExportFirstRoundResultUseCaseTest {

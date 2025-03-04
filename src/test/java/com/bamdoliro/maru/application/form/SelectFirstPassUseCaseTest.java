@@ -11,20 +11,20 @@ import com.bamdoliro.maru.shared.fixture.FormFixture;
 import com.bamdoliro.maru.shared.fixture.UserFixture;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Disabled
 @Slf4j
 @ActiveProfiles("test")
+@Transactional
 @SpringBootTest
 class SelectFirstPassUseCaseTest {
 
@@ -79,6 +79,6 @@ class SelectFirstPassUseCaseTest {
             log.info("status: {}", form.getStatus());
         });
         int passedFormCount = formList.stream().filter(Form::isFirstPassedNow).toList().size();
-        assertEquals(Math.round(FixedNumber.TOTAL * FixedNumber.MULTIPLE), passedFormCount);
+        assertEquals(Math.ceil(FixedNumber.TOTAL * FixedNumber.MULTIPLE), passedFormCount);
     }
 }

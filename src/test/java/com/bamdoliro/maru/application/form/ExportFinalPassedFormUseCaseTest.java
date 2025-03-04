@@ -19,7 +19,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-@Disabled
 @ActiveProfiles("test")
 @SpringBootTest
 class ExportFinalPassedFormUseCaseTest {

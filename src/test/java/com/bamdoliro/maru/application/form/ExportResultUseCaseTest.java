@@ -28,7 +28,6 @@ import java.util.Random;
 @SpringBootTest
 class ExportResultUseCaseTest {
 
-
     @Autowired
     private ExportResultUseCase exportResultUseCase;
 

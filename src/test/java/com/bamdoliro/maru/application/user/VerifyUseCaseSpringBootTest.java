@@ -14,7 +14,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Disabled
 @ActiveProfiles("test")
 @SpringBootTest
 class VerifyUseCaseSpringBootTest {

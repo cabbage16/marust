@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
-@Disabled
 @ActiveProfiles("test")
 @SpringBootTest
 class ExportSecondRoundResultUseCaseTest {
