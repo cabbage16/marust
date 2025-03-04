@@ -56,7 +56,7 @@ public class GenerateAllAdmissionTicketUseCaseTest {
         formList.forEach(Form::firstPass);
         given(formRepository.findByStatus(FormStatus.FIRST_PASSED)).willReturn(formList);
         given(processTemplateService.execute(any(String.class), any(Map.class))).willReturn("html");
-        given(fileService.getPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createFormUrlResponse());
+        given(fileService.getDownloadPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createIdentificationPictureUrlResponse().getDownloadUrl());
         given(generatePdfService.execute(any(String.class))).willReturn(new ByteArrayOutputStream());
 
         // when
@@ -66,6 +66,6 @@ public class GenerateAllAdmissionTicketUseCaseTest {
         verify(formRepository, times(1)).findByStatus(FormStatus.FIRST_PASSED);
         verify(processTemplateService, times(2)).execute(any(String.class), any(Map.class));
         verify(generatePdfService, times(2)).execute(any(String.class));
-        verify(fileService, times(2)).getPresignedUrl(any(String.class), any(String.class));
+        verify(fileService, times(2)).getDownloadPresignedUrl(any(String.class), any(String.class));
     }
 }

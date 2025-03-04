@@ -36,7 +36,7 @@ public class GenerateProofOfApplicationUseCase {
                 "form", form,
                 "year", Schedule.getAdmissionYear(),
                 "announcement_of_first_pass", Schedule.toLocaleString(ANNOUNCEMENT_OF_FIRST_PASS),
-                "identificationPictureUri", fileService.getPresignedUrl(FolderConstant.IDENTIFICATION_PICTURE, user.getUuid().toString()).getDownloadUrl()
+                "identificationPictureUri", fileService.getDownloadPresignedUrl(FolderConstant.IDENTIFICATION_PICTURE, user.getUuid().toString())
         );
         String html = processTemplateService.execute(Templates.PROOF_OF_APPLICATION, formMap);
         ByteArrayOutputStream outputStream = generatePdfService.execute(html);

@@ -21,7 +21,7 @@ public class QueryFormUrlUseCase {
                 .map(vo -> new FormUrlResponse(
                         vo.getExaminationNumber(),
                         vo.getName(),
-                        fileService.getPresignedUrl(FolderConstant.FORM, vo.getUuid()).getDownloadUrl()
+                        fileService.getDownloadPresignedUrl(FolderConstant.FORM, vo.getUuid())
                 )).toList();
     }
 }

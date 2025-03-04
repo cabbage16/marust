@@ -55,7 +55,7 @@ class GenerateAdmissionTicketUseCaseTest {
         form.firstPass();
         given(formFacade.getForm(user)).willReturn(form);
         given(processTemplateService.execute(any(String.class), any(Map.class))).willReturn("html");
-        given(fileService.getPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createFormUrlResponse());
+        given(fileService.getDownloadPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createIdentificationPictureUrlResponse().getDownloadUrl());
         given(generatePdfService.execute(any(String.class))).willReturn(new ByteArrayOutputStream());
 
         // when
@@ -65,7 +65,7 @@ class GenerateAdmissionTicketUseCaseTest {
         verify(formFacade, times(1)).getForm(user);
         verify(processTemplateService, times(1)).execute(any(String.class), any(Map.class));
         verify(generatePdfService, times(1)).execute(any(String.class));
-        verify(fileService, times(1)).getPresignedUrl(any(String.class), any(String.class));
+        verify(fileService, times(1)).getDownloadPresignedUrl(any(String.class), any(String.class));
     }
 
     @Test
