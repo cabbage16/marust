@@ -21,8 +21,8 @@ public class QueryFormUseCase {
         form.isApplicantOrAdmin(user);
 
         String uuid = form.getUser().getUuid().toString();
-        String identificationPictureUri = fileService.getPresignedUrl(FolderConstant.IDENTIFICATION_PICTURE, uuid).getDownloadUrl();
-        String formUrl = fileService.getPresignedUrl(FolderConstant.FORM, uuid).getDownloadUrl();
+        String identificationPictureUri = fileService.getDownloadPresignedUrl(FolderConstant.IDENTIFICATION_PICTURE, uuid);
+        String formUrl = fileService.getDownloadPresignedUrl(FolderConstant.FORM, uuid);
 
         return new FormResponse(form, identificationPictureUri, formUrl);
     }

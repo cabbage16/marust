@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMaruException(MaruException e) {
         return ResponseEntity
                 .status(e.getErrorProperty().getStatus())
-                .body(new ErrorResponse(e.getErrorProperty()));
+                .body(new ErrorResponse(e.getErrorProperty(), e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)

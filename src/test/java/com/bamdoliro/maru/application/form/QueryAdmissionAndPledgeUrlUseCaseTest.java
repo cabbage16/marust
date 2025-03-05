@@ -5,7 +5,6 @@ import com.bamdoliro.maru.infrastructure.s3.FileService;
 import com.bamdoliro.maru.presentation.form.dto.response.AdmissionAndPledgeUrlResponse;
 import com.bamdoliro.maru.shared.fixture.FormFixture;
 import com.bamdoliro.maru.shared.fixture.SharedFixture;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,7 +40,7 @@ public class QueryAdmissionAndPledgeUrlUseCaseTest {
                 FormFixture.createFormUrlVo(),
                 FormFixture.createFormUrlVo()
         ));
-        given(fileService.getPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createAdmissionAndPledgeUrlResponse());
+        given(fileService.getDownloadPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createAdmissionAndPledgeUrlResponse().getDownloadUrl());
 
         // when
         List<AdmissionAndPledgeUrlResponse> responseList = queryAdmissionAndPledgeUrlUseCase.execute(idList);

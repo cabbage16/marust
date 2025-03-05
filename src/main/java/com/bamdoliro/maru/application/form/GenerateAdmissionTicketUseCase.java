@@ -43,7 +43,7 @@ public class GenerateAdmissionTicketUseCase {
                 Map.entry("meisterTalentEntranceTime", Schedule.toLocaleString(MEISTER_TALENT_ENTRANCE_TIME)),
                 Map.entry("meisterTalentExclusionEntranceTime", Schedule.toLocaleString(MEISTER_TALENT_EXCLUSION_ENTRANCE_TIME)),
                 Map.entry("entranceRegistrationTime", Schedule.toLocaleString(ENTRANCE_REGISTRATION_PERIOD_START, ENTRANCE_REGISTRATION_PERIOD_END)),
-                Map.entry("identificationPictureUri", fileService.getPresignedUrl(FolderConstant.IDENTIFICATION_PICTURE, user.getUuid().toString()).getDownloadUrl())
+                Map.entry("identificationPictureUri", fileService.getDownloadPresignedUrl(FolderConstant.IDENTIFICATION_PICTURE, user.getUuid().toString()))
                 );
         String html = processTemplateService.execute(Templates.ADMISSION_TICKET, formMap);
         ByteArrayOutputStream outputStream = generatePdfService.execute(html);

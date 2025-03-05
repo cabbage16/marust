@@ -48,7 +48,7 @@ public class ExportFormUseCase {
                 "grade31", subjectMap.getSubjectListOf(3, 1),
                 "subjectList", getSubjectList(form),
                 "year", Schedule.getAdmissionYear(),
-                "identificationPictureUri", fileService.getPresignedUrl(FolderConstant.IDENTIFICATION_PICTURE, user.getUuid().toString()).getDownloadUrl()
+                "identificationPictureUri", fileService.getDownloadPresignedUrl(FolderConstant.IDENTIFICATION_PICTURE, user.getUuid().toString())
         );
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PdfDocument mergedDocument = new PdfDocument(new PdfWriter(outputStream));
