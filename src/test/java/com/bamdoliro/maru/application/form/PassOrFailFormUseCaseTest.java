@@ -9,20 +9,21 @@ import com.bamdoliro.maru.infrastructure.persistence.form.FormRepository;
 import com.bamdoliro.maru.infrastructure.persistence.user.UserRepository;
 import com.bamdoliro.maru.presentation.form.dto.request.PassOrFailFormListRequest;
 import com.bamdoliro.maru.presentation.form.dto.request.PassOrFailFormRequest;
+import com.bamdoliro.maru.shared.config.DatabaseClearExtension;
 import com.bamdoliro.maru.shared.fixture.FormFixture;
 import com.bamdoliro.maru.shared.fixture.UserFixture;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
-@Transactional
+@ExtendWith(DatabaseClearExtension.class)
 @SpringBootTest
 class PassOrFailFormUseCaseTest {
 
@@ -55,9 +56,11 @@ class PassOrFailFormUseCaseTest {
                         new PassOrFailFormRequest(2L, true)
                 )
         );
+        System.out.println(formRepository.findAll().size());
 
         // when
         passOrFailFormUseCase.execute(request);
+
 
         // then
         assertAll(

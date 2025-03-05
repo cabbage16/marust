@@ -6,7 +6,6 @@ import com.bamdoliro.maru.domain.user.domain.type.VerificationType;
 import com.bamdoliro.maru.infrastructure.persistence.user.SignUpVerificationRepository;
 import com.bamdoliro.maru.infrastructure.persistence.user.UpdatePasswordVerificationRepository;
 import com.bamdoliro.maru.presentation.user.dto.request.VerifyRequest;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +22,7 @@ class VerifyUseCaseSpringBootTest {
 
     @Autowired
     private SignUpVerificationRepository signUpVerificationRepository;
+
     @Autowired
     private UpdatePasswordVerificationRepository updatePasswordVerificationRepository;
 

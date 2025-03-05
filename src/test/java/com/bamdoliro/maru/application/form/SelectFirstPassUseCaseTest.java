@@ -6,16 +6,17 @@ import com.bamdoliro.maru.domain.form.service.CalculateFormScoreService;
 import com.bamdoliro.maru.domain.user.domain.User;
 import com.bamdoliro.maru.infrastructure.persistence.form.FormRepository;
 import com.bamdoliro.maru.infrastructure.persistence.user.UserRepository;
+import com.bamdoliro.maru.shared.config.DatabaseClearExtension;
 import com.bamdoliro.maru.shared.constants.FixedNumber;
 import com.bamdoliro.maru.shared.fixture.FormFixture;
 import com.bamdoliro.maru.shared.fixture.UserFixture;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -24,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 @ActiveProfiles("test")
-@Transactional
+@ExtendWith(DatabaseClearExtension.class)
 @SpringBootTest
 class SelectFirstPassUseCaseTest {
 
