@@ -3,6 +3,9 @@
 === 공지사항 파일 업로드
 어드민 권한을 가진 사용자가 공지사항에 들어갈 파일을 업로드할 수 있습니다.
 
+모든 형식의 이미지, pdf, docx, pptx, xlsx, hwp 파일을 업로드할 수 있습니다.
+hwp 파일을 업로드할 때는 미디어 타입을 application/octet-stream으로 업로드 해야합니다.
+
 ==== 요청 형식
 
 ===== Request Header
