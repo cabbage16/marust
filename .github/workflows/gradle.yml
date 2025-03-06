@@ -28,8 +28,6 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-    - name: set application-test.yml
-      run: echo "${{ secrets.APPLICATION_TEST }}" > ./src/test/resources/application-test.yml
     - name: Debug application-test.yml
       run: cat ./src/test/resources/application-test.yml
     - name: Build with Gradle
