@@ -38,9 +38,9 @@ public class FileService {
         return request != null ? amazonS3Client.generatePresignedUrl(request).toString() : null;
     }
 
-    public UrlResponse getPresignedUrl(String folder, String fileName, FileMetadata request, FileValidator validator) {
+    public UrlResponse getPresignedUrl(String folder, String fileName, FileMetadata metadata, FileValidator validator) {
         return new UrlResponse(
-                getUploadPresignedUrl(folder, fileName, request, validator),
+                getUploadPresignedUrl(folder, fileName, metadata, validator),
                 getDownloadPresignedUrl(folder, fileName)
         );
     }

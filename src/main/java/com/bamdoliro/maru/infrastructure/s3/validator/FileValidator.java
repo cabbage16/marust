@@ -8,7 +8,7 @@ public interface FileValidator {
     void customValidate(FileMetadata request);
 
     default void validate(FileMetadata request) {
-        if (request.getFileName().isBlank() || request.getFileName().lastIndexOf(".") == -1) {
+        if (request.getFileName().isBlank() || request.getFileName().lastIndexOf(".") == -1 || request.getFileSize() <= 0) {
             throw new EmptyFileException();
         }
 

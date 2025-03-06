@@ -296,9 +296,6 @@ include::{snippets}/form-controller-test/증명_사진을_업로드한다/http-r
 ===== 서버 문제로 업로드에 실패한 경우
 include::{snippets}/form-controller-test/증명_사진_업로드가_실패한다/http-response.adoc[]
 
-===== 사진 크기가 규격과 다른 경우
-include::{snippets}/form-controller-test/증명_사진을_업로드할_때_사진_크기가_다르면_에러가_발생한다/http-response.adoc[]
-
 ===== 빈 파일인 경우
 include::{snippets}/form-controller-test/증명_사진을_업로드할_때_파일이_비었으면_에러가_발생한다/http-response.adoc[]
 
