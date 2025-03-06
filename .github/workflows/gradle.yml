@@ -28,6 +28,10 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+    - name: Debug project structure
+      run: |
+        echo "Current Directory: $(pwd)"
+        ls -R ./src
     - name: Debug application-test.yml
       run: cat ../../src/test/resources/application-test.yml
     - name: Build with Gradle
