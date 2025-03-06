@@ -316,7 +316,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(uploadFileUseCase.execute(anyList())).willThrow(new FailedToSaveException());
 
-        mockMvc.perform(multipart("/notice/file")
+        mockMvc.perform(post("/notice/file")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)

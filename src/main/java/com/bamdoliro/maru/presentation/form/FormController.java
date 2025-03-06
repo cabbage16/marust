@@ -164,7 +164,6 @@ public class FormController {
         updateFormUseCase.execute(user, formId, request);
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping( "/identification-picture")
     public SingleCommonResponse<UrlResponse> uploadIdentificationPicture(
             @AuthenticationPrincipal(authority = Authority.USER) User user,
@@ -175,7 +174,6 @@ public class FormController {
         );
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/form-document")
     public SingleCommonResponse<UrlResponse> uploadFormDocument(
             @AuthenticationPrincipal(authority = Authority.USER) User user,

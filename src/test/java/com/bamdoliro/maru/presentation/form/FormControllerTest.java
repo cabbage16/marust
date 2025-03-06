@@ -894,16 +894,16 @@ class FormControllerTest extends RestDocsTestSupport {
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        given(uploadIdentificationPictureUseCase.execute(user, metadata)).willReturn(SharedFixture.createIdentificationPictureUrlResponse());
+        given(uploadIdentificationPictureUseCase.execute(any(User.class), any(FileMetadata.class))).willReturn(SharedFixture.createIdentificationPictureUrlResponse());
 
-        mockMvc.perform(multipart("/form/identification-picture")
+        mockMvc.perform(post("/form/identification-picture")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(metadata))
                 )
 
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
 
                 .andDo(restDocs.document(
                         requestHeaders(
@@ -936,7 +936,7 @@ class FormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new FailedToSaveException()).when(uploadIdentificationPictureUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(multipart("/form/identification-picture")
+        mockMvc.perform(post("/form/identification-picture")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -944,6 +944,33 @@ class FormControllerTest extends RestDocsTestSupport {
                 )
 
                 .andExpect(status().isInternalServerError())
+
+                .andDo(restDocs.document());
+
+        verify(uploadIdentificationPictureUseCase, times(1)).execute(any(User.class), any(FileMetadata.class));
+    }
+
+    @Test
+    void 증명_사진을_업로드할_때_파일이_비었으면_에러가_발생한다() throws Exception {
+        User user = UserFixture.createUser();
+        FileMetadata metadata = new FileMetadata(
+                "identification-picture.png",
+                MediaType.IMAGE_PNG_VALUE,
+                0L
+        );
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new EmptyFileException()).when(uploadIdentificationPictureUseCase).execute(any(User.class), any(FileMetadata.class));
+
+        mockMvc.perform(post("/form/identification-picture")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(metadata))
+                )
+
+                .andExpect(status().isBadRequest())
 
                 .andDo(restDocs.document());
 
@@ -963,7 +990,7 @@ class FormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new FileSizeLimitExceededException(2)).when(uploadIdentificationPictureUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(multipart("/form/identification-picture")
+        mockMvc.perform(post("/form/identification-picture")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -990,7 +1017,7 @@ class FormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new MediaTypeMismatchException()).when(uploadIdentificationPictureUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(multipart("/form/identification-picture")
+        mockMvc.perform(post("/form/identification-picture")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -1015,16 +1042,16 @@ class FormControllerTest extends RestDocsTestSupport {
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        given(uploadFormUseCase.execute(user, metadata)).willReturn(SharedFixture.createFormUrlResponse());
+        given(uploadFormUseCase.execute(any(User.class), any(FileMetadata.class))).willReturn(SharedFixture.createFormUrlResponse());
 
-        mockMvc.perform(multipart("/form/form-document")
+        mockMvc.perform(post("/form/form-document")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(metadata))
                 )
 
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
 
                 .andDo(restDocs.document(
                         requestHeaders(
@@ -1057,7 +1084,7 @@ class FormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new FailedToSaveException()).when(uploadFormUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(multipart("/form/form-document")
+        mockMvc.perform(post("/form/form-document")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -1065,6 +1092,33 @@ class FormControllerTest extends RestDocsTestSupport {
                 )
 
                 .andExpect(status().isInternalServerError())
+
+                .andDo(restDocs.document());
+
+        verify(uploadFormUseCase, times(1)).execute(any(User.class), any(FileMetadata.class));
+    }
+
+    @Test
+    void 원서_서류를_업로드할_때_파일이_비었으면_에러가_발생한다() throws Exception {
+        User user = UserFixture.createUser();
+        FileMetadata metadata = new FileMetadata(
+                "form.pdf",
+                MediaType.APPLICATION_PDF_VALUE,
+                0L
+        );
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new EmptyFileException()).when(uploadFormUseCase).execute(any(User.class), any(FileMetadata.class));
+
+        mockMvc.perform(post("/form/form-document")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(metadata))
+                )
+
+                .andExpect(status().isBadRequest())
 
                 .andDo(restDocs.document());
 
@@ -1084,7 +1138,7 @@ class FormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new FileSizeLimitExceededException(20)).when(uploadFormUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(multipart("/form/form-document")
+        mockMvc.perform(post("/form/form-document")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -1111,7 +1165,7 @@ class FormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new MediaTypeMismatchException()).when(uploadFormUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(multipart("/form/form-document")
+        mockMvc.perform(post("/form/form-document")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -1205,9 +1259,9 @@ class FormControllerTest extends RestDocsTestSupport {
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        given(uploadAdmissionAndPledgeUseCase.execute(user, metadata)).willReturn(SharedFixture.createAdmissionAndPledgeUrlResponse());
+        given(uploadAdmissionAndPledgeUseCase.execute(any(User.class), any(FileMetadata.class))).willReturn(SharedFixture.createAdmissionAndPledgeUrlResponse());
 
-        mockMvc.perform(multipart("/form/admission-and-pledge")
+        mockMvc.perform(post("/form/admission-and-pledge")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -1247,7 +1301,7 @@ class FormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new InvalidFormStatusException()).when(uploadAdmissionAndPledgeUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(multipart("/form/admission-and-pledge")
+        mockMvc.perform(post("/form/admission-and-pledge")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -1274,7 +1328,7 @@ class FormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new FailedToSaveException()).when(uploadAdmissionAndPledgeUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(multipart("/form/admission-and-pledge")
+        mockMvc.perform(post("/form/admission-and-pledge")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -1301,7 +1355,7 @@ class FormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new FileSizeLimitExceededException(20)).when(uploadAdmissionAndPledgeUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(multipart("/form/admission-and-pledge")
+        mockMvc.perform(post("/form/admission-and-pledge")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -1328,7 +1382,7 @@ class FormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new MediaTypeMismatchException()).when(uploadAdmissionAndPledgeUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(multipart("/form/admission-and-pledge")
+        mockMvc.perform(post("/form/admission-and-pledge")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
