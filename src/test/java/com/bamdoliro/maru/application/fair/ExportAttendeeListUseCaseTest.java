@@ -7,7 +7,6 @@ import com.bamdoliro.maru.infrastructure.persistence.fair.FairRepository;
 import com.bamdoliro.maru.shared.fixture.FairFixture;
 import com.bamdoliro.maru.shared.util.SaveFileUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,10 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 @Slf4j
-@Disabled
 @ActiveProfiles("test")
 @SpringBootTest
 class ExportAttendeeListUseCaseTest {
