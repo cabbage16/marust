@@ -23,8 +23,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - run: mkdir ./src/test/resources
-    - run: touch ./src/test/resources/application-test.yml
     - run: echo "${{ secrets.APPLICATION_TEST }}" | base64 --decode > ./src/test/resoucres/application-test.yml
     - name: Set up JDK 17
       uses: actions/setup-java@v3
