@@ -28,7 +28,21 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+    - name: SEt env
+      run: |
+        echo "BUCKET_NAME=${{ secrets.BUCKET_NAME }}" >> $GITHUB_ENV
+        echo "S3_REGION=${{ secrets.S3_REGION }}" >> $GITHUB_ENV
+        echo "S3_ACCESS_KEY=${{ secrets.S3_ACCESS_KEY }}" >> $GITHUB_ENV
+        echo "S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }}" >> $GITHUB_ENV
+        echo "ENCRYPTION_PASSWORD=${{ secrets.ENCRYPTION_PASSWORD }}" >> $GITHUB_ENV
+        echo "ENCRYPTION_SALT=${{ secrets.ENCRYPTION_SALT }}" >> $GITHUB_ENV
+        echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
+        echo "NEIS_KEY=${{ secrets.NEIS_KEY }}" >> $GITHUB_ENV
+        echo "MESSAGE_API_KEY=${{ secrets.MESSAGE_API_KEY }}" >> $GITHUB_ENV
+        echo "MESSAGE_API_SECRET=${{ secrets.MESSAGE_API_SECRET }}" >> $GITHUB_ENV
+        echo "MESSAGE_API_DOMAIN=${{ secrets.MESSAGE_API_DOMAIN }}" >> $GITHUB_ENV
+        echo "MESSAGE_FROM=${{ secrets.MESSAGE_FROM }}" >> $GITHUB_ENV
     - name: Build with Gradle
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
       with:
-        arguments: build
+        arguments: clean build -Dspring.profiles.active=test
