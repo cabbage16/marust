@@ -13,6 +13,21 @@ on:
   pull_request:
     branches: [ "develop" ]
 
+env:
+  BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+  S3_REGION: ${{ secrets.S3_REGION }}
+  S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+  S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+  ENCRYPTION_PASSWORD: ${{ secrets.ENCRYPTION_PASSWORD }}
+  ENCRYPTION_SALT: ${{ secrets.ENCRYPTION_SALT }}
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  NEIS_KEY: ${{ secrets.NEIS_KEY }}
+  MEESAGE_API_KEY: ${{ secrets.MESSAGE_API_KEY }}
+  MESSAGE_API_SECRET: ${{ secrets.MESSAGE_API_SECRET }}
+  MESSAGE_API_DOMAIN: ${{ secrets.MESSAGE_API_DOMAIN }}
+  MESSAGE_FROM: ${{ secrets.MESSAGE_FROM }}
+
+
 permissions:
   contents: read
 
@@ -36,17 +51,4 @@ jobs:
       uses: gradle/gradle-build-action@v2
       with:
         arguments: build
-      env:
-        cloud.aws.s3.bucket: ${{ secrets.BUCKET_NAME }}
-        cloud.aws.region.static: ${{ secrets.S3_REGION }}
-        cloud.aws.credentials.access-key: ${{ secrets.S3_ACCESS_KEY }}
-        cloud.aws.credentials.secret-key: ${{ secrets.S3_SECRET_KEY }}
-        cloud.jasypt.encryptor.key: ${{ secrets.ENCRYPTION_PASSWORD }}
-        cloud.jasypt.encryptor.salt: ${{ secrets.ENCRYPTION_SALT }}
-        jwt.secret-key: ${{ secrets.JWT_SECRET }}
-        neis.key: ${{ secrets.NEIS_KEY }}
-        message.api-key: ${{ secrets.MESSAGE_API_KEY }}
-        message.api-secret: ${{ secrets.MESSAGE_API_SECRET }}
-        message.api-domain: ${{ secrets.MESSAGE_API_DOMAIN }}
-        message.from: ${{ secrets.MESSAGE_FROM }}
-
+      
