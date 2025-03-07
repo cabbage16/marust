@@ -4,13 +4,11 @@ import com.bamdoliro.maru.domain.fair.domain.Fair;
 import com.bamdoliro.maru.infrastructure.persistence.fair.FairRepository;
 import com.bamdoliro.maru.presentation.fair.dto.request.AttendAdmissionFairRequest;
 import com.bamdoliro.maru.shared.fixture.FairFixture;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-@Disabled
 @ActiveProfiles("test")
 @SpringBootTest
 class AttendAdmissionFairUseCaseSpringBootTest {

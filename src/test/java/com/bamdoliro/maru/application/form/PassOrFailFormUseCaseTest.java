@@ -2,29 +2,28 @@ package com.bamdoliro.maru.application.form;
 
 import com.bamdoliro.maru.domain.form.domain.Form;
 import com.bamdoliro.maru.domain.form.domain.type.FormStatus;
+import com.bamdoliro.maru.domain.form.exception.FormNotFoundException;
 import com.bamdoliro.maru.domain.form.service.CalculateFormScoreService;
 import com.bamdoliro.maru.domain.user.domain.User;
 import com.bamdoliro.maru.infrastructure.persistence.form.FormRepository;
 import com.bamdoliro.maru.infrastructure.persistence.user.UserRepository;
 import com.bamdoliro.maru.presentation.form.dto.request.PassOrFailFormListRequest;
 import com.bamdoliro.maru.presentation.form.dto.request.PassOrFailFormRequest;
+import com.bamdoliro.maru.shared.config.DatabaseClearExtension;
 import com.bamdoliro.maru.shared.fixture.FormFixture;
 import com.bamdoliro.maru.shared.fixture.UserFixture;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.BDDMockito.given;
+import static org.junit.jupiter.api.Assertions.*;
 
-@Disabled
 @ActiveProfiles("test")
+@ExtendWith(DatabaseClearExtension.class)
 @SpringBootTest
 class PassOrFailFormUseCaseTest {
 
@@ -57,9 +56,11 @@ class PassOrFailFormUseCaseTest {
                         new PassOrFailFormRequest(2L, true)
                 )
         );
+        System.out.println(formRepository.findAll().size());
 
         // when
         passOrFailFormUseCase.execute(request);
+
 
         // then
         assertAll(
@@ -79,6 +80,8 @@ class PassOrFailFormUseCaseTest {
             formRepository.save(form);
         }
 
+        System.out.println(formRepository.findAll().size());
+
         PassOrFailFormListRequest request = new PassOrFailFormListRequest(
                 List.of(
                         new PassOrFailFormRequest(3L, true),
@@ -89,7 +92,7 @@ class PassOrFailFormUseCaseTest {
         );
 
         // when and then
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(FormNotFoundException.class,
                 () -> passOrFailFormUseCase.execute(request));
     }
 }
