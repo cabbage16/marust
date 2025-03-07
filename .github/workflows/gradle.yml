@@ -28,10 +28,14 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-    - name: set application-test.yml
-      uses: microsoft/variable-substitution@v1
+    - name: Start Redis
+      uses: supercharge/redis-github-action@1.1.0
       with:
-        files: ./src/test/resources/application-test.yml
+        redis-version: 6
+    - name: Build with Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: build -Dspring.profiles.active=test
       env:
         cloud.aws.s3.bucket: ${{ secrets.BUCKET_NAME }}
         cloud.aws.region.static: ${{ secrets.S3_REGION }}
@@ -45,12 +49,4 @@ jobs:
         message.api-secret: ${{ secrets.MESSAGE_API_SECRET }}
         message.api-domain: ${{ secrets.MESSAGE_API_DOMAIN }}
         message.from: ${{ secrets.MESSAGE_FROM }}
-    - name: Start Redis
-      uses: supercharge/redis-github-action@1.1.0
-      with:
-        redis-version: 6
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@v2
-      with:
-        arguments: clean build -Dspring.profiles.active=test
 
