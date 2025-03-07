@@ -28,10 +28,23 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-    - name: Debug application-test.yml
-      run: cat ./src/test/resources/application-test.yml
     - name: set application-test.yml
-      run: echo "${{ secrets.APPLICATION }}" > ./src/test/resources/application-test.yml
+      uses: microsoft/variable-substitution@v1
+      with:
+        files: ./src/test/resources/application-test.yml
+      env:
+        cloud.aws.s3.bucket: ${{ secrets.BUCKET_NAME }}
+        cloud.aws.region.static: ${{ secrets.S3_REGION }}
+        cloud.aws.credentials.access-key: ${{ secrets.S3_ACCESS_KEY }}
+        cloud.aws.credentials.secret-key: ${{ secrets.S3_SECRET_KEY }}
+        cloud.jasypt.encryptor.key: ${{ secrets.ENCRYPTION_PASSWORD }}
+        cloud.jasypt.encryptor.salt: ${{ secrets.ENCRYPTION_SALT }}
+        jwt.secret-key: ${{ secrets.JWT_SECRET }}
+        neis.key: ${{ secrets.NEIS_KEY }}
+        message.api-key: ${{ secrets.MESSAGE_API_KEY }}
+        message.api-secret: ${{ secrets.MESSAGE_API_SECRET }}
+        message.api-domain: ${{ secrets.MESSAGE_API_DOMAIN }}
+        message.from: ${{ secrets.MESSAGE_FROM }}
     - name: Start Redis
       uses: supercharge/redis-github-action@1.1.0
       with:
