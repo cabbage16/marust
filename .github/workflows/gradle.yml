@@ -31,7 +31,7 @@ jobs:
     - name: Debug application-test.yml
       run: cat ./src/test/resources/application-test.yml
     - name: set application-test.yml
-      run: echo "${{ secrets.APPLICATION_TEST }}" > ./src/test/resources/application-test.yml
+      run: echo "${{ secrets.APPLICATION }}" > ./src/test/resources/application-test.yml
     - name: Start Redis
       uses: supercharge/redis-github-action@1.1.0
       with:
