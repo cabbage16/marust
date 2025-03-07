@@ -22,7 +22,7 @@ env:
   ENCRYPTION_SALT: ${{ secrets.ENCRYPTION_SALT }}
   JWT_SECRET: ${{ secrets.JWT_SECRET }}
   NEIS_KEY: ${{ secrets.NEIS_KEY }}
-  MEESAGE_API_KEY: ${{ secrets.MESSAGE_API_KEY }}
+  MESSAGE_API_KEY: ${{ secrets.MESSAGE_API_KEY }}
   MESSAGE_API_SECRET: ${{ secrets.MESSAGE_API_SECRET }}
   MESSAGE_API_DOMAIN: ${{ secrets.MESSAGE_API_DOMAIN }}
   MESSAGE_FROM: ${{ secrets.MESSAGE_FROM }}
