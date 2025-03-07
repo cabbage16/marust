@@ -35,7 +35,7 @@ jobs:
     - name: Build with Gradle
       uses: gradle/gradle-build-action@v2
       with:
-        arguments: build -Dspring.profiles.active=test
+        arguments: build 
       env:
         cloud.aws.s3.bucket: ${{ secrets.BUCKET_NAME }}
         cloud.aws.region.static: ${{ secrets.S3_REGION }}
