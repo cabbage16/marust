@@ -13,11 +13,11 @@ import lombok.NoArgsConstructor;
 public class DocumentRequest {
 
     @NotBlank(message = "필수값입니다.")
-    @Size(max = 1600, message = "1600자 이하여야 합니다.")
+    @Size(max = 1000, message = "1000자 이하여야 합니다.")
     private String coverLetter;
 
     @NotBlank(message = "필수값입니다.")
-    @Size(max = 1600, message = "1600자 이하여야 합니다.")
+    @Size(max = 1000, message = "1000자 이하여야 합니다.")
     private String statementOfPurpose;
 
     public Document toValue() {
