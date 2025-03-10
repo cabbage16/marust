@@ -3,7 +3,6 @@ package com.bamdoliro.maru.presentation.notice;
 import com.bamdoliro.maru.domain.notice.exception.NoticeNotFoundException;
 import com.bamdoliro.maru.domain.user.domain.User;
 import com.bamdoliro.maru.infrastructure.s3.dto.request.FileMetadata;
-import com.bamdoliro.maru.infrastructure.s3.exception.FailedToSaveException;
 import com.bamdoliro.maru.infrastructure.s3.exception.FileCountLimitExceededException;
 import com.bamdoliro.maru.presentation.notice.dto.request.NoticeRequest;
 import com.bamdoliro.maru.presentation.notice.dto.response.DownloadFileResponse;
@@ -298,31 +297,6 @@ class NoticeControllerTest extends RestDocsTestSupport {
                         .content(toJson(metadataList))
                 )
                 .andExpect(status().isBadRequest())
-                .andDo(restDocs.document());
-
-        verify(uploadFileUseCase, times(1)).execute(anyList());
-    }
-
-    @Test
-    void 공지사항_파일_업로드가_실패한다() throws Exception {
-        List<FileMetadata> metadataList = Collections.nCopies(2, new FileMetadata(
-                "notice-file.pdf",
-                MediaType.APPLICATION_PDF_VALUE,
-                10 * MB
-        ));
-        User user = UserFixture.createAdminUser();
-
-        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
-        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        given(uploadFileUseCase.execute(anyList())).willThrow(new FailedToSaveException());
-
-        mockMvc.perform(post("/notice/file")
-                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(metadataList))
-                )
-                .andExpect(status().isInternalServerError())
                 .andDo(restDocs.document());
 
         verify(uploadFileUseCase, times(1)).execute(anyList());

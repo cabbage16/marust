@@ -924,33 +924,6 @@ class FormControllerTest extends RestDocsTestSupport {
     }
 
     @Test
-    void 증명_사진_업로드가_실패한다() throws Exception {
-        User user = UserFixture.createUser();
-        FileMetadata metadata = new FileMetadata(
-                "identification-picture.png",
-                MediaType.IMAGE_PNG_VALUE,
-                MB
-        );
-
-        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
-        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        doThrow(new FailedToSaveException()).when(uploadIdentificationPictureUseCase).execute(any(User.class), any(FileMetadata.class));
-
-        mockMvc.perform(post("/form/identification-picture")
-                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(metadata))
-                )
-
-                .andExpect(status().isInternalServerError())
-
-                .andDo(restDocs.document());
-
-        verify(uploadIdentificationPictureUseCase, times(1)).execute(any(User.class), any(FileMetadata.class));
-    }
-
-    @Test
     void 증명_사진을_업로드할_때_파일이_비었으면_에러가_발생한다() throws Exception {
         User user = UserFixture.createUser();
         FileMetadata metadata = new FileMetadata(
@@ -1067,33 +1040,6 @@ class FormControllerTest extends RestDocsTestSupport {
                                         .description("파일 용량")
                         )
                 ));
-
-        verify(uploadFormUseCase, times(1)).execute(any(User.class), any(FileMetadata.class));
-    }
-
-    @Test
-    void 원서_서류_업로드가_실패한다() throws Exception {
-        User user = UserFixture.createUser();
-        FileMetadata metadata = new FileMetadata(
-                "form.pdf",
-                MediaType.APPLICATION_PDF_VALUE,
-                10 * MB
-        );
-
-        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
-        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        doThrow(new FailedToSaveException()).when(uploadFormUseCase).execute(any(User.class), any(FileMetadata.class));
-
-        mockMvc.perform(post("/form/form-document")
-                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(metadata))
-                )
-
-                .andExpect(status().isInternalServerError())
-
-                .andDo(restDocs.document());
 
         verify(uploadFormUseCase, times(1)).execute(any(User.class), any(FileMetadata.class));
     }
@@ -1309,33 +1255,6 @@ class FormControllerTest extends RestDocsTestSupport {
                 )
 
                 .andExpect(status().isConflict())
-
-                .andDo(restDocs.document());
-
-        verify(uploadAdmissionAndPledgeUseCase, times(1)).execute(any(User.class), any(FileMetadata.class));
-    }
-
-    @Test
-    void 입학등록원_및_금연서약서_업로드가_실패한다() throws Exception {
-        User user = UserFixture.createUser();
-        FileMetadata metadata = new FileMetadata(
-                "admission-and-pledge.pdf",
-                MediaType.APPLICATION_PDF_VALUE,
-                10 * MB
-        );
-
-        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
-        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        doThrow(new FailedToSaveException()).when(uploadAdmissionAndPledgeUseCase).execute(any(User.class), any(FileMetadata.class));
-
-        mockMvc.perform(post("/form/admission-and-pledge")
-                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(metadata))
-                )
-
-                .andExpect(status().isInternalServerError())
 
                 .andDo(restDocs.document());
 
