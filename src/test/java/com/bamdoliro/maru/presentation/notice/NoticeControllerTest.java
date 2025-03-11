@@ -24,8 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.bamdoliro.maru.shared.constants.FileConstant.MB;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
