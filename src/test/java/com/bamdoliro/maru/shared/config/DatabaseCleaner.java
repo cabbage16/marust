@@ -30,7 +30,6 @@ public class DatabaseCleaner {
     private void truncate() {
         entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate();
         for (String tableName : tableNameList) {
-            String pkName = tableName.substring(4) + "_id";
             entityManager.createNativeQuery(String.format("TRUNCATE TABLE %s RESTART IDENTITY", tableName)).executeUpdate();
         }
         entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
