@@ -19,7 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -52,7 +51,7 @@ public class GenerateProofOfApplicationUseCaseTest {
         Form form = FormFixture.createForm(FormType.MULTI_CHILDREN);
         form.submit();
         given(formFacade.getForm(user)).willReturn(form);
-        given(processTemplateService.execute(any(String.class), any(Map.class))).willReturn("html");
+        given(processTemplateService.execute(any(String.class), anyMap())).willReturn("html");
         given(fileService.getDownloadPresignedUrl(any(String.class), any(String.class))).willReturn(SharedFixture.createIdentificationPictureUrlResponse().getDownloadUrl());
         given(generatePdfService.execute(any(String.class))).willReturn(new ByteArrayOutputStream());
 
@@ -61,7 +60,7 @@ public class GenerateProofOfApplicationUseCaseTest {
 
         // then
         verify(formFacade, times(1)).getForm(user);
-        verify(processTemplateService, times(1)).execute(any(String.class), any(Map.class));
+        verify(processTemplateService, times(1)).execute(any(String.class), anyMap());
         verify(generatePdfService, times(1)).execute(any(String.class));
         verify(fileService, times(1)).getDownloadPresignedUrl(any(String.class), any(String.class));
     }
@@ -77,7 +76,7 @@ public class GenerateProofOfApplicationUseCaseTest {
         assertThrows(InvalidFormStatusException.class, () -> generateProofOfApplicationUseCase.execute(user));
 
         verify(formFacade, times(1)).getForm(user);
-        verify(processTemplateService, never()).execute(any(String.class), any(Map.class));
+        verify(processTemplateService, never()).execute(any(String.class), anyMap());
         verify(generatePdfService, never()).execute(any(String.class));
     }
 
@@ -91,7 +90,7 @@ public class GenerateProofOfApplicationUseCaseTest {
         assertThrows(FormNotFoundException.class, () -> generateProofOfApplicationUseCase.execute(user));
 
         verify(formFacade, times(1)).getForm(user);
-        verify(processTemplateService, never()).execute(any(String.class), any(Map.class));
+        verify(processTemplateService, never()).execute(any(String.class), anyMap());
         verify(generatePdfService, never()).execute(any(String.class));
     }
 }
