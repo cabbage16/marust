@@ -22,7 +22,6 @@ import java.util.Optional;
 
 import static com.bamdoliro.maru.shared.constants.FileConstant.MB;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 

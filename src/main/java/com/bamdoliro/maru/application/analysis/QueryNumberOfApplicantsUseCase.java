@@ -6,7 +6,6 @@ import com.bamdoliro.maru.presentation.analysis.dto.response.NumberOfApplicantsR
 import com.bamdoliro.maru.shared.annotation.UseCase;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,7 +16,7 @@ public class QueryNumberOfApplicantsUseCase {
     private final FormRepository formRepository;
 
     public List<NumberOfApplicantsResponse> execute(String type) {
-        List<NumberOfApplicantsResponse> result = new ArrayList<>();
+        List<NumberOfApplicantsResponse> result;
         if (type.equals("ORIGINAL")) {
             result = formRepository.findOriginalTypeAndCountGroupByType()
                     .stream()

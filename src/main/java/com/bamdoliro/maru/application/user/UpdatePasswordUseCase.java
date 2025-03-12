@@ -1,14 +1,10 @@
 package com.bamdoliro.maru.application.user;
 
-import com.bamdoliro.maru.domain.user.domain.SignUpVerification;
 import com.bamdoliro.maru.domain.user.domain.UpdatePasswordVerification;
 import com.bamdoliro.maru.domain.user.domain.User;
-import com.bamdoliro.maru.domain.user.exception.UserNotFoundException;
 import com.bamdoliro.maru.domain.user.exception.VerifyingHasFailedException;
 import com.bamdoliro.maru.domain.user.service.UserFacade;
 import com.bamdoliro.maru.infrastructure.persistence.user.UpdatePasswordVerificationRepository;
-import com.bamdoliro.maru.infrastructure.persistence.user.UserRepository;
-import com.bamdoliro.maru.infrastructure.persistence.user.SignUpVerificationRepository;
 import com.bamdoliro.maru.presentation.user.dto.request.UpdatePasswordRequest;
 import com.bamdoliro.maru.shared.annotation.UseCase;
 import lombok.RequiredArgsConstructor;

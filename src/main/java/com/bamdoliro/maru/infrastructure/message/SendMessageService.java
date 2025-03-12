@@ -1,7 +1,6 @@
 package com.bamdoliro.maru.infrastructure.message;
 
 import com.bamdoliro.maru.infrastructure.message.exception.FailedToSendException;
-import com.bamdoliro.maru.infrastructure.persistence.form.FormRepository;
 import com.bamdoliro.maru.shared.config.properties.MessageProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

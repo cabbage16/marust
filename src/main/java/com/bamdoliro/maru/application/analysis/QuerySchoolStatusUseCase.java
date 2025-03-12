@@ -1,6 +1,5 @@
 package com.bamdoliro.maru.application.analysis;
 
-import com.bamdoliro.maru.domain.form.domain.Form;
 import com.bamdoliro.maru.infrastructure.persistence.form.FormRepository;
 import com.bamdoliro.maru.presentation.analysis.dto.request.SchoolStatusRequest;
 import com.bamdoliro.maru.presentation.analysis.dto.response.SchoolStatusResponse;

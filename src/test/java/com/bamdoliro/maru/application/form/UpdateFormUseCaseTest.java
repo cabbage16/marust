@@ -3,11 +3,10 @@ package com.bamdoliro.maru.application.form;
 import com.bamdoliro.maru.domain.auth.exception.AuthorityMismatchException;
 import com.bamdoliro.maru.domain.form.domain.Form;
 import com.bamdoliro.maru.domain.form.domain.type.FormType;
-import com.bamdoliro.maru.domain.form.exception.FormNotFoundException;
 import com.bamdoliro.maru.domain.form.exception.CannotUpdateNotRejectedFormException;
+import com.bamdoliro.maru.domain.form.exception.FormNotFoundException;
 import com.bamdoliro.maru.domain.form.service.FormFacade;
 import com.bamdoliro.maru.domain.user.domain.User;
-import com.bamdoliro.maru.domain.user.service.UserFacade;
 import com.bamdoliro.maru.shared.fixture.FormFixture;
 import com.bamdoliro.maru.shared.fixture.UserFixture;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.times;
@@ -74,9 +74,9 @@ class UpdateFormUseCaseTest {
         given(formFacade.getForm(form.getId())).willReturn(form);
 
         // when and then
-        assertThrows(AuthorityMismatchException.class, () -> {
-            updateFormUseCase.execute(otherUser, form.getId(), FormFixture.createUpdateFormRequest(FormType.MEISTER_TALENT));
-        });
+        assertThrows(AuthorityMismatchException.class, () ->
+                updateFormUseCase.execute(otherUser, form.getId(), FormFixture.createUpdateFormRequest(FormType.MEISTER_TALENT))
+        );
         
         verify(formFacade, times(1)).getForm(form.getId());
     }
@@ -91,9 +91,9 @@ class UpdateFormUseCaseTest {
         given(formFacade.getForm(form.getId())).willReturn(form);
 
         // when and then
-        assertThrows(CannotUpdateNotRejectedFormException.class, () -> {
-            updateFormUseCase.execute(user, form.getId(), FormFixture.createUpdateFormRequest(FormType.MEISTER_TALENT));
-        });
+        assertThrows(CannotUpdateNotRejectedFormException.class, () ->
+                updateFormUseCase.execute(user, form.getId(), FormFixture.createUpdateFormRequest(FormType.MEISTER_TALENT))
+        );
         
         verify(formFacade, times(1)).getForm(form.getId());
     }
