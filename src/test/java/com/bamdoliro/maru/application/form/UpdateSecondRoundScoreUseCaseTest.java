@@ -23,6 +23,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -83,7 +84,9 @@ class UpdateSecondRoundScoreUseCaseTest {
 
 
         // then
-        List<Form> formList = formRepository.findByStatus(FormStatus.FIRST_PASSED);
+        List<Form> formList = formRepository.findByStatus(FormStatus.FIRST_PASSED).stream()
+                .sorted(Comparator.comparing(Form::getExaminationNumber))
+                .toList();
         assertEquals(3, formList.size());
         assertNull(formList.get(0).getScore().getCodingTestScore());
         assertEquals(20, formList.get(1).getScore().getCodingTestScore());
