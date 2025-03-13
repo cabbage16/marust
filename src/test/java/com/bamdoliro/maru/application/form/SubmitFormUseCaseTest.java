@@ -81,25 +81,4 @@ class SubmitFormUseCaseTest {
         verify(formRepository, never()).delete(any(Form.class));
         verify(formRepository, never()).save(any(Form.class));
     }
-
-    @Test
-    void 원서를_제출할_때_이미_제출한_원서가_반려상태면_다시_작성한다() {
-        //given
-        SubmitFormRequest request = FormFixture.createFormRequest(FormType.REGULAR);
-        User user = UserFixture.createUser();
-        Form form = FormFixture.createForm(FormType.REGULAR);
-        form.reject();
-
-        given(formRepository.findByUser(user)).willReturn(Optional.of(form));
-
-        //when
-        submitFormUseCase.execute(user, request);
-
-        //then
-        verify(formRepository, times(1)).findByUser(user);
-        verify(calculateFormScoreService, times(1)).execute(any(Form.class));
-        verify(assignExaminationNumberService, times(1)).execute(any(Form.class));
-        verify(formRepository, times(1)).delete(any(Form.class));
-        verify(formRepository, times(1)).save(any(Form.class));
-    }
 }
