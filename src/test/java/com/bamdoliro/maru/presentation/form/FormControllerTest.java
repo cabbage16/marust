@@ -2172,7 +2172,7 @@ class FormControllerTest extends RestDocsTestSupport {
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        given(queryAdmissionAndPledgeUrlUseCase.execute(idList)).willReturn(
+        given(queryAdmissionAndPledgeUseCase.execute(idList)).willReturn(
                 List.of(FormFixture.createAdmissionAndPledgeUrlResponse(),
                         FormFixture.createAdmissionAndPledgeUrlResponse(),
                         FormFixture.createAdmissionAndPledgeUrlResponse(),
@@ -2198,6 +2198,6 @@ class FormControllerTest extends RestDocsTestSupport {
                         )
                 ));
 
-        verify(queryAdmissionAndPledgeUrlUseCase, times(1)).execute(idList);
+        verify(queryAdmissionAndPledgeUseCase, times(1)).execute(idList);
     }
 }

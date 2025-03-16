@@ -267,7 +267,7 @@ public abstract class ControllerTest {
     protected UploadAdmissionAndPledgeUseCase uploadAdmissionAndPledgeUseCase;
 
     @MockBean
-    protected QueryAdmissionAndPledgeUrlUseCase queryAdmissionAndPledgeUrlUseCase;
+    protected QueryAdmissionAndPledgeUseCase queryAdmissionAndPledgeUseCase;
 
     protected String toJson(Object object) throws JsonProcessingException {
         return objectMapper.writeValueAsString(object);

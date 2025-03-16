@@ -11,7 +11,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @UseCase
-public class QueryAdmissionAndPledgeUrlUseCase {
+public class QueryAdmissionAndPledgeUseCase {
 
     private final FormRepository formRepository;
     private final FileService fileService;

@@ -72,7 +72,7 @@ public class FormController {
     private final QueryFormUrlUseCase queryFormUrlUseCase;
     private final SelectSecondPassUseCase selectSecondPassUseCase;
     private final GenerateAllAdmissionTicketUseCase generateAllAdmissionTicketUseCase;
-    private final QueryAdmissionAndPledgeUrlUseCase queryAdmissionAndPledgeUrlUseCase;
+    private final QueryAdmissionAndPledgeUseCase queryAdmissionAndPledgeUseCase;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
@@ -344,12 +344,12 @@ public class FormController {
 
 
     @GetMapping("/admission-and-pledges")
-    public ListCommonResponse<AdmissionAndPledgeUrlResponse> getAdmissionAndPledgeUrl(
+    public ListCommonResponse<AdmissionAndPledgeUrlResponse> getAdmissionAndPledges(
             @AuthenticationPrincipal(authority = Authority.ADMIN) User user,
             @RequestParam(name = "id-list") List<Long> formIdList
     ) {
         return CommonResponse.ok(
-                queryAdmissionAndPledgeUrlUseCase.execute(formIdList)
+                queryAdmissionAndPledgeUseCase.execute(formIdList)
         );
     }
 
