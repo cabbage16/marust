@@ -2,7 +2,7 @@ package com.bamdoliro.maru.application.form;
 
 import com.bamdoliro.maru.domain.form.domain.Form;
 import com.bamdoliro.maru.domain.form.exception.CannotUpdateNotRejectedFormException;
-import com.bamdoliro.maru.domain.form.exception.OutOfApplicationPeriodException;
+import com.bamdoliro.maru.domain.form.exception.OutOfApplicationPeriodFormException;
 import com.bamdoliro.maru.domain.form.service.FormFacade;
 import com.bamdoliro.maru.domain.user.domain.User;
 import com.bamdoliro.maru.presentation.form.dto.request.UpdateFormRequest;
@@ -45,7 +45,7 @@ public class UpdateFormUseCase {
 
     private void validateApplicationPeriod(LocalDateTime now) {
         if (now.isBefore(scheduleProperties.getStart()) || now.isAfter(scheduleProperties.getEnd())) {
-            throw new OutOfApplicationPeriodException();
+            throw new OutOfApplicationPeriodFormException();
         }
     }
 }
