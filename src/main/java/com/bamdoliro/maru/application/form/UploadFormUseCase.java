@@ -2,7 +2,7 @@ package com.bamdoliro.maru.application.form;
 
 import com.bamdoliro.maru.domain.form.domain.Form;
 import com.bamdoliro.maru.domain.form.exception.InvalidFormStatusException;
-import com.bamdoliro.maru.domain.form.exception.OutOfApplicationPeriodFormException;
+import com.bamdoliro.maru.domain.form.exception.OutOfApplicationFormPeriodException;
 import com.bamdoliro.maru.domain.user.domain.User;
 import com.bamdoliro.maru.infrastructure.persistence.form.FormRepository;
 import com.bamdoliro.maru.infrastructure.s3.FileService;
@@ -39,7 +39,7 @@ public class UploadFormUseCase {
 
     private void validateApplicationPeriod(LocalDateTime now) {
         if (now.isBefore(scheduleProperties.getStart()) || now.isAfter(scheduleProperties.getEnd())) {
-            throw new OutOfApplicationPeriodFormException();
+            throw new OutOfApplicationFormPeriodException();
         }
     }
 

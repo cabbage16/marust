@@ -2,7 +2,7 @@ package com.bamdoliro.maru.application.form;
 
 import com.bamdoliro.maru.domain.form.domain.Form;
 import com.bamdoliro.maru.domain.form.exception.FormAlreadySubmittedException;
-import com.bamdoliro.maru.domain.form.exception.OutOfApplicationPeriodFormException;
+import com.bamdoliro.maru.domain.form.exception.OutOfApplicationFormPeriodException;
 import com.bamdoliro.maru.domain.form.service.AssignExaminationNumberService;
 import com.bamdoliro.maru.domain.form.service.CalculateFormScoreService;
 import com.bamdoliro.maru.domain.user.domain.User;
@@ -54,7 +54,7 @@ public class SubmitFormUseCase {
 
     private void validateApplicationPeriod(LocalDateTime now) {
         if (now.isBefore(scheduleProperties.getStart()) || now.isAfter(scheduleProperties.getEnd())) {
-            throw new OutOfApplicationPeriodFormException();
+            throw new OutOfApplicationFormPeriodException();
         }
     }
 }
