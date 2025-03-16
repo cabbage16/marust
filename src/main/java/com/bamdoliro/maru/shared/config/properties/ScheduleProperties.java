@@ -25,5 +25,7 @@ public class ScheduleProperties {
     private LocalDateTime entranceRegistrationPeriodEnd;
     private LocalDateTime meisterTalentEntranceTime;
     private LocalDateTime meisterTalentExclusionEntranceTime;
+    private LocalDateTime admissionAndPledgeStart;
+    private LocalDateTime admissionAndPledgeEnd;
     private String selectFirstPassCron;
 }
