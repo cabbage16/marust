@@ -30,7 +30,7 @@ class SchoolControllerTest extends RestDocsTestSupport {
         given(tokenService.getUser(anyString())).willReturn(user);
 
 
-        mockMvc.perform(get("/school")
+        mockMvc.perform(get("/schools")
                         .param("q", "부산소프트")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON))
@@ -57,7 +57,7 @@ class SchoolControllerTest extends RestDocsTestSupport {
         given(tokenService.getUser(anyString())).willReturn(user);
 
 
-        mockMvc.perform(get("/school")
+        mockMvc.perform(get("/schools")
                         .param("q", "비전")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON))
@@ -75,7 +75,7 @@ class SchoolControllerTest extends RestDocsTestSupport {
         given(tokenService.getUser(anyString())).willReturn(user);
 
 
-        mockMvc.perform(get("/school")
+        mockMvc.perform(get("/schools")
                         .param("q", "누가봐도없을것같은검색어")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON))

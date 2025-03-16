@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("/notice")
+@RequestMapping("/notices")
 @RestController
 public class NoticeController {
 
@@ -42,7 +42,7 @@ public class NoticeController {
                 createNoticeUseCase.execute(request));
     }
 
-    @PostMapping("/file")
+    @PostMapping("/files")
     public ListCommonResponse<UploadFileResponse> uploadFile(
             @AuthenticationPrincipal(authority = Authority.ADMIN) User user,
             @RequestBody @Valid List<FileMetadata> metadataList

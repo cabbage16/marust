@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @Validated
-@RequestMapping("/user")
+@RequestMapping("/users")
 @RestController
 public class UserController {
 
