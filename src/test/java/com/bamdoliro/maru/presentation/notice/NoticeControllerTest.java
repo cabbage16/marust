@@ -44,7 +44,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
 
-        mockMvc.perform(post("/notice")
+        mockMvc.perform(post("/notices")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -84,7 +84,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
 
-        mockMvc.perform(put("/notice/{notice-id}", id)
+        mockMvc.perform(put("/notices/{notice-id}", id)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -125,7 +125,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
 
-        mockMvc.perform(put("/notice/{notice-id}", id)
+        mockMvc.perform(put("/notices/{notice-id}", id)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -145,7 +145,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
         );
         given(queryNoticeListUseCase.execute()).willReturn(response);
 
-        mockMvc.perform(get("/notice")
+        mockMvc.perform(get("/notices")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
 
@@ -171,7 +171,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
         ));
         given(queryNoticeUseCase.execute(id)).willReturn(response);
 
-        mockMvc.perform(get("/notice/{notice-id}", id)
+        mockMvc.perform(get("/notices/{notice-id}", id)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
 
@@ -192,7 +192,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
         Long id = 1L;
         willThrow(new NoticeNotFoundException()).given(queryNoticeUseCase).execute(id);
 
-        mockMvc.perform(get("/notice/{notice-id}", id)
+        mockMvc.perform(get("/notices/{notice-id}", id)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
 
@@ -212,7 +212,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
 
-        mockMvc.perform(delete("/notice/{notice-id}", id)
+        mockMvc.perform(delete("/notices/{notice-id}", id)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON))
 
@@ -254,7 +254,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
                 )
         ));
 
-        mockMvc.perform(post("/notice/file")
+        mockMvc.perform(post("/notices/files")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -288,7 +288,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(uploadFileUseCase.execute(anyList())).willThrow(new FileCountLimitExceededException(3));
 
-        mockMvc.perform(post("/notice/file")
+        mockMvc.perform(post("/notices/files")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)

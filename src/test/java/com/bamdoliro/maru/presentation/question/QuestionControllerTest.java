@@ -50,7 +50,7 @@ class QuestionControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
 
-        mockMvc.perform(post("/question")
+        mockMvc.perform(post("/questions")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -88,7 +88,7 @@ class QuestionControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
 
-        mockMvc.perform(put("/question/{question-id}", id)
+        mockMvc.perform(put("/questions/{question-id}", id)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -129,7 +129,7 @@ class QuestionControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
 
-        mockMvc.perform(put("/question/{question-id}", id)
+        mockMvc.perform(put("/questions/{question-id}", id)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -149,7 +149,7 @@ class QuestionControllerTest extends RestDocsTestSupport {
         );
         given(queryQuestionListUseCase.execute(QuestionCategory.TOP_QUESTION)).willReturn(response);
 
-        mockMvc.perform(get("/question")
+        mockMvc.perform(get("/questions")
                         .param("category", QuestionCategory.TOP_QUESTION.name())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -172,7 +172,7 @@ class QuestionControllerTest extends RestDocsTestSupport {
         Long id = 1L;
         given(queryQuestionUseCase.execute(id)).willReturn(QuestionFixture.createQuestionResponse());
 
-        mockMvc.perform(get("/question/{question-id}", id)
+        mockMvc.perform(get("/questions/{question-id}", id)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
 
@@ -193,7 +193,7 @@ class QuestionControllerTest extends RestDocsTestSupport {
         Long id = -1L;
         given(queryQuestionUseCase.execute(id)).willThrow(new QuestionNotFoundException());
 
-        mockMvc.perform(get("/question/{question-id}", id)
+        mockMvc.perform(get("/questions/{question-id}", id)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
 
@@ -211,7 +211,7 @@ class QuestionControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
 
-        mockMvc.perform(delete("/question/{question-id}", id)
+        mockMvc.perform(delete("/questions/{question-id}", id)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON))
 
