@@ -10,14 +10,13 @@ import com.bamdoliro.maru.infrastructure.s3.constants.FolderConstant;
 import com.bamdoliro.maru.infrastructure.thymeleaf.ProcessTemplateService;
 import com.bamdoliro.maru.infrastructure.thymeleaf.Templates;
 import com.bamdoliro.maru.shared.annotation.UseCase;
-import com.bamdoliro.maru.shared.constants.Schedule;
+import com.bamdoliro.maru.shared.config.properties.ScheduleProperties;
+import com.bamdoliro.maru.shared.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
-
-import static com.bamdoliro.maru.shared.constants.Schedule.ANNOUNCEMENT_OF_FIRST_PASS;
 
 @RequiredArgsConstructor
 @UseCase
@@ -27,6 +26,8 @@ public class GenerateProofOfApplicationUseCase {
     private final ProcessTemplateService processTemplateService;
     private final GeneratePdfService generatePdfService;
     private final FileService fileService;
+    private final ScheduleService scheduleService;
+    private final ScheduleProperties scheduleProperties;
 
     public ByteArrayResource execute(User user) {
         Form form = formFacade.getForm(user);
@@ -34,8 +35,8 @@ public class GenerateProofOfApplicationUseCase {
 
         Map<String, Object> formMap = Map.of(
                 "form", form,
-                "year", Schedule.getAdmissionYear(),
-                "announcement_of_first_pass", Schedule.toLocaleString(ANNOUNCEMENT_OF_FIRST_PASS),
+                "year", scheduleService.getAdmissionYear(),
+                "announcement_of_first_pass", ScheduleService.toLocaleString(scheduleProperties.getAnnouncementOfFirstPass()),
                 "identificationPictureUri", fileService.getDownloadPresignedUrl(FolderConstant.IDENTIFICATION_PICTURE, user.getUuid().toString())
         );
         String html = processTemplateService.execute(Templates.PROOF_OF_APPLICATION, formMap);
