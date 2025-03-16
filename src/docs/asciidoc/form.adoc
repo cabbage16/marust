@@ -686,7 +686,7 @@ include::{snippets}/form-controller-test/선택한_원서의_원서url을_조회
 ===== 정상 응답
 include::{snippets}/form-controller-test/선택한_원서의_원서url을_조회한다/http-response.adoc[]
 
-=== 선택한 원서의 입락등록원 및 금연서약서 url 조회
+=== 선택한 원서의 입학등록원 및 금연서약서 url 조회
 어드민은 선택한 원서의 입학등록원 및 금연서약서 url을 조회할 수 있습니다.
 
 ==== 요청 형식
