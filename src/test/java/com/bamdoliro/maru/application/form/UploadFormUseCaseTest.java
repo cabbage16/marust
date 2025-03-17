@@ -71,7 +71,6 @@ class UploadFormUseCaseTest {
     void 원서_서류를_업로드할_때_원서_접수_기간이_아니면_에러가_발생한다() {
         // given
         User user = UserFixture.createUser();
-        Form form = FormFixture.createForm(FormType.REGULAR);
         FileMetadata metadata = new FileMetadata(
                 "form.pdf",
                 MediaType.APPLICATION_PDF_VALUE,
