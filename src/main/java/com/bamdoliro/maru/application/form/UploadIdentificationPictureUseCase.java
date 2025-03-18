@@ -10,11 +10,11 @@ import com.bamdoliro.maru.infrastructure.s3.dto.request.FileMetadata;
 import com.bamdoliro.maru.infrastructure.s3.dto.response.UrlResponse;
 import com.bamdoliro.maru.infrastructure.s3.validator.DefaultFileValidator;
 import com.bamdoliro.maru.shared.annotation.UseCase;
+import com.bamdoliro.maru.shared.annotation.ValidateApplicationFormPeriod;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 
 import java.util.Optional;
-
 import java.util.Set;
 
 @RequiredArgsConstructor
@@ -24,6 +24,7 @@ public class UploadIdentificationPictureUseCase {
     private final FileService fileService;
     private final FormRepository formRepository;
 
+    @ValidateApplicationFormPeriod
     public UrlResponse execute(User user, FileMetadata fileMetadata) {
         Optional<Form> form = formRepository.findByUser(user);
         form.ifPresent(this::validateFormStatus);

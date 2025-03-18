@@ -17,6 +17,8 @@ public enum FormErrorProperty implements ErrorProperty {
     INVALID_FILE(HttpStatus.BAD_REQUEST, "잘못된 파일입니다."),
     MISSING_TOTAL_SCORE(HttpStatus.CONFLICT, "최종 점수가 입력되지 않은 원서가 존재합니다."),
     WRONG_SCORE(HttpStatus.BAD_REQUEST, "점수 범위를 초과했습니다."),
+    OUT_OF_APPLICATION_FORM_PERIOD(HttpStatus.FORBIDDEN, "지금은 원서 접수 기간이 아닙니다."),
+    OUT_OF_ADMISSION_AND_PLEDGE_PERIOD(HttpStatus.FORBIDDEN, "지금은 입학 등록원 및 서약서 제출 기간이 아닙니다.")
     ;
 
     private final HttpStatus status;

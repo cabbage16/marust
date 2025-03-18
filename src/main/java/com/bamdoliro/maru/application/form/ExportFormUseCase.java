@@ -13,7 +13,7 @@ import com.bamdoliro.maru.infrastructure.s3.constants.FolderConstant;
 import com.bamdoliro.maru.infrastructure.thymeleaf.ProcessTemplateService;
 import com.bamdoliro.maru.infrastructure.thymeleaf.Templates;
 import com.bamdoliro.maru.shared.annotation.UseCase;
-import com.bamdoliro.maru.shared.constants.Schedule;
+import com.bamdoliro.maru.shared.service.ScheduleService;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.utils.PdfMerger;
@@ -36,6 +36,7 @@ public class ExportFormUseCase {
     private final GeneratePdfService generatePdfService;
     private final MergePdfService mergePdfService;
     private final FileService fileService;
+    private final ScheduleService scheduleService;
 
     public ByteArrayResource execute(User user) {
         Form form = formFacade.getForm(user);
@@ -47,7 +48,7 @@ public class ExportFormUseCase {
                 "grade22", subjectMap.getSubjectListOf(2, 2),
                 "grade31", subjectMap.getSubjectListOf(3, 1),
                 "subjectList", getSubjectList(form),
-                "year", Schedule.getAdmissionYear(),
+                "year", scheduleService.getAdmissionYear(),
                 "identificationPictureUri", fileService.getDownloadPresignedUrl(FolderConstant.IDENTIFICATION_PICTURE, user.getUuid().toString())
         );
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

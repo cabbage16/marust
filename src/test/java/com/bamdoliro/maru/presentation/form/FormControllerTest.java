@@ -8,8 +8,13 @@ import com.bamdoliro.maru.domain.form.exception.*;
 import com.bamdoliro.maru.domain.user.domain.User;
 import com.bamdoliro.maru.infrastructure.pdf.exception.FailedToExportPdfException;
 import com.bamdoliro.maru.infrastructure.s3.dto.request.FileMetadata;
-import com.bamdoliro.maru.infrastructure.s3.exception.*;
-import com.bamdoliro.maru.presentation.form.dto.request.*;
+import com.bamdoliro.maru.infrastructure.s3.exception.EmptyFileException;
+import com.bamdoliro.maru.infrastructure.s3.exception.FileSizeLimitExceededException;
+import com.bamdoliro.maru.infrastructure.s3.exception.MediaTypeMismatchException;
+import com.bamdoliro.maru.presentation.form.dto.request.PassOrFailFormListRequest;
+import com.bamdoliro.maru.presentation.form.dto.request.PassOrFailFormRequest;
+import com.bamdoliro.maru.presentation.form.dto.request.SubmitFormRequest;
+import com.bamdoliro.maru.presentation.form.dto.request.UpdateFormRequest;
 import com.bamdoliro.maru.presentation.form.dto.response.FormResultResponse;
 import com.bamdoliro.maru.presentation.form.dto.response.FormSimpleResponse;
 import com.bamdoliro.maru.shared.fixture.AuthFixture;
@@ -225,6 +230,29 @@ class FormControllerTest extends RestDocsTestSupport {
     }
 
     @Test
+    void 원서를_제출할_때_원서_접수_기간이_아니면_에러가_발생한다() throws Exception {
+        SubmitFormRequest request = FormFixture.createFormRequest(FormType.REGULAR);
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new OutOfApplicationFormPeriodException()).when(submitFormUseCase).execute(any(User.class), any(SubmitFormRequest.class));
+
+        mockMvc.perform(post("/forms")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(request))
+                )
+
+                .andExpect(status().isForbidden())
+
+                .andDo(restDocs.document());
+
+        verify(submitFormUseCase, times(1)).execute(any(User.class), any(SubmitFormRequest.class));
+    }
+
+    @Test
     void 원서를_제출할_때_이미_제출한_원서가_있으면_에러가_발생한다() throws Exception {
         SubmitFormRequest request = FormFixture.createFormRequest(FormType.REGULAR);
         User user = UserFixture.createUser();
@@ -296,8 +324,28 @@ class FormControllerTest extends RestDocsTestSupport {
     }
 
     @Test
+    void 원서를_최종_제출할_때_원서_접수_기간이_아니면_에러가_발생한다() throws Exception {
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new OutOfApplicationFormPeriodException()).when(submitFinalFormUseCase).execute(any(User.class));
+
+        mockMvc.perform(patch("/forms")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+
+                .andExpect(status().isForbidden())
+
+                .andDo(restDocs.document());
+
+        verify(submitFinalFormUseCase, times(1)).execute(any(User.class));
+    }
+
+    @Test
     void 원서를_최종_제출할_때_이미_제출한_원서라면_에러가_발생한다() throws Exception {
-        SubmitFinalFormRequest request = new SubmitFinalFormRequest("https://maru.bamdoliro.com/form.pdf");
         User user = UserFixture.createUser();
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
@@ -308,7 +356,6 @@ class FormControllerTest extends RestDocsTestSupport {
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(request))
                 )
 
                 .andExpect(status().isConflict())
@@ -810,6 +857,30 @@ class FormControllerTest extends RestDocsTestSupport {
     }
 
     @Test
+    void 원서를_수정할_때_원서_접수_기간이_아니면_에러가_발생한다() throws Exception {
+        Long formId = 1L;
+        UpdateFormRequest request = FormFixture.createUpdateFormRequest(FormType.REGULAR);
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new OutOfApplicationFormPeriodException()).when(updateFormUseCase).execute(any(User.class), anyLong(), any(UpdateFormRequest.class));
+
+        mockMvc.perform(put("/forms/{form-id}", formId)
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(request))
+                )
+
+                .andExpect(status().isForbidden())
+
+                .andDo(restDocs.document());
+
+        verify(updateFormUseCase, times(1)).execute(any(User.class), anyLong(), any(UpdateFormRequest.class));
+    }
+
+    @Test
     void 원서를_수정할_때_원서가_없으면_에러가_발생한다() throws Exception {
         Long formId = 1L;
         User user = UserFixture.createAdminUser();
@@ -917,6 +988,33 @@ class FormControllerTest extends RestDocsTestSupport {
                                         .description("파일 용량")
                         )
                 ));
+
+        verify(uploadIdentificationPictureUseCase, times(1)).execute(any(User.class), any(FileMetadata.class));
+    }
+
+    @Test
+    void 증명_사진을_업로드할_때_원서_접수_기간이_아니면_에러가_발생한다() throws Exception {
+        User user = UserFixture.createUser();
+        FileMetadata metadata = new FileMetadata(
+                "identification-picture.png",
+                MediaType.IMAGE_PNG_VALUE,
+                MB
+        );
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new OutOfApplicationFormPeriodException()).when(uploadIdentificationPictureUseCase).execute(any(User.class), any(FileMetadata.class));
+
+        mockMvc.perform(post("/forms/identification-picture")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(metadata))
+                )
+
+                .andExpect(status().isForbidden())
+
+                .andDo(restDocs.document());
 
         verify(uploadIdentificationPictureUseCase, times(1)).execute(any(User.class), any(FileMetadata.class));
     }
@@ -1038,6 +1136,33 @@ class FormControllerTest extends RestDocsTestSupport {
                                         .description("파일 용량")
                         )
                 ));
+
+        verify(uploadFormUseCase, times(1)).execute(any(User.class), any(FileMetadata.class));
+    }
+
+    @Test
+    void 원서_서류를_업로드할_때_원서_접수_기간이_아니면_에러가_발생한다() throws Exception {
+        User user = UserFixture.createUser();
+        FileMetadata metadata = new FileMetadata(
+                "form.pdf",
+                MediaType.APPLICATION_PDF_VALUE,
+                10 * MB
+        );
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new OutOfApplicationFormPeriodException()).when(uploadFormUseCase).execute(any(User.class), any(FileMetadata.class));
+
+        mockMvc.perform(post("/forms/form-document")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(metadata))
+                )
+
+                .andExpect(status().isForbidden())
+
+                .andDo(restDocs.document());
 
         verify(uploadFormUseCase, times(1)).execute(any(User.class), any(FileMetadata.class));
     }
@@ -1228,6 +1353,33 @@ class FormControllerTest extends RestDocsTestSupport {
                                         .description("파일 용량")
                         )
                 ));
+
+        verify(uploadAdmissionAndPledgeUseCase, times(1)).execute(any(User.class), any(FileMetadata.class));
+    }
+
+    @Test
+    void 입학등록원_및_금연서약서를_업로드할_때_제출_기간이_아니면_에러가_발생한다() throws Exception {
+        User user = UserFixture.createUser();
+        FileMetadata metadata = new FileMetadata(
+                "admission-and-pledge.pdf",
+                MediaType.APPLICATION_PDF_VALUE,
+                10 * MB
+        );
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new OutOfAdmissionAndPledgePeriodException()).when(uploadAdmissionAndPledgeUseCase).execute(any(User.class), any(FileMetadata.class));
+
+        mockMvc.perform(post("/forms/admission-and-pledge")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(metadata))
+                )
+
+                .andExpect(status().isForbidden())
+
+                .andDo(restDocs.document());
 
         verify(uploadAdmissionAndPledgeUseCase, times(1)).execute(any(User.class), any(FileMetadata.class));
     }

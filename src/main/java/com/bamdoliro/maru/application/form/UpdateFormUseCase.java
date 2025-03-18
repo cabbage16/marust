@@ -6,6 +6,7 @@ import com.bamdoliro.maru.domain.form.service.FormFacade;
 import com.bamdoliro.maru.domain.user.domain.User;
 import com.bamdoliro.maru.presentation.form.dto.request.UpdateFormRequest;
 import com.bamdoliro.maru.shared.annotation.UseCase;
+import com.bamdoliro.maru.shared.annotation.ValidateApplicationFormPeriod;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ public class UpdateFormUseCase {
 
     private final FormFacade formFacade;
 
+    @ValidateApplicationFormPeriod
     @Transactional
     public void execute(User user, Long id, UpdateFormRequest request) {
         Form form = formFacade.getForm(id);

@@ -8,6 +8,7 @@ import com.bamdoliro.maru.domain.user.domain.User;
 import com.bamdoliro.maru.infrastructure.persistence.form.FormRepository;
 import com.bamdoliro.maru.presentation.form.dto.request.SubmitFormRequest;
 import com.bamdoliro.maru.shared.annotation.UseCase;
+import com.bamdoliro.maru.shared.annotation.ValidateApplicationFormPeriod;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class SubmitFormUseCase {
     private final CalculateFormScoreService calculateFormScoreService;
     private final AssignExaminationNumberService assignExaminationNumberService;
 
+    @ValidateApplicationFormPeriod
     @Transactional
     public void execute(User user, SubmitFormRequest request) {
         validateOnlyOneFormPerUser(user);

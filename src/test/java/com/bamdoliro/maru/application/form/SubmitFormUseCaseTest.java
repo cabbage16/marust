@@ -22,9 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SubmitFormUseCaseTest {
@@ -56,7 +54,6 @@ class SubmitFormUseCaseTest {
         submitFormUseCase.execute(user, request);
 
         // then
-
         verify(formRepository, times(1)).findByUser(user);
         verify(calculateFormScoreService, times(1)).execute(any(Form.class));
         verify(assignExaminationNumberService, times(1)).execute(any(Form.class));
