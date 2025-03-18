@@ -2,16 +2,10 @@ package com.bamdoliro.maru.presentation.user;
 
 import com.bamdoliro.maru.domain.user.domain.User;
 import com.bamdoliro.maru.domain.user.domain.type.VerificationType;
-import com.bamdoliro.maru.domain.user.exception.UserAlreadyExistsException;
-import com.bamdoliro.maru.domain.user.exception.UserNotFoundException;
-import com.bamdoliro.maru.domain.user.exception.VerificationCodeMismatchException;
-import com.bamdoliro.maru.domain.user.exception.VerifyingHasFailedException;
+import com.bamdoliro.maru.domain.user.exception.*;
 import com.bamdoliro.maru.domain.user.exception.error.UserErrorProperty;
 import com.bamdoliro.maru.infrastructure.message.exception.FailedToSendException;
-import com.bamdoliro.maru.presentation.user.dto.request.SendVerificationRequest;
-import com.bamdoliro.maru.presentation.user.dto.request.SignUpUserRequest;
-import com.bamdoliro.maru.presentation.user.dto.request.UpdatePasswordRequest;
-import com.bamdoliro.maru.presentation.user.dto.request.VerifyRequest;
+import com.bamdoliro.maru.presentation.user.dto.request.*;
 import com.bamdoliro.maru.shared.fixture.AuthFixture;
 import com.bamdoliro.maru.shared.fixture.UserFixture;
 import com.bamdoliro.maru.shared.util.RestDocsTestSupport;
@@ -395,5 +389,56 @@ class UserControllerTest extends RestDocsTestSupport {
                 .andDo(restDocs.document());
 
         verify(updatePasswordUseCase, never()).execute(any(UpdatePasswordRequest.class));
+    }
+
+    @Test
+    void 유저를_삭제한다() throws Exception {
+        User user = UserFixture.createUser();
+        DeleteUserRequest request = new DeleteUserRequest("password123$");
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        willDoNothing().given(deleteUserUseCase).execute(any(User.class), any(DeleteUserRequest.class));
+
+        mockMvc.perform(delete("/users")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(request))
+                )
+                .andExpect(status().isNoContent())
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("Bearer token")
+                        ),
+                        requestFields(
+                                fieldWithPath("password")
+                                        .description("비밀번호")
+                        )
+                ));
+
+        verify(deleteUserUseCase, times(1)).execute(any(User.class), any(DeleteUserRequest.class));
+    }
+
+    @Test
+    void 유저를_삭제할_때_비밀번호가_틀리면_에러가_발생한다() throws Exception {
+        User user = UserFixture.createUser();
+        DeleteUserRequest request = new DeleteUserRequest("Wrongpassword123$");
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new PasswordMismatchException()).when(deleteUserUseCase).execute(any(User.class), any(DeleteUserRequest.class));
+
+        mockMvc.perform(delete("/users")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(request))
+                )
+                .andExpect(status().isUnauthorized())
+                .andDo(restDocs.document());
+
+        verify(deleteUserUseCase, times(1)).execute(any(User.class), any(DeleteUserRequest.class));
     }
 }
