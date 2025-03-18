@@ -19,7 +19,7 @@ public class XlsxGenerator {
 
     private final XlsxService xlsxService;
 
-    public Resource export(String templateName, List<Form> formList, List<Function<Form, Object>> columnList, List<String> styleList) throws IOException {
+    public Resource execute(String templateName, List<Form> formList, List<Function<Form, Object>> columnList, List<String> styleList) throws IOException {
         Workbook workbook = xlsxService.openTemplate(templateName);
         Sheet sheet = workbook.getSheetAt(0);
 
