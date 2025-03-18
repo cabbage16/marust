@@ -1,164 +1,87 @@
 package com.bamdoliro.maru.application.form;
 
 import com.bamdoliro.maru.domain.form.domain.Form;
-import com.bamdoliro.maru.domain.form.domain.value.SubjectMap;
 import com.bamdoliro.maru.domain.form.service.FormFacade;
-import com.bamdoliro.maru.infrastructure.xlsx.XlsxService;
-import com.bamdoliro.maru.infrastructure.xlsx.constant.XlsxConstant;
+import com.bamdoliro.maru.infrastructure.xlsx.constant.XlsxGenerator;
 import com.bamdoliro.maru.shared.annotation.UseCase;
 import com.bamdoliro.maru.shared.util.MathUtil;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.function.Function;
 
 @RequiredArgsConstructor
 @UseCase
 public class ExportResultUseCase {
 
     private final FormFacade formFacade;
-    private final XlsxService xlsxService;
+    private final XlsxGenerator xlsxGenerator;
 
     public Resource execute() throws IOException {
         List<Form> formList = formFacade.getSortedFormList(null);
-        Workbook workbook = xlsxService.openTemplate("전체결과");
-        Sheet sheet = workbook.getSheetAt(0);
 
-        CellStyle defaultCellStyle = xlsxService.createDefaultCellStyle(workbook);
-        CellStyle rightCellStyle = xlsxService.createRightCellStyle(workbook);
-        CellStyle emptyCellStyle = xlsxService.createEmptyCellStyle(workbook);
+        List<Function<Form, Object>> columnList = List.of(
+                Form::getId,
+                Form::getExaminationNumber,
+                form -> form.getOriginalType().getDescription(),
+                form -> form.getType().getDescription(),
+                form -> form.getStatus().getDescription(),
+                form -> form.getApplicant().getName(),
+                form -> form.getApplicant().getGender().getDescription(),
+                form -> form.getApplicant().getBirthday().format(DateTimeFormatter.BASIC_ISO_DATE),
+                form -> form.getEducation().getSchool().getLocation(),
+                form -> form.getEducation().getGraduationTypeToString(),
+                form -> form.getEducation().getSchool().getName(),
+                form -> form.getEducation().getSchool().getCode(),
+                form -> form.getGrade().getSubjectList().getSubjectMap().getSubjectListOf(2, 1).size(),
+                form -> form.getGrade().getSubjectList().getSubjectMap().getSubjectListOf(2, 1).totalScore(),
+                form -> form.getGrade().getSubjectList().getSubjectMap().getSubjectListOf(2, 2).size(),
+                form -> form.getGrade().getSubjectList().getSubjectMap().getSubjectListOf(2, 2).totalScore(),
+                form -> form.getGrade().getSubjectList().getSubjectMap().getSubjectListOf(3, 1).size(),
+                form -> form.getGrade().getSubjectList().getSubjectMap().getSubjectListOf(3, 1).totalScore(),
+                form -> MathUtil.roundTo(form.getScore().getSubjectGradeScore(), 3),
+                form -> form.getScore().getAttendanceScore(),
+                form -> form.getScore().getVolunteerScore(),
+                form -> form.getScore().getBonusScore(),
+                form -> form.getScore().getDepthInterviewScore(),
+                form -> form.getScore().getNcsScore(),
+                form -> form.getScore().getCodingTestScore(),
+                form -> form.tookSecondRound() ? MathUtil.roundTo(form.getScore().getTotalScore(), 3) : MathUtil.roundTo(form.getScore().getFirstRoundScore(), 3)
+        );
 
+        List<String> styleList = List.of(
+                "default",
+                "default",
+                "default",
+                "default",
+                "default",
+                "default",
+                "default",
+                "default",
+                "default",
+                "default",
+                "default",
+                "default",
+                "default",
+                "default",
+                "default",
+                "default",
+                "default",
+                "default",
+                "default",
+                "right",
+                "right",
+                "right",
+                "right",
+                "right",
+                "right",
+                "right",
+                "right"
+        );
 
-        for (int index = 0; index < formList.size(); index++) {
-            Form form = formList.get(index);
-            Row row = sheet.createRow(index + XlsxConstant.FIRST_ROW_INDEX_WITH_TITLE);
-            SubjectMap subjectMap = form.getGrade().getSubjectList().getSubjectMap();
-
-            Cell idCell = row.createCell(0);
-            idCell.setCellValue(form.getId());
-            idCell.setCellStyle(defaultCellStyle);
-
-            Cell examinationNumberCell = row.createCell(1);
-            examinationNumberCell.setCellValue(form.getExaminationNumber());
-            examinationNumberCell.setCellStyle(defaultCellStyle);
-
-            Cell originalTypeCell = row.createCell(2);
-            originalTypeCell.setCellValue(form.getOriginalType().getDescription());
-            originalTypeCell.setCellStyle(defaultCellStyle);
-
-            Cell typeCell = row.createCell(3);
-            typeCell.setCellValue(form.getType().getDescription());
-            typeCell.setCellStyle(defaultCellStyle);
-
-            Cell resultCell = row.createCell(4);
-            resultCell.setCellValue(form.getStatus().getDescription());
-            resultCell.setCellStyle(defaultCellStyle);
-
-            Cell nameCell = row.createCell(5);
-            nameCell.setCellValue(form.getApplicant().getName());
-            nameCell.setCellStyle(defaultCellStyle);
-
-            Cell genderCell = row.createCell(6);
-            genderCell.setCellValue(form.getApplicant().getGender().getDescription());
-            genderCell.setCellStyle(defaultCellStyle);
-
-            Cell birthdayCell = row.createCell(7);
-            birthdayCell.setCellValue(form.getApplicant().getBirthday().format(DateTimeFormatter.BASIC_ISO_DATE));
-            birthdayCell.setCellStyle(defaultCellStyle);
-
-            Cell locationCell = row.createCell(8);
-            locationCell.setCellValue(form.getEducation().getSchool().getLocation());
-            locationCell.setCellStyle(defaultCellStyle);
-
-            Cell graduationCell = row.createCell(9);
-            graduationCell.setCellValue(form.getEducation().getGraduationTypeToString());
-            graduationCell.setCellStyle(defaultCellStyle);
-
-            Cell schoolCell = row.createCell(10);
-            schoolCell.setCellValue(form.getEducation().getSchool().getName());
-            schoolCell.setCellStyle(defaultCellStyle);
-
-            Cell schoolCodeCell = row.createCell(11);
-            schoolCodeCell.setCellValue(form.getEducation().getSchool().getCode());
-            schoolCodeCell.setCellStyle(defaultCellStyle);
-
-            Cell subjectCount21 = row.createCell(12);
-            subjectCount21.setCellValue(subjectMap.getSubjectListOf(2,1).size());
-            subjectCount21.setCellStyle(defaultCellStyle);
-
-            Cell subjectTotalScore21 = row.createCell(13);
-            subjectTotalScore21.setCellValue(subjectMap.getSubjectListOf(2,1).totalScore());
-            subjectTotalScore21.setCellStyle(defaultCellStyle);
-
-            Cell subjectCount22 = row.createCell(14);
-            subjectCount22.setCellValue(subjectMap.getSubjectListOf(2,2).size());
-            subjectCount22.setCellStyle(defaultCellStyle);
-
-            Cell subjectTotalScore22 = row.createCell(15);
-            subjectTotalScore22.setCellValue(subjectMap.getSubjectListOf(2,2).totalScore());
-            subjectTotalScore22.setCellStyle(defaultCellStyle);
-
-            Cell subjectCount31 = row.createCell(16);
-            subjectCount31.setCellValue(subjectMap.getSubjectListOf(3,1).size());
-            subjectCount31.setCellStyle(defaultCellStyle);
-
-            Cell subjectTotalScore31 = row.createCell(17);
-            subjectTotalScore31.setCellValue(subjectMap.getSubjectListOf(3,1).totalScore());
-            subjectTotalScore31.setCellStyle(defaultCellStyle);
-
-            Cell subjectGradeScoreCell = row.createCell(18);
-            subjectGradeScoreCell.setCellValue(MathUtil.roundTo(form.getScore().getSubjectGradeScore(), 3));
-            subjectGradeScoreCell.setCellStyle(rightCellStyle);
-
-            Cell attendanceScoreCell = row.createCell(19);
-            attendanceScoreCell.setCellValue(form.getScore().getAttendanceScore());
-            attendanceScoreCell.setCellStyle(rightCellStyle);
-
-            Cell volunteerScoreCell = row.createCell(20);
-            volunteerScoreCell.setCellValue(form.getScore().getVolunteerScore());
-            volunteerScoreCell.setCellStyle(rightCellStyle);
-
-            Cell bonusScoreCell = row.createCell(21);
-            bonusScoreCell.setCellValue(form.getScore().getBonusScore());
-            bonusScoreCell.setCellStyle(rightCellStyle);
-
-            Cell depthInterviewScoreCell = row.createCell(22);
-            Cell ncsScoreCell = row.createCell(23);
-            Cell codingTestScoreCell = row.createCell(24);
-            Cell totalScoreCell = row.createCell(25);
-            totalScoreCell.setCellStyle(rightCellStyle);
-
-            if (form.tookSecondRound()) {
-                depthInterviewScoreCell.setCellValue(form.getScore().getDepthInterviewScore());
-                depthInterviewScoreCell.setCellStyle(rightCellStyle);
-
-                ncsScoreCell.setCellValue(form.getScore().getNcsScore());
-                ncsScoreCell.setCellStyle(rightCellStyle);
-
-                if (form.getType().isMeister()) {
-                    codingTestScoreCell.setCellValue(form.getScore().getCodingTestScore());
-                    codingTestScoreCell.setCellStyle(rightCellStyle);
-                } else {
-                    codingTestScoreCell.setCellStyle(emptyCellStyle);
-                }
-
-                totalScoreCell.setCellValue(MathUtil.roundTo(form.getScore().getTotalScore(), 3));
-            } else {
-                depthInterviewScoreCell.setCellStyle(emptyCellStyle);
-                ncsScoreCell.setCellStyle(emptyCellStyle);
-                codingTestScoreCell.setCellStyle(emptyCellStyle);
-
-                totalScoreCell.setCellValue(MathUtil.roundTo(form.getScore().getFirstRoundScore(), 3));
-            }
-        }
-
-        return xlsxService.convertToByteArrayResource(workbook);
+        return xlsxGenerator.export("전체결과", formList, columnList, styleList);
     }
 }
