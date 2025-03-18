@@ -71,6 +71,6 @@ public class ExportFirstRoundResultUseCase {
                 "right"
         );
 
-        return xlsxGenerator.export("1차전형결과", formList, columnList, styleList);
+        return xlsxGenerator.execute("1차전형결과", formList, columnList, styleList);
     }
 }

@@ -76,6 +76,6 @@ public class ExportSecondRoundResultUseCase {
                 "right"
         );
 
-        return xlsxGenerator.export("2차전형결과", formList, columnList, styleList);
+        return xlsxGenerator.execute("2차전형결과", formList, columnList, styleList);
     }
 }

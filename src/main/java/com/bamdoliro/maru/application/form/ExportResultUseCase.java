@@ -82,6 +82,6 @@ public class ExportResultUseCase {
                 "right"
         );
 
-        return xlsxGenerator.export("전체결과", formList, columnList, styleList);
+        return xlsxGenerator.execute("전체결과", formList, columnList, styleList);
     }
 }

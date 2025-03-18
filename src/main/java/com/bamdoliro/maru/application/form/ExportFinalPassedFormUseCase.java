@@ -80,6 +80,6 @@ public class ExportFinalPassedFormUseCase {
                 "right"
         );
 
-        return xlsxGenerator.export("최종합격자", formList, columnList, styleList);
+        return xlsxGenerator.execute("최종합격자", formList, columnList, styleList);
     }
 }
