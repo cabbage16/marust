@@ -3,7 +3,7 @@ package com.bamdoliro.maru.application.form;
 import com.bamdoliro.maru.domain.form.domain.Form;
 import com.bamdoliro.maru.domain.form.domain.type.FormStatus;
 import com.bamdoliro.maru.domain.form.service.FormFacade;
-import com.bamdoliro.maru.infrastructure.xlsx.constant.XlsxGenerator;
+import com.bamdoliro.maru.infrastructure.xlsx.XlsxGenerator;
 import com.bamdoliro.maru.shared.annotation.UseCase;
 import com.bamdoliro.maru.shared.util.MathUtil;
 import lombok.RequiredArgsConstructor;
