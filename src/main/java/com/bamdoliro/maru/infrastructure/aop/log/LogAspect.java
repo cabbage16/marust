@@ -1,4 +1,4 @@
-package com.bamdoliro.maru.infrastructure.log;
+package com.bamdoliro.maru.infrastructure.aop.log;
 
 import com.bamdoliro.maru.domain.form.domain.Form;
 import com.bamdoliro.maru.domain.form.domain.type.FormStatus;
