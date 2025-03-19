@@ -17,9 +17,9 @@ import java.util.Optional;
 @UseCase
 public class DeleteUserUseCase {
 
-    private final UserRepository userRepository;
     private final FormRepository formRepository;
     private final LogOutUseCase logOutUseCase;
+    private final UserRepository userRepository;
 
     public void execute(User user, DeleteUserRequest request) {
         validatePassword(request.getPassword(), user.getPassword());
