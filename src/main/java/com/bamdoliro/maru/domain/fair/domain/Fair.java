@@ -4,16 +4,7 @@ import com.bamdoliro.maru.domain.fair.domain.type.FairStatus;
 import com.bamdoliro.maru.domain.fair.domain.type.FairType;
 import com.bamdoliro.maru.infrastructure.persistence.fair.AttendeeRepository;
 import com.bamdoliro.maru.shared.entity.BaseTimeEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -68,8 +59,8 @@ public class Fair extends BaseTimeEntity {
         this.place = place;
         this.applicationUrl = applicationUrl;
         this.type = type;
-        this.applicationStartDate = applicationStartDate == null ? LocalDate.now() : applicationStartDate;
-        this.applicationEndDate = applicationEndDate == null ? start.minusDays(3).toLocalDate() : applicationEndDate;
+        this.applicationStartDate = applicationStartDate;
+        this.applicationEndDate = applicationEndDate;
     }
 
     public Integer getHeadcount(AttendeeRepository attendeeRepository) {
