@@ -13,10 +13,7 @@ import com.bamdoliro.maru.application.message.SendMessageUseCase;
 import com.bamdoliro.maru.application.notice.*;
 import com.bamdoliro.maru.application.question.*;
 import com.bamdoliro.maru.application.school.SearchSchoolUseCase;
-import com.bamdoliro.maru.application.user.SendVerificationUseCase;
-import com.bamdoliro.maru.application.user.SignUpUserUseCase;
-import com.bamdoliro.maru.application.user.UpdatePasswordUseCase;
-import com.bamdoliro.maru.application.user.VerifyUseCase;
+import com.bamdoliro.maru.application.user.*;
 import com.bamdoliro.maru.domain.auth.service.TokenService;
 import com.bamdoliro.maru.infrastructure.message.SendMessageService;
 import com.bamdoliro.maru.infrastructure.neis.SearchSchoolService;
@@ -71,6 +68,9 @@ public abstract class ControllerTest {
 
     @MockBean
     protected UpdatePasswordUseCase updatePasswordUseCase;
+
+    @MockBean
+    protected DeleteUserUseCase deleteUserUseCase;
 
     @MockBean
     protected RefreshTokenUseCase refreshTokenUseCase;
