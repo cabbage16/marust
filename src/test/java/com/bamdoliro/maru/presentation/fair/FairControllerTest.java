@@ -20,21 +20,14 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.payload.JsonFieldType;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.BDDMockito.willThrow;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class FairControllerTest extends RestDocsTestSupport {
@@ -81,11 +74,11 @@ class FairControllerTest extends RestDocsTestSupport {
                                 fieldWithPath("applicationStartDate")
                                         .type(JsonFieldType.STRING)
                                         .optional()
-                                        .description("입학설명회 신청 시작일 (yyyy-MM-dd), null이면 당일 시작"),
+                                        .description("입학설명회 신청 시작일 (yyyy-MM-dd)"),
                                 fieldWithPath("applicationEndDate")
                                         .type(JsonFieldType.STRING)
                                         .optional()
-                                        .description("입학설명회 신청 종료일 (yyyy-MM-dd), null이면 입학설명회 3일 전 종료")
+                                        .description("입학설명회 신청 종료일 (yyyy-MM-dd)")
                         )
                 ));
 
