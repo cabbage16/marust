@@ -48,7 +48,7 @@ public class FairRepositoryImpl implements FairRepositoryCustom {
         return Optional.ofNullable(
                 queryFactory
                         .selectFrom(fair)
-                        .join(fair.attendeeList).fetchJoin()
+                        .leftJoin(fair.attendeeList).fetchJoin()
                         .where(fair.id.eq(fairId))
                         .fetchOne()
         );
