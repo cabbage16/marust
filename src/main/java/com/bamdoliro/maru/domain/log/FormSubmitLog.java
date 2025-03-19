@@ -4,6 +4,7 @@ import com.bamdoliro.maru.domain.form.domain.Form;
 import com.bamdoliro.maru.domain.form.domain.type.FormStatus;
 import com.bamdoliro.maru.domain.form.domain.type.FormType;
 import com.bamdoliro.maru.domain.user.domain.User;
+import com.bamdoliro.maru.shared.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "tbl_form_submit_log")
 @Entity
-public class FormSubmitLog {
+public class FormSubmitLog extends BaseTimeEntity {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
