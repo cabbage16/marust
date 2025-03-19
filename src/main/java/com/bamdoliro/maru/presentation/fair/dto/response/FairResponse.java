@@ -13,17 +13,17 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class FairResponse {
 
+    private Long id;
     private LocalDateTime start;
     private String place;
-    private String applicationUrl;
     private LocalDate applicationStartDate;
     private LocalDate applicationEndDate;
     private FairStatus status;
 
     public FairResponse(Fair fair, AttendeeRepository attendeeRepository) {
+        this.id = fair.getId();
         this.start = fair.getStart();
         this.place = fair.getPlace();
-        this.applicationUrl = fair.getApplicationUrl();
         this.applicationStartDate = fair.getApplicationStartDate();
         this.applicationEndDate = fair.getApplicationEndDate();
         this.status = fair.getStatus(attendeeRepository);
