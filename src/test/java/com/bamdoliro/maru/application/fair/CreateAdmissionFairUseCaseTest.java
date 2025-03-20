@@ -42,6 +42,5 @@ class CreateAdmissionFairUseCaseTest {
         Fair savedFair = captor.getValue();
         assertEquals(fair.getStart(), savedFair.getStart());
         assertEquals(fair.getPlace(), savedFair.getPlace());
-        assertEquals(fair.getStart().minusDays(3).toLocalDate(), savedFair.getApplicationEndDate());
-    }
+       }
 }

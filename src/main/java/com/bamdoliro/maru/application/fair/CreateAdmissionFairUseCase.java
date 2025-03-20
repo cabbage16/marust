@@ -20,7 +20,6 @@ public class CreateAdmissionFairUseCase {
                         .start(request.getStart())
                         .capacity(request.getCapacity())
                         .place(request.getPlace())
-                        .applicationUrl(request.getApplicationUrl())
                         .type(request.getType())
                         .applicationStartDate(request.getApplicationStartDate())
                         .applicationEndDate(request.getApplicationEndDate())

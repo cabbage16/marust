@@ -17,36 +17,33 @@ public class FairFixture {
 
     public static Fair createFair() {
         return new Fair(
-                LocalDateTime.of(2025, 4, 15, 10, 39),
+                LocalDateTime.of(2025, 8, 26, 11, 0),
                 120,
-                "서울시 강남구",
-                "https://docs.google.com",
+                "부산소프트웨어마이스터고등학교 1층 SRC관",
                 FairType.STUDENT_AND_PARENT,
                 LocalDate.now(),
-                LocalDate.now().plusDays(3)
+                LocalDate.now().plusWeeks(2)
         );
     }
     public static CreateFairRequest createFairRequest() {
         return new CreateFairRequest(
-                LocalDateTime.of(2025, 4, 15, 10, 39),
+                LocalDateTime.of(2025, 8, 26, 11, 0),
                 120,
-                "서울시 강남구",
-                "https://docs.google.com",
+                "부산소프트웨어마이스터고등학교 1층 SRC관",
                 FairType.STUDENT_AND_PARENT,
                 LocalDate.now(),
-                null
+                LocalDate.now().plusWeeks(2)
         );
     }
 
     public static Fair createClosedFair() {
         return new Fair(
-                LocalDateTime.of(2005, 4, 15, 10, 39),
+                LocalDateTime.of(2024, 8, 26, 11, 0),
                 120,
-                "서울시 강남구",
-                "https://docs.google.com",
+                "부산소프트웨어마이스터고등학교 1층 SRC관",
                 FairType.STUDENT_AND_PARENT,
                 LocalDate.now(),
-                LocalDate.now().plusDays(3)
+                LocalDate.now().plusWeeks(2)
         );
     }
 
