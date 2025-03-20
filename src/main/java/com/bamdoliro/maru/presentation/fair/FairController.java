@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 
 @RequiredArgsConstructor
-@RequestMapping("/fair")
+@RequestMapping("/fairs")
 @RestController
 public class FairController {
 

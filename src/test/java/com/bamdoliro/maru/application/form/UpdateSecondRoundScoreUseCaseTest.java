@@ -7,12 +7,13 @@ import com.bamdoliro.maru.domain.form.service.CalculateFormScoreService;
 import com.bamdoliro.maru.domain.user.domain.User;
 import com.bamdoliro.maru.infrastructure.persistence.form.FormRepository;
 import com.bamdoliro.maru.infrastructure.persistence.user.UserRepository;
+import com.bamdoliro.maru.shared.config.DatabaseClearExtension;
 import com.bamdoliro.maru.shared.constants.FixedNumber;
 import com.bamdoliro.maru.shared.fixture.FormFixture;
 import com.bamdoliro.maru.shared.fixture.UserFixture;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
@@ -22,13 +23,14 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-@Disabled
 @ActiveProfiles("test")
+@ExtendWith(DatabaseClearExtension.class)
 @SpringBootTest
 class UpdateSecondRoundScoreUseCaseTest {
 
@@ -80,11 +82,14 @@ class UpdateSecondRoundScoreUseCaseTest {
         // when
         updateSecondRoundScoreUseCase.execute(multipartFile);
 
+
         // then
-        List<Form> formList = formRepository.findByStatus(FormStatus.FIRST_PASSED);
+        List<Form> formList = formRepository.findByStatus(FormStatus.FIRST_PASSED).stream()
+                .sorted(Comparator.comparing(Form::getExaminationNumber))
+                .toList();
         assertEquals(3, formList.size());
         assertNull(formList.get(0).getScore().getCodingTestScore());
-        assertEquals(133.2, formList.get(1).getScore().getCodingTestScore());
+        assertEquals(20, formList.get(1).getScore().getCodingTestScore());
         assertNull(formList.get(2).getScore().getCodingTestScore());
     }
 }

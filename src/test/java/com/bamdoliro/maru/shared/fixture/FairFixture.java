@@ -3,7 +3,6 @@ package com.bamdoliro.maru.shared.fixture;
 import com.bamdoliro.maru.domain.fair.domain.Attendee;
 import com.bamdoliro.maru.domain.fair.domain.Fair;
 import com.bamdoliro.maru.domain.fair.domain.type.FairType;
-import com.bamdoliro.maru.infrastructure.persistence.fair.AttendeeRepository;
 import com.bamdoliro.maru.presentation.fair.dto.request.AttendAdmissionFairRequest;
 import com.bamdoliro.maru.presentation.fair.dto.request.CreateFairRequest;
 import com.bamdoliro.maru.presentation.fair.dto.response.FairDetailResponse;
@@ -13,7 +12,6 @@ import com.bamdoliro.maru.shared.util.RandomCodeUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random;
 
 public class FairFixture {
 

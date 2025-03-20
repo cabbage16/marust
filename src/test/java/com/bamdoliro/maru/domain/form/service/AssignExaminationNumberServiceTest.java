@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
@@ -29,27 +29,27 @@ class AssignExaminationNumberServiceTest {
     void 수험번호를_부여한다() {
         // given
         Form form = FormFixture.createForm(FormType.REGULAR);
-        given(formRepository.findMaxExaminationNumber(1000L, 2000L)).willReturn(Optional.of(1005L));
+        given(formRepository.findAllExaminationNumber()).willReturn(List.of(1001L, 1002L, 1003L, 1004L, 1005L));
 
         // when
         assignExaminationNumberService.execute(form);
 
         // then
         assertEquals(1006L, form.getExaminationNumber());
-        verify(formRepository).findMaxExaminationNumber(1000L, 2000L);
+        verify(formRepository).findAllExaminationNumber();
     }
 
     @Test
     void 이전에_수험번호가_없다면_초기값을_부여한다() {
         // given
         Form form = FormFixture.createForm(FormType.TEEN_HOUSEHOLDER);
-        given(formRepository.findMaxExaminationNumber(3000L, 4000L)).willReturn(Optional.empty());
+        given(formRepository.findAllExaminationNumber()).willReturn(List.of());
 
         // when
         assignExaminationNumberService.execute(form);
 
         // then
         assertEquals(3001L, form.getExaminationNumber());
-        verify(formRepository).findMaxExaminationNumber(3000L, 4000L);
+        verify(formRepository).findAllExaminationNumber();
     }
 }

@@ -1,7 +1,6 @@
 package com.bamdoliro.maru.shared.fixture;
 
 import com.bamdoliro.maru.domain.form.domain.type.FormType;
-import com.bamdoliro.maru.infrastructure.persistence.form.vo.NumberOfApplicantsVo;
 import com.bamdoliro.maru.presentation.analysis.dto.response.GenderRatioResponse;
 import com.bamdoliro.maru.presentation.analysis.dto.response.GradeDistributionResponse;
 import com.bamdoliro.maru.presentation.analysis.dto.response.NumberOfApplicantsResponse;
@@ -10,7 +9,6 @@ import com.bamdoliro.maru.presentation.analysis.dto.response.SchoolStatusRespons
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 import static com.bamdoliro.maru.shared.util.RandomUtil.randomDouble;
 import static com.bamdoliro.maru.shared.util.RandomUtil.randomNumber;
@@ -117,15 +115,4 @@ public class AnalysisFixture {
         );
     }
 
-    public static NumberOfApplicantsVo createNumberOfApplicantsVo() {
-        return new NumberOfApplicantsVo(
-                randomFormType(),
-                (long) randomNumber(0, 50)
-        );
-    }
-
-    private static FormType randomFormType() {
-        FormType[] values = {FormType.REGULAR, FormType.REGULAR, FormType.REGULAR, FormType.REGULAR, FormType.MEISTER_TALENT, FormType.MEISTER_TALENT, FormType.MEISTER_TALENT, FormType.MEISTER_TALENT, FormType.ONE_PARENT, FormType.MULTI_CHILDREN, FormType.SPECIAL_ADMISSION};
-        return values[new Random().nextInt(values.length)];
-    }
 }

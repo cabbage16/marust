@@ -2,16 +2,10 @@ package com.bamdoliro.maru.presentation.user;
 
 import com.bamdoliro.maru.domain.user.domain.User;
 import com.bamdoliro.maru.domain.user.domain.type.VerificationType;
-import com.bamdoliro.maru.domain.user.exception.UserAlreadyExistsException;
-import com.bamdoliro.maru.domain.user.exception.UserNotFoundException;
-import com.bamdoliro.maru.domain.user.exception.VerificationCodeMismatchException;
-import com.bamdoliro.maru.domain.user.exception.VerifyingHasFailedException;
+import com.bamdoliro.maru.domain.user.exception.*;
 import com.bamdoliro.maru.domain.user.exception.error.UserErrorProperty;
 import com.bamdoliro.maru.infrastructure.message.exception.FailedToSendException;
-import com.bamdoliro.maru.presentation.user.dto.request.SendVerificationRequest;
-import com.bamdoliro.maru.presentation.user.dto.request.SignUpUserRequest;
-import com.bamdoliro.maru.presentation.user.dto.request.UpdatePasswordRequest;
-import com.bamdoliro.maru.presentation.user.dto.request.VerifyRequest;
+import com.bamdoliro.maru.presentation.user.dto.request.*;
 import com.bamdoliro.maru.shared.fixture.AuthFixture;
 import com.bamdoliro.maru.shared.fixture.UserFixture;
 import com.bamdoliro.maru.shared.util.RestDocsTestSupport;
@@ -21,7 +15,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
@@ -43,7 +36,7 @@ class UserControllerTest extends RestDocsTestSupport {
                 "password123$"
         );
 
-        mockMvc.perform(post("/user")
+        mockMvc.perform(post("/users")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -71,7 +64,7 @@ class UserControllerTest extends RestDocsTestSupport {
         doThrow(new VerifyingHasFailedException()).when(signUpUserUseCase).execute(any(SignUpUserRequest.class));
         SignUpUserRequest request = new SignUpUserRequest("01085852525", "김밤돌", "password123$");
 
-        mockMvc.perform(post("/user")
+        mockMvc.perform(post("/users")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -86,7 +79,7 @@ class UserControllerTest extends RestDocsTestSupport {
                 .when(signUpUserUseCase).execute(any(SignUpUserRequest.class));
         SignUpUserRequest request = new SignUpUserRequest("01085852525", "김밤돌", "password123$");
 
-        mockMvc.perform(post("/user")
+        mockMvc.perform(post("/users")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -102,7 +95,7 @@ class UserControllerTest extends RestDocsTestSupport {
         willDoNothing().given(signUpUserUseCase).execute(any(SignUpUserRequest.class));
         SignUpUserRequest request = new SignUpUserRequest("bamdoliro", "", "p$");
 
-        mockMvc.perform(post("/user")
+        mockMvc.perform(post("/users")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -118,7 +111,7 @@ class UserControllerTest extends RestDocsTestSupport {
         SendVerificationRequest request = new SendVerificationRequest("01085852525", VerificationType.SIGNUP);
         willDoNothing().given(sendVerificationUseCase).execute(any(SendVerificationRequest.class));
 
-        mockMvc.perform(post("/user/verification")
+        mockMvc.perform(post("/users/verification")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -145,7 +138,7 @@ class UserControllerTest extends RestDocsTestSupport {
         SendVerificationRequest request = new SendVerificationRequest("누가봐도전화번호아님ㅎg", VerificationType.SIGNUP);
         willDoNothing().given(sendVerificationUseCase).execute(any(SendVerificationRequest.class));
 
-        mockMvc.perform(post("/user/verification")
+        mockMvc.perform(post("/users/verification")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -164,7 +157,7 @@ class UserControllerTest extends RestDocsTestSupport {
         doThrow(new FailedToSendException())
                 .when(sendVerificationUseCase).execute(any(SendVerificationRequest.class));
 
-        mockMvc.perform(post("/user/verification")
+        mockMvc.perform(post("/users/verification")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -184,7 +177,7 @@ class UserControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
 
-        mockMvc.perform(get("/user")
+        mockMvc.perform(get("/users")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON))
 
@@ -203,7 +196,7 @@ class UserControllerTest extends RestDocsTestSupport {
         willDoNothing().given(verifyUseCase).execute(any(VerifyRequest.class));
         VerifyRequest request = new VerifyRequest("01085852525", "123456", VerificationType.SIGNUP);
 
-        mockMvc.perform(patch("/user/verification")
+        mockMvc.perform(patch("/users/verification")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -233,7 +226,7 @@ class UserControllerTest extends RestDocsTestSupport {
         doThrow(new VerificationCodeMismatchException()).when(verifyUseCase).execute(any(VerifyRequest.class));
         VerifyRequest request = new VerifyRequest("01085852525", "123456", VerificationType.SIGNUP);
 
-        mockMvc.perform(patch("/user/verification")
+        mockMvc.perform(patch("/users/verification")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -251,7 +244,7 @@ class UserControllerTest extends RestDocsTestSupport {
         doThrow(new VerifyingHasFailedException()).when(verifyUseCase).execute(any(VerifyRequest.class));
         VerifyRequest request = new VerifyRequest("01085852525", "123456", VerificationType.SIGNUP);
 
-        mockMvc.perform(patch("/user/verification")
+        mockMvc.perform(patch("/users/verification")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -269,7 +262,7 @@ class UserControllerTest extends RestDocsTestSupport {
         willDoNothing().given(verifyUseCase).execute(any(VerifyRequest.class));
         VerifyRequest request = new VerifyRequest("01085852525", "123456", VerificationType.UPDATE_PASSWORD);
 
-        mockMvc.perform(patch("/user/verification")
+        mockMvc.perform(patch("/users/verification")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -299,7 +292,7 @@ class UserControllerTest extends RestDocsTestSupport {
         doThrow(new VerificationCodeMismatchException()).when(verifyUseCase).execute(any(VerifyRequest.class));
         VerifyRequest request = new VerifyRequest("01085852525", "123456", VerificationType.UPDATE_PASSWORD);
 
-        mockMvc.perform(patch("/user/verification")
+        mockMvc.perform(patch("/users/verification")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -317,7 +310,7 @@ class UserControllerTest extends RestDocsTestSupport {
         doThrow(new VerifyingHasFailedException()).when(verifyUseCase).execute(any(VerifyRequest.class));
         VerifyRequest request = new VerifyRequest("01085852525", "123456", VerificationType.UPDATE_PASSWORD);
 
-        mockMvc.perform(patch("/user/verification")
+        mockMvc.perform(patch("/users/verification")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -335,7 +328,7 @@ class UserControllerTest extends RestDocsTestSupport {
         willDoNothing().given(updatePasswordUseCase).execute(any(UpdatePasswordRequest.class));
         UpdatePasswordRequest request = new UpdatePasswordRequest("01085852525", "hihi1234!");
 
-        mockMvc.perform(patch("/user/password")
+        mockMvc.perform(patch("/users/password")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -358,7 +351,7 @@ class UserControllerTest extends RestDocsTestSupport {
         doThrow(new VerifyingHasFailedException()).when(updatePasswordUseCase).execute(any(UpdatePasswordRequest.class));
         SignUpUserRequest request = new SignUpUserRequest("01085852525", "김밤돌", "password123$");
 
-        mockMvc.perform(patch("/user/password")
+        mockMvc.perform(patch("/users/password")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -372,7 +365,7 @@ class UserControllerTest extends RestDocsTestSupport {
         doThrow(new UserNotFoundException()).when(updatePasswordUseCase).execute(any(UpdatePasswordRequest.class));
         UpdatePasswordRequest request = new UpdatePasswordRequest("01085852525", "hihi1234!");
 
-        mockMvc.perform(patch("/user/password")
+        mockMvc.perform(patch("/users/password")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -387,7 +380,7 @@ class UserControllerTest extends RestDocsTestSupport {
     void 비밀번호_형식이_다르면_오류가_발생한다() throws Exception {
         UpdatePasswordRequest request = new UpdatePasswordRequest("01085852525", "123456");
 
-        mockMvc.perform(patch("/user/password")
+        mockMvc.perform(patch("/users/password")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -396,5 +389,56 @@ class UserControllerTest extends RestDocsTestSupport {
                 .andDo(restDocs.document());
 
         verify(updatePasswordUseCase, never()).execute(any(UpdatePasswordRequest.class));
+    }
+
+    @Test
+    void 유저를_삭제한다() throws Exception {
+        User user = UserFixture.createUser();
+        DeleteUserRequest request = new DeleteUserRequest("password123$");
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        willDoNothing().given(deleteUserUseCase).execute(any(User.class), any(DeleteUserRequest.class));
+
+        mockMvc.perform(delete("/users")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(request))
+                )
+                .andExpect(status().isNoContent())
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("Bearer token")
+                        ),
+                        requestFields(
+                                fieldWithPath("password")
+                                        .description("비밀번호")
+                        )
+                ));
+
+        verify(deleteUserUseCase, times(1)).execute(any(User.class), any(DeleteUserRequest.class));
+    }
+
+    @Test
+    void 유저를_삭제할_때_비밀번호가_틀리면_에러가_발생한다() throws Exception {
+        User user = UserFixture.createUser();
+        DeleteUserRequest request = new DeleteUserRequest("Wrongpassword123$");
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new PasswordMismatchException()).when(deleteUserUseCase).execute(any(User.class), any(DeleteUserRequest.class));
+
+        mockMvc.perform(delete("/users")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(request))
+                )
+                .andExpect(status().isUnauthorized())
+                .andDo(restDocs.document());
+
+        verify(deleteUserUseCase, times(1)).execute(any(User.class), any(DeleteUserRequest.class));
     }
 }

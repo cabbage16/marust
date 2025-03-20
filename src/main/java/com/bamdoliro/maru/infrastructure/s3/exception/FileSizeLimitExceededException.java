@@ -5,7 +5,7 @@ import com.bamdoliro.maru.shared.error.MaruException;
 
 public class FileSizeLimitExceededException extends MaruException {
 
-    public FileSizeLimitExceededException() {
-        super(S3ErrorProperty.FILE_SIZE_LIMIT_EXCEEDED);
+    public FileSizeLimitExceededException(int maxSize) {
+        super(S3ErrorProperty.FILE_SIZE_LIMIT_EXCEEDED, maxSize);
     }
 }

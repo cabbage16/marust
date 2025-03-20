@@ -48,7 +48,7 @@ class FairControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         willDoNothing().given(createAdmissionFairUseCase).execute(request);
 
-        mockMvc.perform(post("/fair")
+        mockMvc.perform(post("/fairs")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -98,7 +98,7 @@ class FairControllerTest extends RestDocsTestSupport {
         AttendAdmissionFairRequest request = FairFixture.createAttendAdmissionFairRequest();
         willDoNothing().given(attendAdmissionFairUseCase).execute(any(Long.class), any(AttendAdmissionFairRequest.class));
 
-        mockMvc.perform(post("/fair/{fair-id}", fairId)
+        mockMvc.perform(post("/fairs/{fair-id}", fairId)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -143,7 +143,7 @@ class FairControllerTest extends RestDocsTestSupport {
         AttendAdmissionFairRequest request = FairFixture.createAttendAdmissionFairRequest();
         doThrow(new FairNotFoundException()).when(attendAdmissionFairUseCase).execute(any(Long.class), any(AttendAdmissionFairRequest.class));
 
-        mockMvc.perform(post("/fair/{fair-id}", fairId)
+        mockMvc.perform(post("/fairs/{fair-id}", fairId)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -162,7 +162,7 @@ class FairControllerTest extends RestDocsTestSupport {
         AttendAdmissionFairRequest request = FairFixture.createAttendAdmissionFairRequest();
         doThrow(new HeadcountExceededException()).when(attendAdmissionFairUseCase).execute(any(Long.class), any(AttendAdmissionFairRequest.class));
 
-        mockMvc.perform(post("/fair/{fair-id}", fairId)
+        mockMvc.perform(post("/fairs/{fair-id}", fairId)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -181,7 +181,7 @@ class FairControllerTest extends RestDocsTestSupport {
         AttendAdmissionFairRequest request = FairFixture.createAttendAdmissionFairRequest();
         doThrow(new NotApplicationPeriodException()).when(attendAdmissionFairUseCase).execute(any(Long.class), any(AttendAdmissionFairRequest.class));
 
-        mockMvc.perform(post("/fair/{fair-id}", fairId)
+        mockMvc.perform(post("/fairs/{fair-id}", fairId)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request))
@@ -198,7 +198,7 @@ class FairControllerTest extends RestDocsTestSupport {
     void 입학설명회_일정을_불러온다() throws Exception {
         given(queryFairListUseCase.execute(any(FairType.class))).willReturn(FairFixture.createFairResponseList());
 
-        mockMvc.perform(get("/fair")
+        mockMvc.perform(get("/fairs")
                         .param("type", FairType.STUDENT_AND_PARENT.name())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -225,7 +225,7 @@ class FairControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(queryFairDetailUseCase.execute(fairId)).willReturn(FairFixture.createFairDetailResponse());
 
-        mockMvc.perform(get("/fair/{fair-id}", fairId)
+        mockMvc.perform(get("/fairs/{fair-id}", fairId)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -255,7 +255,7 @@ class FairControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         willThrow(new FairNotFoundException()).given(queryFairDetailUseCase).execute(fairId);
 
-        mockMvc.perform(get("/fair/{fair-id}", fairId)
+        mockMvc.perform(get("/fairs/{fair-id}", fairId)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -282,7 +282,7 @@ class FairControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(exportAttendeeListUseCase.execute(fairId)).willReturn(new ByteArrayResource(file.getBytes()));
 
-        mockMvc.perform(get("/fair/{fair-id}/export", fairId)
+        mockMvc.perform(get("/fairs/{fair-id}/export", fairId)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
 
@@ -311,7 +311,7 @@ class FairControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         willThrow(new FairNotFoundException()).given(exportAttendeeListUseCase).execute(fairId);
 
-        mockMvc.perform(get("/fair/{fair-id}/export", fairId)
+        mockMvc.perform(get("/fairs/{fair-id}/export", fairId)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader()))
 
                 .andExpect(status().isNotFound())

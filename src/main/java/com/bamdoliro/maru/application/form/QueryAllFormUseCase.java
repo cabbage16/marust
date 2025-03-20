@@ -32,6 +32,8 @@ public class QueryAllFormUseCase {
                         formList.sort(Comparator.comparing(form -> form.getScore().getTotalScore(), Comparator.nullsLast(Comparator.reverseOrder())));
                 case "form-id" -> formList.sort(Comparator.comparing(Form::getId));
             }
+        } else {
+            formList.sort(Comparator.comparing(Form::getExaminationNumber));
         }
 
         return formList.stream()

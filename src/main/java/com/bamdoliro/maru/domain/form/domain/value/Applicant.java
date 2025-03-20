@@ -1,13 +1,9 @@
 package com.bamdoliro.maru.domain.form.domain.value;
 
 import com.bamdoliro.maru.domain.form.domain.type.Gender;
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import com.bamdoliro.maru.infrastructure.persistence.converter.LocalDateEncryptedConverter;
+import com.bamdoliro.maru.infrastructure.persistence.converter.StringEncryptedConverter;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,16 +17,19 @@ import java.time.LocalDate;
 @Embeddable
 public class Applicant {
 
-    @Column(nullable = false, length = 20)
+    @Convert(converter = StringEncryptedConverter.class)
+    @Column(nullable = false)
     private String name;
 
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "value", column = @Column(name = "phone_number", nullable = false, length = 11)),
+            @AttributeOverride(name = "value", column = @Column(name = "phone_number", nullable = false)),
     })
     private PhoneNumber phoneNumber;
 
+
+    @Convert(converter = LocalDateEncryptedConverter.class)
     @Column(nullable = false)
     private LocalDate birthday;
 

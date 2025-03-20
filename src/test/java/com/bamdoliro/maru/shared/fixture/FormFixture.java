@@ -272,8 +272,8 @@ public class FormFixture {
                 new Education(
                         GraduationType.QUALIFICATION_EXAMINATION,
                         "2021",
-                        null,
-                        null
+                        new School(null, null, null, null),
+                        new Teacher(null, null, null)
                 ),
                 new Grade(
                         new SubjectList(

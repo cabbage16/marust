@@ -2,17 +2,10 @@ package com.bamdoliro.maru.domain.user.domain;
 
 import com.bamdoliro.maru.domain.user.domain.type.Authority;
 import com.bamdoliro.maru.domain.user.domain.value.Password;
+import com.bamdoliro.maru.infrastructure.persistence.converter.StringEncryptedConverter;
 import com.bamdoliro.maru.shared.util.PasswordUtil;
 import com.bamdoliro.maru.shared.entity.BaseTimeEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,10 +27,12 @@ public class User extends BaseTimeEntity {
     @Column(unique = true, nullable = false)
     private UUID uuid;
 
-    @Column(unique = true, nullable = false, length = 11)
+    @Convert(converter = StringEncryptedConverter.class)
+    @Column(unique = true, nullable = false)
     private String phoneNumber;
 
-    @Column(nullable = false, length = 50)
+    @Convert(converter = StringEncryptedConverter.class)
+    @Column(nullable = false)
     private String name;
 
     @Embedded

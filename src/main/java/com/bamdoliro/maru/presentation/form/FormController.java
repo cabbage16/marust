@@ -8,6 +8,7 @@ import com.bamdoliro.maru.infrastructure.s3.dto.response.UrlResponse;
 import com.bamdoliro.maru.presentation.form.dto.request.PassOrFailFormListRequest;
 import com.bamdoliro.maru.presentation.form.dto.request.SubmitFormRequest;
 import com.bamdoliro.maru.presentation.form.dto.request.UpdateFormRequest;
+import com.bamdoliro.maru.infrastructure.s3.dto.request.FileMetadata;
 import com.bamdoliro.maru.presentation.form.dto.response.*;
 import com.bamdoliro.maru.shared.auth.AuthenticationPrincipal;
 import com.bamdoliro.maru.shared.auth.Authority;
@@ -20,7 +21,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +38,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("/form")
+@RequestMapping("/forms")
 @RestController
 public class FormController {
 
@@ -71,9 +71,8 @@ public class FormController {
     private final PassOrFailFormUseCase passOrFailFormUseCase;
     private final QueryFormUrlUseCase queryFormUrlUseCase;
     private final SelectSecondPassUseCase selectSecondPassUseCase;
-    private final UpdateOriginalTypeUseCase updateOriginalTypeUseCase;
     private final GenerateAllAdmissionTicketUseCase generateAllAdmissionTicketUseCase;
-    private final QueryAdmissionAndPledgeUrlUseCase queryAdmissionAndPledgeUrlUseCase;
+    private final QueryAdmissionAndPledgeUseCase queryAdmissionAndPledgeUseCase;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
@@ -165,32 +164,30 @@ public class FormController {
         updateFormUseCase.execute(user, formId, request);
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping( "/identification-picture")
     public SingleCommonResponse<UrlResponse> uploadIdentificationPicture(
-            @AuthenticationPrincipal(authority = Authority.USER) User user
+            @AuthenticationPrincipal(authority = Authority.USER) User user,
+            @RequestBody @Valid FileMetadata metadata
     ) {
         return SingleCommonResponse.ok(
-                uploadIdentificationPictureUseCase.execute(user)
+                uploadIdentificationPictureUseCase.execute(user, metadata)
         );
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/form-document")
     public SingleCommonResponse<UrlResponse> uploadFormDocument(
-            @AuthenticationPrincipal(authority = Authority.USER) User user
+            @AuthenticationPrincipal(authority = Authority.USER) User user,
+            @RequestBody @Valid FileMetadata metadata
     ) {
         return SingleCommonResponse.ok(
-                uploadFormUseCase.execute(user)
+                uploadFormUseCase.execute(user, metadata)
         );
     }
 
     @GetMapping("/export")
     public ResponseEntity<Resource> exportForm(
-            @AuthenticationPrincipal(authority = Authority.USER) User user,
-            Model model
+            @AuthenticationPrincipal(authority = Authority.USER) User user
     ) {
-        model.addAttribute("a", "a");
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(exportFormUseCase.execute(user));
@@ -207,10 +204,11 @@ public class FormController {
 
     @PostMapping("/admission-and-pledge")
     public SingleCommonResponse<UrlResponse> uploadAdmissionAndPledge(
-            @AuthenticationPrincipal(authority = Authority.USER) User user
+            @AuthenticationPrincipal(authority = Authority.USER) User user,
+            @RequestBody FileMetadata metadata
     ) {
         return SingleCommonResponse.ok(
-                uploadAdmissionAndPledgeUseCase.execute(user)
+                uploadAdmissionAndPledgeUseCase.execute(user, metadata)
         );
     }
 
@@ -253,7 +251,7 @@ public class FormController {
                 .body(generateAdmissionTicketUseCase.execute(user));
     }
 
-    @GetMapping("/admission-ticket/all")
+    @GetMapping("/admission-tickets")
     public ResponseEntity<Resource> generateAllAdmissionTicket(
             @AuthenticationPrincipal(authority = Authority.ADMIN) User user
     ) {
@@ -345,13 +343,13 @@ public class FormController {
     }
 
 
-    @GetMapping("/admission-and-pledge-url")
-    public ListCommonResponse<AdmissionAndPledgeUrlResponse> getAdmissionAndPledgeUrl(
+    @GetMapping("/admission-and-pledges")
+    public ListCommonResponse<AdmissionAndPledgeUrlResponse> getAdmissionAndPledges(
             @AuthenticationPrincipal(authority = Authority.ADMIN) User user,
             @RequestParam(name = "id-list") List<Long> formIdList
     ) {
         return CommonResponse.ok(
-                queryAdmissionAndPledgeUrlUseCase.execute(formIdList)
+                queryAdmissionAndPledgeUseCase.execute(formIdList)
         );
     }
 
@@ -361,12 +359,5 @@ public class FormController {
             @AuthenticationPrincipal(authority = Authority.ADMIN) User user
     ) {
         selectSecondPassUseCase.execute();
-    }
-
-    @PatchMapping("/original-type")
-    public void updateOriginalType(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user
-    ) {
-        updateOriginalTypeUseCase.execute();
     }
 }

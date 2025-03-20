@@ -1,6 +1,8 @@
 package com.bamdoliro.maru.domain.form.domain.value;
 
+import com.bamdoliro.maru.infrastructure.persistence.converter.StringEncryptedConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -13,13 +15,16 @@ import lombok.NoArgsConstructor;
 @Embeddable
 public class Address {
 
-    @Column(nullable = false, length = 5)
+    @Convert(converter = StringEncryptedConverter.class)
+    @Column(nullable = false)
     private String zoneCode;
 
-    @Column(nullable = false, length = 100)
+    @Convert(converter = StringEncryptedConverter.class)
+    @Column(nullable = false)
     private String address;
 
-    @Column(nullable = false, length = 100)
+    @Convert(converter = StringEncryptedConverter.class)
+    @Column(nullable = false)
     private String detailAddress;
 
     @Override

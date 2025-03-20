@@ -23,7 +23,7 @@ public class QueryNoticeUseCase {
         List<DownloadFileResponse> fileList = null;
         if (notice.getFileNameList() != null && !notice.getFileNameList().isEmpty()) {
             fileList = notice.getFileNameList().stream().map(fileName -> new DownloadFileResponse(
-                    fileService.getPresignedUrl(FolderConstant.NOTICE_FILE, fileName).getDownloadUrl(),
+                    fileService.getDownloadPresignedUrl(FolderConstant.NOTICE_FILE, fileName),
                     fileName
             )).toList();
         }

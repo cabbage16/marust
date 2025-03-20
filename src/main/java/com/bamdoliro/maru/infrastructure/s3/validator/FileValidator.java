@@ -1,17 +1,17 @@
 package com.bamdoliro.maru.infrastructure.s3.validator;
 
 import com.bamdoliro.maru.infrastructure.s3.exception.EmptyFileException;
-import org.springframework.web.multipart.MultipartFile;
+import com.bamdoliro.maru.infrastructure.s3.dto.request.FileMetadata;
 
 @FunctionalInterface
 public interface FileValidator {
-    void customValidate(MultipartFile file);
+    void customValidate(FileMetadata request);
 
-    default void validate(MultipartFile file) {
-        if (file.isEmpty()) {
+    default void validate(FileMetadata request) {
+        if (request.getFileName().isBlank() || request.getFileName().lastIndexOf(".") == -1 || request.getFileSize() <= 0) {
             throw new EmptyFileException();
         }
 
-        customValidate(file);
+        customValidate(request);
     }
 }

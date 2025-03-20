@@ -6,6 +6,7 @@ import com.bamdoliro.maru.presentation.analysis.dto.response.SchoolStatusRespons
 import com.bamdoliro.maru.shared.annotation.UseCase;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -22,12 +23,14 @@ public class QuerySchoolStatusUseCase {
             return formRepository.findSchoolByAddress(request.getStatusList(), keyword)
                     .stream()
                     .map(SchoolStatusResponse::new)
+                    .sorted(Comparator.comparing(SchoolStatusResponse::getApplicantName))
                     .toList();
         }
 
         return formRepository.findNotBusanSchool(request.getStatusList())
                 .stream()
                 .map(SchoolStatusResponse::new)
+                .sorted(Comparator.comparing(SchoolStatusResponse::getApplicantName))
                 .toList();
     }
 }

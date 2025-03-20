@@ -2,9 +2,9 @@ package com.bamdoliro.maru.presentation.notice;
 
 import com.bamdoliro.maru.domain.notice.exception.NoticeNotFoundException;
 import com.bamdoliro.maru.domain.user.domain.User;
-import com.bamdoliro.maru.infrastructure.s3.exception.FailedToSaveException;
+import com.bamdoliro.maru.infrastructure.s3.dto.request.FileMetadata;
+import com.bamdoliro.maru.infrastructure.s3.exception.FileCountLimitExceededException;
 import com.bamdoliro.maru.presentation.notice.dto.request.NoticeRequest;
-import com.bamdoliro.maru.presentation.notice.dto.request.UploadFileRequest;
 import com.bamdoliro.maru.presentation.notice.dto.response.DownloadFileResponse;
 import com.bamdoliro.maru.presentation.notice.dto.response.NoticeResponse;
 import com.bamdoliro.maru.presentation.notice.dto.response.NoticeSimpleResponse;
@@ -20,10 +20,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 
+import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static com.bamdoliro.maru.shared.constants.FileConstant.MB;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -44,7 +44,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
 
-        mockMvc.perform(post("/notice")
+        mockMvc.perform(post("/notices")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -84,7 +84,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
 
-        mockMvc.perform(put("/notice/{notice-id}", id)
+        mockMvc.perform(put("/notices/{notice-id}", id)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -125,7 +125,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
 
-        mockMvc.perform(put("/notice/{notice-id}", id)
+        mockMvc.perform(put("/notices/{notice-id}", id)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -145,7 +145,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
         );
         given(queryNoticeListUseCase.execute()).willReturn(response);
 
-        mockMvc.perform(get("/notice")
+        mockMvc.perform(get("/notices")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
 
@@ -171,7 +171,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
         ));
         given(queryNoticeUseCase.execute(id)).willReturn(response);
 
-        mockMvc.perform(get("/notice/{notice-id}", id)
+        mockMvc.perform(get("/notices/{notice-id}", id)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
 
@@ -192,7 +192,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
         Long id = 1L;
         willThrow(new NoticeNotFoundException()).given(queryNoticeUseCase).execute(id);
 
-        mockMvc.perform(get("/notice/{notice-id}", id)
+        mockMvc.perform(get("/notices/{notice-id}", id)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
 
@@ -212,7 +212,7 @@ class NoticeControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
 
-        mockMvc.perform(delete("/notice/{notice-id}", id)
+        mockMvc.perform(delete("/notices/{notice-id}", id)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON))
 
@@ -234,30 +234,31 @@ class NoticeControllerTest extends RestDocsTestSupport {
 
     @Test
     void 공지사항_파일을_업로드한다() throws Exception {
-        UploadFileRequest request = new UploadFileRequest(List.of(
-                "공지사항 파일.pdf",
-                "공지사항 파일.hwp"
+        List<FileMetadata> metadataList = Collections.nCopies(2, new FileMetadata(
+                "notice-file.pdf",
+                MediaType.APPLICATION_PDF_VALUE,
+                10 * MB
         ));
         User user = UserFixture.createAdminUser();
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        given(uploadFileUseCase.execute(any(UploadFileRequest.class))).willReturn(List.of(
+        given(uploadFileUseCase.execute(anyList())).willReturn(List.of(
                 new UploadFileResponse(
                         SharedFixture.createNoticeFileUrlResponse(),
-                        "공지사항 파일.pdf"
+                        "notice-file.pdf"
                 ),
                 new UploadFileResponse(
                         SharedFixture.createNoticeFileUrlResponse(),
-                        "공지사항 파일.hwp"
+                        "notice-file.pdf"
                 )
         ));
 
-        mockMvc.perform(post("/notice/file")
+        mockMvc.perform(post("/notices/files")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(request))
+                        .content(toJson(metadataList))
                 )
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(
@@ -266,34 +267,36 @@ class NoticeControllerTest extends RestDocsTestSupport {
                                         .description("Bearer token")
                         ),
                         requestFields(
-                                fieldWithPath("fileNameList")
-                                        .type(JsonFieldType.ARRAY)
-                                        .description("파일 이름 목록(최대 3개)")
+                                fieldWithPath("[].fileName")
+                                        .description("파일 이름"),
+                                fieldWithPath("[].mediaType")
+                                        .description("미디어 타입"),
+                                fieldWithPath("[].fileSize")
+                                        .description("파일 용량")
                         )
                 ));
+
+        verify(uploadFileUseCase, times(1)).execute(anyList());
     }
 
     @Test
-    void 공지사항_파일_업로드가_실패한다() throws Exception {
-        UploadFileRequest request = new UploadFileRequest(List.of(
-                "공지사항 파일.pdf",
-                "공지사항 파일.hwp"
-        ));
+    void 공지사항_파일을_4개_이상_업로드하면_에러가_발생한다() throws Exception {
+        List<FileMetadata> metadataList = Collections.nCopies(4, new FileMetadata());
         User user = UserFixture.createAdminUser();
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        willThrow(new FailedToSaveException()).given(uploadFileUseCase).execute(any(UploadFileRequest.class));
+        given(uploadFileUseCase.execute(anyList())).willThrow(new FileCountLimitExceededException(3));
 
-        mockMvc.perform(multipart("/notice/file")
+        mockMvc.perform(post("/notices/files")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(request))
+                        .content(toJson(metadataList))
                 )
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isBadRequest())
                 .andDo(restDocs.document());
 
-        verify(uploadFileUseCase, times(1)).execute(any(UploadFileRequest.class));
+        verify(uploadFileUseCase, times(1)).execute(anyList());
     }
 }

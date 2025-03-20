@@ -12,21 +12,20 @@ import com.bamdoliro.maru.shared.fixture.FormFixture;
 import com.bamdoliro.maru.shared.fixture.UserFixture;
 import com.bamdoliro.maru.shared.util.SaveFileUtil;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
-@Disabled
 @ActiveProfiles("test")
+@Transactional
 @SpringBootTest
 class ExportResultUseCaseTest {
-
 
     @Autowired
     private ExportResultUseCase exportResultUseCase;

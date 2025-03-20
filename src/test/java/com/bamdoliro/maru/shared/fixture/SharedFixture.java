@@ -32,8 +32,8 @@ public class SharedFixture {
 
     public static UrlResponse createAdmissionAndPledgeUrlResponse() {
         return new UrlResponse(
-                "https://maru.bamdoliro.com/admission_and_pledge.pdf",
-                "https://maru.bamdoliro.com/admission_and_pledge.pdf"
+                "https://maru.bamdoliro.com/admission-and-pledge.pdf",
+                "https://maru.bamdoliro.com/admission-and-pledge.pdf"
         );
     }
 }

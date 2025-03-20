@@ -34,4 +34,5 @@ public interface FormRepositoryCustom {
     List<GradeVo> findGradeGroupByTypeAndStatus(List<FormStatus> round);
     List<SchoolStatusVo> findSchoolByAddress(List<FormStatus> round, String keyword);
     List<SchoolStatusVo> findNotBusanSchool(List<FormStatus> round);
+    List<Long> findAllExaminationNumber();
 }
