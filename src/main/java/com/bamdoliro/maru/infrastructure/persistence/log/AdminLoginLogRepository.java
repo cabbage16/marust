@@ -1,7 +1,7 @@
 package com.bamdoliro.maru.infrastructure.persistence.log;
 
 import com.bamdoliro.maru.domain.log.AdminLoginLog;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
 
-public interface AdminLoginLogRepository extends JpaRepository<AdminLoginLog, Long> {
+public interface AdminLoginLogRepository extends CrudRepository<AdminLoginLog, Long> {
 }
