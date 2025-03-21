@@ -5,17 +5,29 @@ import com.bamdoliro.maru.domain.form.domain.type.FormStatus;
 import com.bamdoliro.maru.domain.form.service.FormFacade;
 import com.bamdoliro.maru.domain.log.AdminLoginLog;
 import com.bamdoliro.maru.domain.log.FormSubmitLog;
+import com.bamdoliro.maru.domain.log.FormUpdateLog;
+import com.bamdoliro.maru.domain.log.UpdatedField;
 import com.bamdoliro.maru.domain.user.domain.User;
 import com.bamdoliro.maru.domain.user.domain.type.Authority;
 import com.bamdoliro.maru.domain.user.service.UserFacade;
 import com.bamdoliro.maru.infrastructure.persistence.log.AdminLoginLogRepository;
 import com.bamdoliro.maru.infrastructure.persistence.log.FormSubmitLogRepository;
+import com.bamdoliro.maru.infrastructure.persistence.log.FormUpdateLogRepository;
+import com.bamdoliro.maru.infrastructure.persistence.log.UpdatedFieldRepository;
 import com.bamdoliro.maru.presentation.auth.dto.request.LogInRequest;
+import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.hibernate.Hibernate;
+import org.javers.core.Javers;
+import org.javers.core.JaversBuilder;
+import org.javers.core.diff.Diff;
+import org.javers.core.diff.changetype.ValueChange;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -25,10 +37,15 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Component
 public class LogAspect {
 
-    private final AdminLoginLogRepository adminLoginLogRepository;
-    private final UserFacade userFacade;
+    private final Javers javers;
     private final FormFacade formFacade;
+    private final UserFacade userFacade;
+    private final EntityManager entityManager;
+    private final AdminLoginLogRepository adminLoginLogRepository;
     private final FormSubmitLogRepository formSubmitLogRepository;
+    private final FormUpdateLogRepository formUpdateLogRepository;
+    private final UpdatedFieldRepository updatedFieldRepository;
+
 
     @AfterReturning(value = "execution(* com.bamdoliro.maru.application.auth.LogInUseCase.execute(..))")
     public void logAdminLoginSuccess(JoinPoint joinPoint) {
@@ -38,7 +55,7 @@ public class LogAspect {
         User user = userFacade.getUser(phoneNumber);
 
         if (user.getAuthority() == Authority.ADMIN) {
-            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            HttpServletRequest request = getCurrentHttpRequest();
 
             String clientIp = getClientIp(request);
             String userAgent = getUserAgent(request);
@@ -58,26 +75,54 @@ public class LogAspect {
         generateFormSubmitLog(joinPoint, FormStatus.FINAL_SUBMITTED);
     }
 
-    private void generateFormSubmitLog(JoinPoint joinPoint, FormStatus status) {
+    @Around(value = "execution(* com.bamdoliro.maru.application.form.UpdateFormUseCase.execute(..))")
+    public void logUpdateFormSuccess(ProceedingJoinPoint joinPoint) throws Throwable {
         Object[] args = joinPoint.getArgs();
 
         User user = (User) args[0];
-        Form form = formFacade.getForm(user);
+        Form originalForm = formFacade.getForm(user);
+        Hibernate.initialize(originalForm.getGrade().getSubjectList().getValue());
+        Hibernate.initialize(originalForm.getGrade().getCertificateList().getValue());
+        entityManager.detach(originalForm);
 
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        joinPoint.proceed();
+
+        Form updatedForm = formFacade.getForm(user);
+
+        HttpServletRequest request = getCurrentHttpRequest();
 
         String clientIp = getClientIp(request);
         String userAgent = getUserAgent(request);
 
-        FormSubmitLog formSubmitLog = FormSubmitLog.builder()
+        FormUpdateLog formUpdateLog = FormUpdateLog.builder()
                 .phoneNumber(user.getPhoneNumber())
                 .clientIp(clientIp)
                 .userAgent(userAgent)
                 .user(user)
-                .form(form)
-                .status(status)
+                .form(updatedForm)
                 .build();
-        formSubmitLogRepository.save(formSubmitLog);
+        formUpdateLogRepository.save(formUpdateLog);
+
+        Diff diff = javers.compare(originalForm, updatedForm);
+
+        diff.getChanges().forEach(change -> {
+            if (change instanceof ValueChange valueChange) {
+                String fieldName = valueChange.getPropertyName();
+                String oldValue = valueChange.getLeft().toString();
+                String newValue = valueChange.getRight().toString();
+                UpdatedField updatedField = UpdatedField.builder()
+                        .formUpdateLog(formUpdateLog)
+                        .filedName(fieldName)
+                        .oldValue(oldValue)
+                        .newValue(newValue)
+                        .build();
+                updatedFieldRepository.save(updatedField);
+            }
+        });
+    }
+
+    private HttpServletRequest getCurrentHttpRequest() {
+        return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
     }
 
     private String getClientIp(HttpServletRequest request) {
@@ -92,5 +137,27 @@ public class LogAspect {
 
         if (userAgent == null) return "Unknown";
         return userAgent;
+    }
+
+    private void generateFormSubmitLog(JoinPoint joinPoint, FormStatus status) {
+        Object[] args = joinPoint.getArgs();
+
+        User user = (User) args[0];
+        Form form = formFacade.getForm(user);
+
+        HttpServletRequest request = getCurrentHttpRequest();
+
+        String clientIp = getClientIp(request);
+        String userAgent = getUserAgent(request);
+
+        FormSubmitLog formSubmitLog = FormSubmitLog.builder()
+                .phoneNumber(user.getPhoneNumber())
+                .clientIp(clientIp)
+                .userAgent(userAgent)
+                .user(user)
+                .form(form)
+                .status(status)
+                .build();
+        formSubmitLogRepository.save(formSubmitLog);
     }
 }
