@@ -305,6 +305,9 @@ include::{snippets}/form-controller-test/증명_사진을_업로드한다/http-r
 ===== 원서 접수 기간이 아닌 경우
 include::{snippets}/form-controller-test/증명_사진을_업로드할_때_원서_접수_기간이_아니면_에러가_발생한다/http-response.adoc[]
 
+===== 미제출 또는 반려된 원서가 아닌 경우
+include::{snippets}/form-controller-test/증명_사진을_업로드할_때_반려_또는_미제출_상태가_아니면_에러가_발생한다/http-response.adoc[]
+
 ===== 빈 파일인 경우
 include::{snippets}/form-controller-test/증명_사진을_업로드할_때_파일이_비었으면_에러가_발생한다/http-response.adoc[]
 
@@ -339,6 +342,9 @@ include::{snippets}/form-controller-test/원서_서류를_업로드한다/http-r
 
 ===== 원서 접수 기간이 아닌 경우
 include::{snippets}/form-controller-test/원서_서류를_업로드할_때_원서_접수_기간이_아니면_에러가_발생한다/http-response.adoc[]
+
+===== 제출 또는 반려된 원서가 아닌 경우
+include::{snippets}/form-controller-test/원서_서류를_업로드할_때_제출_또는_반려_상태가_아니면_에러가_발생한다/http-response.adoc[]
 
 ===== 빈 파일인 경우
 include::{snippets}/form-controller-test/원서_서류를_업로드할_때_파일이_비었으면_에러가_발생한다/http-response.adoc[]

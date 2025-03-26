@@ -1020,6 +1020,33 @@ class FormControllerTest extends RestDocsTestSupport {
     }
 
     @Test
+    void 증명_사진을_업로드할_때_반려_또는_미제출_상태가_아니면_에러가_발생한다() throws Exception {
+        User user = UserFixture.createUser();
+        FileMetadata metadata = new FileMetadata(
+                "identification-picture.png",
+                MediaType.IMAGE_PNG_VALUE,
+                MB
+        );
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new InvalidFormStatusException()).when(uploadIdentificationPictureUseCase).execute(any(User.class), any(FileMetadata.class));
+
+        mockMvc.perform(post("/forms/identification-picture")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(metadata))
+                )
+
+                .andExpect(status().isConflict())
+
+                .andDo(restDocs.document());
+
+        verify(uploadIdentificationPictureUseCase, times(1)).execute(any(User.class), any(FileMetadata.class));
+    }
+
+    @Test
     void 증명_사진을_업로드할_때_파일이_비었으면_에러가_발생한다() throws Exception {
         User user = UserFixture.createUser();
         FileMetadata metadata = new FileMetadata(
@@ -1136,6 +1163,33 @@ class FormControllerTest extends RestDocsTestSupport {
                                         .description("파일 용량")
                         )
                 ));
+
+        verify(uploadFormUseCase, times(1)).execute(any(User.class), any(FileMetadata.class));
+    }
+
+    @Test
+    void 원서_서류를_업로드할_때_제출_또는_반려_상태가_아니면_에러가_발생한다() throws Exception {
+        User user = UserFixture.createUser();
+        FileMetadata metadata = new FileMetadata(
+                "form.pdf",
+                MediaType.APPLICATION_PDF_VALUE,
+                10 * MB
+        );
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new InvalidFormStatusException()).when(uploadFormUseCase).execute(any(User.class), any(FileMetadata.class));
+
+        mockMvc.perform(post("/forms/form-document")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(metadata))
+                )
+
+                .andExpect(status().isConflict())
+
+                .andDo(restDocs.document());
 
         verify(uploadFormUseCase, times(1)).execute(any(User.class), any(FileMetadata.class));
     }
