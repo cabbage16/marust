@@ -10,6 +10,7 @@ import com.bamdoliro.maru.shared.annotation.UseCase;
 import com.bamdoliro.maru.shared.constants.FixedNumber;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -20,6 +21,7 @@ public class SelectSecondPassUseCase {
 
     private final FormRepository formRepository;
     private final CalculateFormScoreService calculateFormScoreService;
+    private int otherRegionCount = FixedNumber.TOTAL / 2;
 
     @Transactional
     public void execute() {
@@ -73,8 +75,16 @@ public class SelectSecondPassUseCase {
     private void processForms(List<Form> formList, int count, Consumer<Form> action) {
         for (Form form: formList) {
             if (count > 0) {
-                form.pass();
-                count--;
+                if (form.getEducation().getSchool().isBusan()) {
+                    form.pass();
+                    count--;
+                } else if (otherRegionCount > 0) {
+                    form.pass();
+                    otherRegionCount--;
+                    count--;
+                } else {
+                    action.accept(form);
+                }
             } else {
                 action.accept(form);
             }

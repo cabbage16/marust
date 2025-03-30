@@ -18,6 +18,7 @@ public class SelectFirstPassUseCase {
 
     private final FormRepository formRepository;
     private final CalculateFormScoreService calculateFormScoreService;
+    private int otherRegionCount = calculateMultiple(FixedNumber.TOTAL) / 2;
 
     @Transactional
     public void execute() {
@@ -75,12 +76,20 @@ public class SelectFirstPassUseCase {
         if (formList.isEmpty())
             return;
 
-        Double lastScore = formList.get(Math.min(count, formList.size())-1).getScore().getFirstRoundScore();
+        Double lastScore = formList.get(Math.min(count, formList.size()) - 1).getScore().getFirstRoundScore();
 
-        for (Form form: formList) {
+        for (Form form : formList) {
             if (count > 0) {
-                form.firstPass();
-                count--;
+                if (form.getEducation().getSchool().isBusan()) {
+                    form.firstPass();
+                    count--;
+                } else if (otherRegionCount > 0) {
+                    form.firstPass();
+                    otherRegionCount--;
+                    count--;
+                } else {
+                    action.accept(form);
+                }
             } else if (form.getScore().getFirstRoundScore().equals(lastScore)) {
                 form.firstPass();
             } else {
