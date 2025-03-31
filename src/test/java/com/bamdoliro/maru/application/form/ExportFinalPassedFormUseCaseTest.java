@@ -45,7 +45,7 @@ class ExportFinalPassedFormUseCaseTest {
         List<User> userList = userRepository.saveAll(
                 UserFixture.generateUserList(FixedNumber.TOTAL)
         );
-        List<Form> formList = FormFixture.generateFormList(userList);
+        List<Form> formList = FormFixture.generateBusanFormList(userList);
         formList.forEach(form -> {
             assignExaminationNumberService.execute(form);
             form.pass();

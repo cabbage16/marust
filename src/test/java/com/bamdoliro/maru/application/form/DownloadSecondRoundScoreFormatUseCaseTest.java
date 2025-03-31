@@ -47,7 +47,7 @@ class DownloadSecondRoundScoreFormatUseCaseTest {
         List<User> userList = userRepository.saveAll(
                 UserFixture.generateUserList(FixedNumber.TOTAL * 2)
         );
-        List<Form> formList = FormFixture.generateFormList(userList);
+        List<Form> formList = FormFixture.generateBusanFormList(userList);
         formList.forEach(form -> {
             assignExaminationNumberService.execute(form);
             form.receive();
