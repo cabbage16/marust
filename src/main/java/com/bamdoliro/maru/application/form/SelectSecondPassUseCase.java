@@ -10,9 +10,9 @@ import com.bamdoliro.maru.shared.annotation.UseCase;
 import com.bamdoliro.maru.shared.constants.FixedNumber;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor
@@ -21,7 +21,6 @@ public class SelectSecondPassUseCase {
 
     private final FormRepository formRepository;
     private final CalculateFormScoreService calculateFormScoreService;
-    private int otherRegionCount = FixedNumber.TOTAL / 2;
 
     @Transactional
     public void execute() {
@@ -32,6 +31,7 @@ public class SelectSecondPassUseCase {
         int socialIntegrationCount = FixedNumber.SOCIAL_INTEGRATION;
         int nationalVeteransEducationCount = FixedNumber.NATIONAL_VETERANS_EDUCATION;
         int specialAdmissionCount = FixedNumber.SPECIAL_ADMISSION;
+        AtomicInteger otherRegionCount = new AtomicInteger((int) Math.ceil(FixedNumber.TOTAL * FixedNumber.OTHER_REGION_RATE));
 
         List<Form> specialFormList = formRepository.findFirstPassedSpecialForm();
         List<Form> meisterTalentFormList = classifyFormsByType(specialFormList, FormType::isMeister);
@@ -54,33 +54,33 @@ public class SelectSecondPassUseCase {
         int equalOpportunityCount = (int) Math.round(socialIntegrationCount * 0.5);
         int societyDiversityCount = equalOpportunityCount;
 
-        processForms(equalOpportunityFormList, equalOpportunityCount, this::changeToRegularAndCalculateScoreAgain);
-        processForms(societyDiversityFormList, societyDiversityCount, this::changeToRegularAndCalculateScoreAgain);
-        processForms(meisterTalentFormList, meisterTalentCount, this::changeToRegularAndCalculateScoreAgain);
+        processForms(equalOpportunityFormList, equalOpportunityCount, otherRegionCount, this::changeToRegularAndCalculateScoreAgain);
+        processForms(societyDiversityFormList, societyDiversityCount, otherRegionCount, this::changeToRegularAndCalculateScoreAgain);
+        processForms(meisterTalentFormList, meisterTalentCount, otherRegionCount, this::changeToRegularAndCalculateScoreAgain);
 
         formRepository.flush();
         List<Form> regularFormList = formRepository.findFirstPassedRegularForm();
 
-        processForms(regularFormList, regularCount, Form::fail);
+        processForms(regularFormList, regularCount, otherRegionCount, Form::fail);
 
         formRepository.flush();
         List<Form> supernumeraryFormList = formRepository.findFirstPassedSupernumeraryForm();
         List<Form> nationalVeteransEducationFormList = classifyFormsByType(supernumeraryFormList, FormType::isNationalVeteransEducation);
         List<Form> specialAdmissionFormList = classifyFormsByType(supernumeraryFormList, FormType::isSpecialAdmission);
 
-        processForms(nationalVeteransEducationFormList, nationalVeteransEducationCount, Form::fail);
-        processForms(specialAdmissionFormList, specialAdmissionCount, Form::fail);
+        processForms(nationalVeteransEducationFormList, nationalVeteransEducationCount, otherRegionCount, Form::fail);
+        processForms(specialAdmissionFormList, specialAdmissionCount, otherRegionCount, Form::fail);
     }
 
-    private void processForms(List<Form> formList, int count, Consumer<Form> action) {
-        for (Form form: formList) {
+    private void processForms(List<Form> formList, int count, AtomicInteger otherRegionCount, Consumer<Form> action) {
+        for (Form form : formList) {
             if (count > 0) {
                 if (form.getEducation().getSchool().isBusan()) {
                     form.pass();
                     count--;
-                } else if (otherRegionCount > 0) {
+                } else if (otherRegionCount.intValue() > 0) {
                     form.pass();
-                    otherRegionCount--;
+                    otherRegionCount.getAndDecrement();
                     count--;
                 } else {
                     action.accept(form);
@@ -99,7 +99,9 @@ public class SelectSecondPassUseCase {
         List<Form> firstPassedFormList = formRepository.findByStatus(FormStatus.FIRST_PASSED);
         firstPassedFormList.stream()
                 .filter(form -> form.getScore().getTotalScore() == null)
-                .forEach(form -> {throw new MissingTotalScoreException();});
+                .forEach(form -> {
+                    throw new MissingTotalScoreException();
+                });
     }
 
     private List<Form> classifyFormsByType(List<Form> formList, FormTypeFilter filter) {
