@@ -58,7 +58,8 @@ public class SelectSecondPassUseCaseTest {
                 UserFixture.generateUserList(FixedNumber.TOTAL * 2)
         );
         List<Form> formList = FormFixture.generateBusanFormList(userList.subList(0, userList.size() / 2));
-        formList.addAll(FormFixture.generateOtherRegionFormList(userList.subList(userList.size() / 2, userList.size())));        formList.forEach(form -> {
+        formList.addAll(FormFixture.generateOtherRegionFormList(userList.subList(userList.size() / 2, userList.size())));
+        formList.forEach(form -> {
             assignExaminationNumberService.execute(form);
             form.receive();
             calculateFormScoreService.execute(form);
@@ -74,11 +75,6 @@ public class SelectSecondPassUseCaseTest {
             }
             formRepository.save(form);
         });
-    }
-
-    @AfterEach
-    void tearDown() {
-        formRepository.deleteAll();
     }
 
     @Test
