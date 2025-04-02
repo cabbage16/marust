@@ -29,6 +29,8 @@ public class GlobalExceptionHandler {
                 errorMap.put(fieldError.getField(), fieldError.getDefaultMessage())
         );
 
+        logHandledException(e);
+
         return ResponseEntity
                 .status(GlobalErrorProperty.BAD_REQUEST.getStatus())
                 .body(new ErrorResponse(GlobalErrorProperty.BAD_REQUEST, errorMap));
@@ -41,6 +43,8 @@ public class GlobalExceptionHandler {
             errorMap.put(violation.getPropertyPath().toString(), violation.getMessage())
         );
 
+        logHandledException(e);
+
         return ResponseEntity
                 .status(GlobalErrorProperty.BAD_REQUEST.getStatus())
                 .body(new ErrorResponse(GlobalErrorProperty.BAD_REQUEST, errorMap));
@@ -48,6 +52,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MissingRequestValueException.class)
     public ResponseEntity<ErrorResponse> handleMissingRequestValueException(MissingRequestValueException e) {
+        logHandledException(e);
+
         return ResponseEntity
                 .status(GlobalErrorProperty.BAD_REQUEST.getStatus())
                 .body(new ErrorResponse(GlobalErrorProperty.BAD_REQUEST, e.getMessage()));
@@ -57,6 +63,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMissingServletRequestPartException(MissingServletRequestPartException e) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put(e.getRequestPartName(), e.getMessage());
+
+        logHandledException(e);
 
         return ResponseEntity
                 .status(GlobalErrorProperty.BAD_REQUEST.getStatus())
@@ -70,6 +78,8 @@ public class GlobalExceptionHandler {
             errorMap.put(error.getField(), error.getDefaultMessage())
         );
 
+        logHandledException(e);
+
         return ResponseEntity
                 .status(GlobalErrorProperty.BAD_REQUEST.getStatus())
                 .body(new ErrorResponse(GlobalErrorProperty.BAD_REQUEST, errorMap));
@@ -77,6 +87,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FileSizeLimitExceededException.class)
     public ResponseEntity<ErrorResponse> handleFileSizeLimitExceededException(Exception e) {
+        logHandledException(e);
+
         return ResponseEntity
                 .status(HttpStatus.PAYLOAD_TOO_LARGE)
                 .body(new ErrorResponse(GlobalErrorProperty.BAD_REQUEST, e.getMessage()));
@@ -84,6 +96,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e) {
+        logHandledException(e);
+
         return ResponseEntity
                 .status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
                 .body(new ErrorResponse(GlobalErrorProperty.BAD_REQUEST, e.getMessage()));
@@ -91,6 +105,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        logHandledException(e);
+
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(GlobalErrorProperty.BAD_REQUEST, e.getMessage()));
@@ -98,6 +114,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MaruException.class)
     public ResponseEntity<ErrorResponse> handleMaruException(MaruException e) {
+        logHandledException(e);
+
         return ResponseEntity
                 .status(e.getErrorProperty().getStatus())
                 .body(new ErrorResponse(e.getErrorProperty(), e.getMessage()));
@@ -110,5 +128,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(GlobalErrorProperty.INTERNAL_SERVER_ERROR.getStatus())
                 .body(new ErrorResponse(GlobalErrorProperty.INTERNAL_SERVER_ERROR));
+    }
+
+    private void logHandledException(Exception e) {
+        log.warn("Resolved [{}: {}]", e.getClass().getName(), e.getMessage());
     }
 }
