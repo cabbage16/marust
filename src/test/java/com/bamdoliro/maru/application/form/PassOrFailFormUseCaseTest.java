@@ -44,7 +44,7 @@ class PassOrFailFormUseCaseTest {
         // given
         for (int i = 0; i < 3; i++) {
             User user = userRepository.save(UserFixture.createUser());
-            Form form = FormFixture.createRandomForm(user);
+            Form form = FormFixture.createRandomBusanForm(user);
             calculateFormScoreService.execute(form);
             formRepository.save(form);
         }
@@ -75,7 +75,7 @@ class PassOrFailFormUseCaseTest {
         // given
         for (int i = 0; i < 3; i++) {
             User user = userRepository.save(UserFixture.createUser());
-            Form form = FormFixture.createRandomForm(user);
+            Form form = FormFixture.createRandomBusanForm(user);
             calculateFormScoreService.execute(form);
             formRepository.save(form);
         }
