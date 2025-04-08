@@ -5,7 +5,7 @@ import com.bamdoliro.maru.shared.error.MaruException;
 
 public class WrongScoreException extends MaruException {
 
-    public WrongScoreException() {
-        super(FormErrorProperty.WRONG_SCORE);
+    public WrongScoreException(int row, String columns) {
+        super(FormErrorProperty.WRONG_SCORE, row, columns);
     }
 }
