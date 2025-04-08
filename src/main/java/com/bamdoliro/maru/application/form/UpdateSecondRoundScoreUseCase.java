@@ -50,31 +50,52 @@ public class UpdateSecondRoundScoreUseCase {
     }
 
     private List<SecondScoreVo> getSecondScoreVoList(Sheet sheet) {
-        return IntStream.range(1, sheet.getPhysicalNumberOfRows())
+        List<Cell> invalidCellTypeList = new ArrayList<>();
+        List<Cell> wrongScoreCellList = new ArrayList<>();
+        List<SecondScoreVo> voList = IntStream.range(1, sheet.getPhysicalNumberOfRows())
                 .mapToObj(sheet::getRow)
-                .map(this::getSecondScoreFrom)
-                .sorted(Comparator.comparingLong(SecondScoreVo::getExaminationNumber))
-                .toList();
+                .map(row -> getSecondScoreFrom(row, invalidCellTypeList, wrongScoreCellList))
+                .collect(Collectors.toList());
+
+        if (!invalidCellTypeList.isEmpty()) {
+            throw new InvalidFileException("셀타입이 올바르지 않습니다.\n" + formatCellErrorMessage(invalidCellTypeList));
+        }
+        if (!wrongScoreCellList.isEmpty()) {
+            throw new WrongScoreException(formatCellErrorMessage(wrongScoreCellList));
+        }
+
+        voList.sort(Comparator.comparingLong(SecondScoreVo::getExaminationNumber));
+
+        return voList;
     }
 
-    private SecondScoreVo getSecondScoreFrom(Row row) {
-        validateRow(row);
+    private SecondScoreVo getSecondScoreFrom(Row row, List<Cell> invalidTypeCellList, List<Cell> wrongScoreCellList) {
+        List<Cell> invalidTypeCells = validateCellType(row);
+        List<Cell> wrongScoreCells = invalidTypeCells.isEmpty() ? validateScore(row) : List.of();
+        invalidTypeCellList.addAll(invalidTypeCells);
+        wrongScoreCellList.addAll(wrongScoreCells);
 
-        boolean isShow = row.getCell(6).getBooleanCellValue();
-        FormType.Category type = getFormType(row.getCell(2).getStringCellValue());
+        if (invalidTypeCells.isEmpty() && wrongScoreCells.isEmpty()) {
+            boolean isShow = row.getCell(6).getBooleanCellValue();
+            FormType.Category type = getFormType(row.getCell(2).getStringCellValue());
 
-        return new SecondScoreVo(
-                (long) row.getCell(0).getNumericCellValue(),
-                type,
-                isShow ? row.getCell(3).getNumericCellValue() : null,
-                isShow ? row.getCell(4).getNumericCellValue() : null,
-                isShow && type == FormType.Category.MEISTER_TALENT ? row.getCell(5).getNumericCellValue() : null,
-                isShow
-        );
+            return new SecondScoreVo(
+                    (long) row.getCell(0).getNumericCellValue(),
+                    type,
+                    isShow ? row.getCell(3).getNumericCellValue() : null,
+                    isShow ? row.getCell(4).getNumericCellValue() : null,
+                    isShow && type == FormType.Category.MEISTER_TALENT ? row.getCell(5).getNumericCellValue() : null,
+                    isShow
+            );
+        } else {
+            return null;
+        }
     }
 
-    private void validateRow(Row row) {
+    private List<Cell> validateCellType(Row row) {
         // 수험번호 | 이름 | 전형 구분 | 심층면접 | NCS | 코딩테스트 | 응시 여부
+        List<Cell> invalidCellTypeList = new ArrayList<>();
+
         Cell examinationNumberCell = row.getCell(0);
         Cell nameCell = row.getCell(1);
         Cell typeCell = row.getCell(2);
@@ -82,30 +103,37 @@ public class UpdateSecondRoundScoreUseCase {
         Cell ncsScoreCell = row.getCell(4);
         Cell codingTestScoreCell = row.getCell(5);
         Cell isShowCell = row.getCell(6);
+        boolean isShow = false;
 
-        List<Integer> invalidColumns = new ArrayList<>();
-
-        if (examinationNumberCell.getCellType() != CellType.NUMERIC) invalidColumns.add(examinationNumberCell.getColumnIndex()+1);
-        if (nameCell.getCellType() != CellType.STRING) invalidColumns.add(nameCell.getColumnIndex()+1);
-        if (typeCell.getCellType() != CellType.STRING) invalidColumns.add(typeCell.getColumnIndex()+1);
-        if (isShowCell.getCellType() != CellType.BOOLEAN) invalidColumns.add(isShowCell.getColumnIndex()+1);
-
-        boolean isShow = isShowCell.getBooleanCellValue();
+        if (examinationNumberCell.getCellType() != CellType.NUMERIC) invalidCellTypeList.add(examinationNumberCell);
+        if (nameCell.getCellType() != CellType.STRING) invalidCellTypeList.add(nameCell);
+        if (typeCell.getCellType() != CellType.STRING) invalidCellTypeList.add(typeCell);
+        if (isShowCell.getCellType() != CellType.FORMULA) {
+            invalidCellTypeList.add(isShowCell);
+        } else {
+            isShow = isShowCell.getBooleanCellValue();
+        }
 
         if (isShow) {
-            if (depthInterviewScoreCell.getCellType() != CellType.NUMERIC) invalidColumns.add(depthInterviewScoreCell.getColumnIndex()+1);
-            if (ncsScoreCell.getCellType() != CellType.NUMERIC) invalidColumns.add(ncsScoreCell.getColumnIndex()+1);
+            if (depthInterviewScoreCell.getCellType() != CellType.NUMERIC) invalidCellTypeList.add(depthInterviewScoreCell);
+            if (ncsScoreCell.getCellType() != CellType.NUMERIC) invalidCellTypeList.add(ncsScoreCell);
             if (!(codingTestScoreCell.getCellType() == CellType.NUMERIC || codingTestScoreCell.getCellType() == CellType.BLANK)) {
-                invalidColumns.add(codingTestScoreCell.getColumnIndex()+1);
+                invalidCellTypeList.add(codingTestScoreCell);
             }
         }
 
-        if (!invalidColumns.isEmpty()) {
-            String columns = invalidColumns.stream()
-                    .map(col -> col + "열")
-                    .collect(Collectors.joining(", "));
-            throw new InvalidFileException(row.getRowNum()+1 + "행 " + columns + "의 셀타입이 올바르지 않습니다.");
-        }
+        return invalidCellTypeList;
+    }
+
+    private List<Cell> validateScore(Row row) {
+        // 수험번호 | 이름 | 전형 구분 | 심층면접 | NCS | 코딩테스트 | 응시 여부
+        Cell typeCell = row.getCell(2);
+        Cell depthInterviewScoreCell = row.getCell(3);
+        Cell ncsScoreCell = row.getCell(4);
+        Cell codingTestScoreCell = row.getCell(5);
+        boolean isShow = row.getCell(6).getCellType() == CellType.FORMULA && row.getCell(6).getBooleanCellValue();
+
+        List<Cell> wrongScoreCellList = new ArrayList<>();
 
         if (isShow) {
             String type = typeCell.getStringCellValue();
@@ -113,39 +141,32 @@ public class UpdateSecondRoundScoreUseCase {
             double ncsScore = ncsScoreCell.getNumericCellValue();
             double codingTestScore = codingTestScoreCell.getNumericCellValue();
 
-            List<Integer> wrongScoreColumns = new ArrayList<>();
-
             switch (type) {
                 case "마이스터인재전형" -> {
                     if (depthInterviewScore < 0 || depthInterviewScore > 120)
-                        wrongScoreColumns.add(depthInterviewScoreCell.getColumnIndex()+1);
+                        wrongScoreCellList.add(depthInterviewScoreCell);
                     if (ncsScore < 0 || ncsScore > 40)
-                        wrongScoreColumns.add(ncsScoreCell.getColumnIndex()+1);
+                        wrongScoreCellList.add(ncsScoreCell);
                     if (codingTestScore < 0 || codingTestScore > 80)
-                        wrongScoreColumns.add(codingTestScoreCell.getColumnIndex()+1);
+                        wrongScoreCellList.add(codingTestScoreCell);
                 }
                 case "사회통합전형" -> {
                     if (depthInterviewScore < 0 || depthInterviewScore > 200)
-                        wrongScoreColumns.add(depthInterviewScoreCell.getColumnIndex()+1);
+                        wrongScoreCellList.add(depthInterviewScoreCell);
                     if (ncsScore < 0 || ncsScore > 40)
-                        wrongScoreColumns.add(ncsScoreCell.getColumnIndex()+1);
+                        wrongScoreCellList.add(ncsScoreCell);
                 }
                 // 일반전형, 국가보훈대상자 중 교육지원대상자녀, 특례입학대상자
                 default -> {
                     if (depthInterviewScore < 0 || depthInterviewScore > 120)
-                        wrongScoreColumns.add(depthInterviewScoreCell.getColumnIndex()+1);
+                        wrongScoreCellList.add(depthInterviewScoreCell);
                     if (ncsScore < 0 || ncsScore > 40)
-                        wrongScoreColumns.add(ncsScoreCell.getColumnIndex()+1);
+                        wrongScoreCellList.add(ncsScoreCell);
                 }
             }
-
-            if (!wrongScoreColumns.isEmpty()) {
-                String columns = wrongScoreColumns.stream()
-                        .map(col -> col + "열")
-                        .collect(Collectors.joining(", "));
-                throw new WrongScoreException(row.getRowNum()+1, columns);
-            }
         }
+
+        return wrongScoreCellList;
     }
 
     private FormType.Category getFormType(String description) {
@@ -190,6 +211,28 @@ public class UpdateSecondRoundScoreUseCase {
             );
         }
     }
+
+    private String convertToXlsxColumnName(int colIndex) {
+        StringBuilder columnName = new StringBuilder();
+        int index = colIndex;
+
+        while (index >= 0) {
+            columnName.insert(0, (char) ('A' + index % 26));
+            index = index / 26 - 1;
+        }
+
+        return columnName.toString();
+    }
+
+    private String formatCellErrorMessage(List<Cell> cells) {
+        return cells.stream()
+                .map(cell -> {
+                    String cellName = convertToXlsxColumnName(cell.getColumnIndex()) + (cell.getRowIndex() + 1);
+                    return String.format("- %s: %s", cellName, cell);
+                })
+                .collect(Collectors.joining("\n"));
+    }
+
 }
 
 @Getter
