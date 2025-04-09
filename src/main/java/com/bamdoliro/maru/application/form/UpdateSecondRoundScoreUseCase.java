@@ -115,9 +115,9 @@ public class UpdateSecondRoundScoreUseCase {
         }
 
         if (isShow) {
-            if (depthInterviewScoreCell.getCellType() != CellType.NUMERIC) invalidCellTypeList.add(depthInterviewScoreCell);
-            if (ncsScoreCell.getCellType() != CellType.NUMERIC) invalidCellTypeList.add(ncsScoreCell);
-            if (!(codingTestScoreCell.getCellType() == CellType.NUMERIC || codingTestScoreCell.getCellType() == CellType.BLANK)) {
+            if (depthInterviewScoreCell != null && depthInterviewScoreCell.getCellType() != CellType.NUMERIC) invalidCellTypeList.add(depthInterviewScoreCell);
+            if (ncsScoreCell != null && ncsScoreCell.getCellType() != CellType.NUMERIC) invalidCellTypeList.add(ncsScoreCell);
+            if (!(codingTestScoreCell == null || codingTestScoreCell.getCellType() == CellType.NUMERIC || codingTestScoreCell.getCellType() == CellType.BLANK)) {
                 invalidCellTypeList.add(codingTestScoreCell);
             }
         }
@@ -130,7 +130,7 @@ public class UpdateSecondRoundScoreUseCase {
         Cell typeCell = row.getCell(2);
         Cell depthInterviewScoreCell = row.getCell(3);
         Cell ncsScoreCell = row.getCell(4);
-        Cell codingTestScoreCell = row.getCell(5);
+        Cell codingTestScoreCell = row.getCell(5) != null ? row.getCell(5) : null;
         boolean isShow = row.getCell(6).getCellType() == CellType.FORMULA && row.getCell(6).getBooleanCellValue();
 
         List<Cell> wrongScoreCellList = new ArrayList<>();
@@ -139,7 +139,7 @@ public class UpdateSecondRoundScoreUseCase {
             String type = typeCell.getStringCellValue();
             double depthInterviewScore = depthInterviewScoreCell.getNumericCellValue();
             double ncsScore = ncsScoreCell.getNumericCellValue();
-            double codingTestScore = codingTestScoreCell.getNumericCellValue();
+            double codingTestScore = codingTestScoreCell != null ? codingTestScoreCell.getNumericCellValue() : 0;
 
             switch (type) {
                 case "마이스터인재전형" -> {
@@ -178,6 +178,8 @@ public class UpdateSecondRoundScoreUseCase {
     }
 
     private static void validateList(List<Form> formList, List<SecondScoreVo> secondScoreVoList) {
+        System.out.println(formList.size());
+        System.out.println(secondScoreVoList.size());
         if (formList.size() != secondScoreVoList.size()) {
             throw new InvalidFileException("학생 수가 맞지 않습니다.");
         }
