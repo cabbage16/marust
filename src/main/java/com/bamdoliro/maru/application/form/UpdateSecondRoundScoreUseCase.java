@@ -178,8 +178,6 @@ public class UpdateSecondRoundScoreUseCase {
     }
 
     private static void validateList(List<Form> formList, List<SecondScoreVo> secondScoreVoList) {
-        System.out.println(formList.size());
-        System.out.println(secondScoreVoList.size());
         if (formList.size() != secondScoreVoList.size()) {
             throw new InvalidFileException("학생 수가 맞지 않습니다.");
         }

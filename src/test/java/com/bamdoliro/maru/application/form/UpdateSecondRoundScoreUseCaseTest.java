@@ -62,10 +62,10 @@ class UpdateSecondRoundScoreUseCaseTest {
             assignExaminationNumberService.execute(form);
             form.receive();
             calculateFormScoreService.execute(form);
-            if (form.getExaminationNumber() == 3001 ||
-                    form.getExaminationNumber() == 3002 ||
+            if (form.getExaminationNumber() == 1001 ||
+                    form.getExaminationNumber() == 1002 ||
                     form.getExaminationNumber() == 2001 ||
-                    form.getExaminationNumber() == 2002
+                    form.getExaminationNumber() == 3001
             ) {
                 formRepository.save(form);
             }
@@ -81,7 +81,6 @@ class UpdateSecondRoundScoreUseCaseTest {
 
         // when
         updateSecondRoundScoreUseCase.execute(multipartFile);
-
 
         // then
         List<Form> formList = formRepository.findByStatus(FormStatus.FIRST_PASSED).stream()
