@@ -2063,7 +2063,7 @@ class FormControllerTest extends RestDocsTestSupport {
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        doThrow(new InvalidFileException()).when(updateSecondRoundScoreUseCase).execute(any(MultipartFile.class));
+        doThrow(new InvalidFileException("")).when(updateSecondRoundScoreUseCase).execute(any(MultipartFile.class));
 
         mockMvc.perform(multipartPatch("/forms/second-round/score")
                         .file(file)
@@ -2089,7 +2089,7 @@ class FormControllerTest extends RestDocsTestSupport {
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        doThrow(new WrongScoreException()).when(updateSecondRoundScoreUseCase).execute(any(MultipartFile.class));
+        doThrow(new WrongScoreException("- D2: -10")).when(updateSecondRoundScoreUseCase).execute(any(MultipartFile.class));
 
         mockMvc.perform(multipartPatch("/forms/second-round/score")
                         .file(file)
