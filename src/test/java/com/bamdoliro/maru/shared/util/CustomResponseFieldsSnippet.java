@@ -6,7 +6,6 @@ import org.springframework.restdocs.payload.AbstractFieldsSnippet;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.PayloadSubsectionExtractor;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +24,7 @@ public class CustomResponseFieldsSnippet extends AbstractFieldsSnippet {
     }
 
     @Override
-    protected byte[] getContent(Operation operation) throws IOException {
+    protected byte[] getContent(Operation operation) {
         return operation.getResponse().getContent();
     }
 }

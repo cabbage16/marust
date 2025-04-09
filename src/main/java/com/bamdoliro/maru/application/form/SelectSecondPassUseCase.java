@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class SelectSecondPassUseCase {
 
     private final FormRepository formRepository;
     private final CalculateFormScoreService calculateFormScoreService;
+    private final AtomicInteger otherRegionCount = new AtomicInteger((int) Math.ceil(FixedNumber.TOTAL * FixedNumber.OTHER_REGION_RATE));
 
     @Transactional
     public void execute() {
@@ -71,10 +73,18 @@ public class SelectSecondPassUseCase {
     }
 
     private void processForms(List<Form> formList, int count, Consumer<Form> action) {
-        for (Form form: formList) {
+        for (Form form : formList) {
             if (count > 0) {
-                form.pass();
-                count--;
+                if (form.getEducation().getSchool().isBusan()) {
+                    form.pass();
+                    count--;
+                } else if (otherRegionCount.intValue() > 0) {
+                    form.pass();
+                    otherRegionCount.getAndDecrement();
+                    count--;
+                } else {
+                    action.accept(form);
+                }
             } else {
                 action.accept(form);
             }
@@ -89,7 +99,9 @@ public class SelectSecondPassUseCase {
         List<Form> firstPassedFormList = formRepository.findByStatus(FormStatus.FIRST_PASSED);
         firstPassedFormList.stream()
                 .filter(form -> form.getScore().getTotalScore() == null)
-                .forEach(form -> {throw new MissingTotalScoreException();});
+                .forEach(form -> {
+                    throw new MissingTotalScoreException();
+                });
     }
 
     private List<Form> classifyFormsByType(List<Form> formList, FormTypeFilter filter) {

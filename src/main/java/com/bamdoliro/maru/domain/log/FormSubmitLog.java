@@ -2,7 +2,6 @@ package com.bamdoliro.maru.domain.log;
 
 import com.bamdoliro.maru.domain.form.domain.Form;
 import com.bamdoliro.maru.domain.form.domain.type.FormStatus;
-import com.bamdoliro.maru.domain.form.domain.type.FormType;
 import com.bamdoliro.maru.domain.user.domain.User;
 import com.bamdoliro.maru.shared.entity.BaseTimeEntity;
 import jakarta.persistence.*;

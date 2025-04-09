@@ -1,49 +1,49 @@
 package com.bamdoliro.maru.shared.error;
 
 import com.bamdoliro.maru.shared.response.ErrorResponse;
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestValueException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-
     @ExceptionHandler(BindException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> bindException(BindException e) {
+    public ResponseEntity<ErrorResponse> handleBindException(BindException e) {
         Map<String, String> errorMap = new HashMap<>();
+        e.getFieldErrors().forEach(fieldError ->
+                errorMap.put(fieldError.getField(), fieldError.getDefaultMessage())
+        );
 
-        for (FieldError error : e.getFieldErrors()) {
-            errorMap.put(error.getField(), error.getDefaultMessage());
-        }
+        logHandledException(e);
 
         return ResponseEntity
                 .status(GlobalErrorProperty.BAD_REQUEST.getStatus())
                 .body(new ErrorResponse(GlobalErrorProperty.BAD_REQUEST, errorMap));
     }
 
-    @ExceptionHandler({ConstraintViolationException.class})
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException e) {
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
         Map<String, String> errorMap = new HashMap<>();
-        for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
-            errorMap.put(violation.getPropertyPath().toString(), violation.getMessage());
-        }
+        e.getConstraintViolations().forEach(violation ->
+            errorMap.put(violation.getPropertyPath().toString(), violation.getMessage())
+        );
+
+        logHandledException(e);
 
         return ResponseEntity
                 .status(GlobalErrorProperty.BAD_REQUEST.getStatus())
@@ -51,8 +51,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MissingRequestValueException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> missingRequestValueException(MissingRequestValueException e) {
+    public ResponseEntity<ErrorResponse> handleMissingRequestValueException(MissingRequestValueException e) {
+        logHandledException(e);
 
         return ResponseEntity
                 .status(GlobalErrorProperty.BAD_REQUEST.getStatus())
@@ -60,41 +60,62 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MissingServletRequestPartException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> missingRequestValueException(MissingServletRequestPartException e) {
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestPartException(MissingServletRequestPartException e) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put(e.getRequestPartName(), e.getMessage());
+
+        logHandledException(e);
 
         return ResponseEntity
                 .status(GlobalErrorProperty.BAD_REQUEST.getStatus())
-                .body(new ErrorResponse(GlobalErrorProperty.BAD_REQUEST, e.getMessage()));
+                .body(new ErrorResponse(GlobalErrorProperty.BAD_REQUEST, errorMap));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> enumMismatchException(MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        Map<String, String> errorMap = new HashMap<>();
+        e.getBindingResult().getFieldErrors().forEach(error ->
+            errorMap.put(error.getField(), error.getDefaultMessage())
+        );
+
+        logHandledException(e);
 
         return ResponseEntity
                 .status(GlobalErrorProperty.BAD_REQUEST.getStatus())
-                .body(new ErrorResponse(GlobalErrorProperty.BAD_REQUEST, e.getBindingResult().getFieldErrors().get(0).getDefaultMessage()));
+                .body(new ErrorResponse(GlobalErrorProperty.BAD_REQUEST, errorMap));
     }
 
     @ExceptionHandler(FileSizeLimitExceededException.class)
-    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
     public ResponseEntity<ErrorResponse> handleFileSizeLimitExceededException(Exception e) {
+        logHandledException(e);
+
         return ResponseEntity
                 .status(HttpStatus.PAYLOAD_TOO_LARGE)
                 .body(new ErrorResponse(GlobalErrorProperty.BAD_REQUEST, e.getMessage()));
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
-    public ResponseEntity<ErrorResponse> handleError(HttpMediaTypeNotSupportedException e) {
+    public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e) {
+        logHandledException(e);
+
         return ResponseEntity
                 .status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
                 .body(new ErrorResponse(GlobalErrorProperty.BAD_REQUEST, e.getMessage()));
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        logHandledException(e);
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(GlobalErrorProperty.BAD_REQUEST, e.getMessage()));
+    }
+
     @ExceptionHandler(MaruException.class)
     public ResponseEntity<ErrorResponse> handleMaruException(MaruException e) {
+        logHandledException(e);
+
         return ResponseEntity
                 .status(e.getErrorProperty().getStatus())
                 .body(new ErrorResponse(e.getErrorProperty(), e.getMessage()));
@@ -102,9 +123,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
-        e.printStackTrace();
+        log.error(e.getMessage(), e);
+
         return ResponseEntity
                 .status(GlobalErrorProperty.INTERNAL_SERVER_ERROR.getStatus())
                 .body(new ErrorResponse(GlobalErrorProperty.INTERNAL_SERVER_ERROR));
+    }
+
+    private void logHandledException(Exception e) {
+        log.warn("Resolved [{}: {}]", e.getClass().getName(), e.getMessage());
     }
 }
