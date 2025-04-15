@@ -143,24 +143,24 @@ public class UpdateSecondRoundScoreUseCase {
 
             switch (type) {
                 case "마이스터인재전형" -> {
-                    if (depthInterviewScore < 0 || depthInterviewScore > 120)
+                    if (!(0 <= depthInterviewScore && depthInterviewScore <= 120))
                         wrongScoreCellList.add(depthInterviewScoreCell);
-                    if (ncsScore < 0 || ncsScore > 40)
+                    if (!(0 <= ncsScore && ncsScore <= 40))
                         wrongScoreCellList.add(ncsScoreCell);
-                    if (codingTestScore < 0 || codingTestScore > 80)
+                    if (!(0 <= codingTestScore && codingTestScore <= 80))
                         wrongScoreCellList.add(codingTestScoreCell);
                 }
                 case "사회통합전형" -> {
-                    if (depthInterviewScore < 0 || depthInterviewScore > 200)
+                    if (!(0 <= depthInterviewScore && depthInterviewScore <= 200))
                         wrongScoreCellList.add(depthInterviewScoreCell);
-                    if (ncsScore < 0 || ncsScore > 40)
+                    if (!(0 <= ncsScore && ncsScore <= 40))
                         wrongScoreCellList.add(ncsScoreCell);
                 }
                 // 일반전형, 국가보훈대상자 중 교육지원대상자녀, 특례입학대상자
                 default -> {
-                    if (depthInterviewScore < 0 || depthInterviewScore > 120)
+                    if (!(0 <= depthInterviewScore && depthInterviewScore <= 120))
                         wrongScoreCellList.add(depthInterviewScoreCell);
-                    if (ncsScore < 0 || ncsScore > 40)
+                    if (!(0 <= ncsScore && ncsScore <= 40))
                         wrongScoreCellList.add(ncsScoreCell);
                 }
             }
