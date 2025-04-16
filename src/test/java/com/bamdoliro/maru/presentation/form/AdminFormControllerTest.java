@@ -48,7 +48,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         willDoNothing().given(approveFormUseCase).execute(formId);
 
 
-        mockMvc.perform(patch("/forms/{form-id}/approve", formId)
+        mockMvc.perform(patch("/forms/admin/{form-id}/approve", formId)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -79,7 +79,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         doThrow(new FormNotFoundException()).when(approveFormUseCase).execute(formId);
 
 
-        mockMvc.perform(patch("/forms/{form-id}/approve", formId)
+        mockMvc.perform(patch("/forms/admin/{form-id}/approve", formId)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -101,7 +101,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         willDoNothing().given(rejectFormUseCase).execute(formId);
 
 
-        mockMvc.perform(patch("/forms/{form-id}/reject", formId)
+        mockMvc.perform(patch("/forms/admin/{form-id}/reject", formId)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -132,7 +132,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         doThrow(new FormNotFoundException()).when(rejectFormUseCase).execute(formId);
 
 
-        mockMvc.perform(patch("/forms/{form-id}/reject", formId)
+        mockMvc.perform(patch("/forms/admin/{form-id}/reject", formId)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -154,7 +154,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         willDoNothing().given(receiveFormUseCase).execute(formId);
 
 
-        mockMvc.perform(patch("/forms/{form-id}/receive", formId)
+        mockMvc.perform(patch("/forms/admin/{form-id}/receive", formId)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -185,7 +185,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         doThrow(new FormNotFoundException()).when(receiveFormUseCase).execute(formId);
 
 
-        mockMvc.perform(patch("/forms/{form-id}/receive", formId)
+        mockMvc.perform(patch("/forms/admin/{form-id}/receive", formId)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -210,7 +210,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         ));
 
 
-        mockMvc.perform(get("/forms/review")
+        mockMvc.perform(get("/forms/admin/review")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -234,7 +234,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         given(querySubmittedFormUseCase.execute()).willReturn(List.of());
 
 
-        mockMvc.perform(get("/forms/review")
+        mockMvc.perform(get("/forms/admin/review")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -259,7 +259,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(queryAllFormUseCase.execute(FormStatus.SUBMITTED, FormType.Category.REGULAR, null)).willReturn(responseList);
 
-        mockMvc.perform(get("/forms")
+        mockMvc.perform(get("/forms/admin")
                         .param("status", FormStatus.SUBMITTED.name())
                         .param("type", FormType.Category.REGULAR.name())
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
@@ -302,7 +302,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(generateAllAdmissionTicketUseCase.execute()).willReturn(new ByteArrayResource(file.getBytes()));
 
-        mockMvc.perform(get("/forms/admission-tickets")
+        mockMvc.perform(get("/forms/admin/admission-tickets")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_PDF))
 
@@ -332,7 +332,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(downloadSecondRoundScoreFormatUseCase.execute()).willReturn(new ByteArrayResource(file.getBytes()));
 
-        mockMvc.perform(get("/forms/second-round/format")
+        mockMvc.perform(get("/forms/admin/second-round/format")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
 
@@ -362,7 +362,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         willDoNothing().given(updateSecondRoundScoreUseCase).execute(any(MultipartFile.class));
 
-        mockMvc.perform(multipartPatch("/forms/second-round/score")
+        mockMvc.perform(multipartPatch("/forms/admin/second-round/score")
                         .file(file)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -397,7 +397,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new InvalidFileException()).when(updateSecondRoundScoreUseCase).execute(any(MultipartFile.class));
 
-        mockMvc.perform(multipartPatch("/forms/second-round/score")
+        mockMvc.perform(multipartPatch("/forms/admin/second-round/score")
                         .file(file)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -423,7 +423,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new WrongScoreException()).when(updateSecondRoundScoreUseCase).execute(any(MultipartFile.class));
 
-        mockMvc.perform(multipartPatch("/forms/second-round/score")
+        mockMvc.perform(multipartPatch("/forms/admin/second-round/score")
                         .file(file)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -449,7 +449,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(exportFinalPassedFormUseCase.execute()).willReturn(new ByteArrayResource(file.getBytes()));
 
-        mockMvc.perform(get("/forms/xlsx/final-passed")
+        mockMvc.perform(get("/forms/admin/xlsx/final-passed")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
 
@@ -479,7 +479,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(exportFinalPassedFormUseCase.execute()).willReturn(new ByteArrayResource(file.getBytes()));
 
-        mockMvc.perform(get("/forms/xlsx/first-round")
+        mockMvc.perform(get("/forms/admin/xlsx/first-round")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
 
@@ -509,7 +509,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(exportFinalPassedFormUseCase.execute()).willReturn(new ByteArrayResource(file.getBytes()));
 
-        mockMvc.perform(get("/forms/xlsx/second-round")
+        mockMvc.perform(get("/forms/admin/xlsx/second-round")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
 
@@ -539,7 +539,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(exportFinalPassedFormUseCase.execute()).willReturn(new ByteArrayResource(file.getBytes()));
 
-        mockMvc.perform(get("/forms/xlsx/result")
+        mockMvc.perform(get("/forms/admin/xlsx/result")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
 
@@ -573,7 +573,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
                 )
         );
 
-        mockMvc.perform(patch("/forms/second-round/result")
+        mockMvc.perform(patch("/forms/admin/second-round/result")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request)))
@@ -615,7 +615,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
                 )
         );
 
-        mockMvc.perform(patch("/forms/second-round/result")
+        mockMvc.perform(patch("/forms/admin/second-round/result")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request)))
@@ -642,7 +642,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
                         FormFixture.createFormUrlResponse())
         );
 
-        mockMvc.perform(get("/forms/form-url")
+        mockMvc.perform(get("/forms/admin/form-url")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .param("id-list", "1,2,3,4,5")
                         .accept(MediaType.APPLICATION_JSON))
@@ -671,7 +671,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         willDoNothing().given(selectSecondPassUseCase).execute();
 
-        mockMvc.perform(patch("/forms/second-round/select")
+        mockMvc.perform(patch("/forms/admin/second-round/select")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader()))
 
                 .andExpect(status().isNoContent())
@@ -693,7 +693,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         willThrow(new MissingTotalScoreException()).given(selectSecondPassUseCase).execute();
 
-        mockMvc.perform(patch("/forms/second-round/select")
+        mockMvc.perform(patch("/forms/admin/second-round/select")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader()))
 
                 .andExpect(status().isConflict())
@@ -718,7 +718,7 @@ class AdminFormControllerTest extends RestDocsTestSupport {
                         FormFixture.createAdmissionAndPledgeUrlResponse())
         );
 
-        mockMvc.perform(get("/forms/admission-and-pledges")
+        mockMvc.perform(get("/forms/admin/admission-and-pledges")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .param("id-list", "1,2,3,4,5")
                         .accept(MediaType.APPLICATION_JSON))
