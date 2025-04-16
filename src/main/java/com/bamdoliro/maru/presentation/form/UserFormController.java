@@ -20,7 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
-@RequestMapping("/forms")
+@RequestMapping("/forms/user")
 @RestController
 public class UserFormController {
 

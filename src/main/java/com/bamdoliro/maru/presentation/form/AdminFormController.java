@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("/forms")
+@RequestMapping("/forms/admin")
 @RestController
 public class AdminFormController {
     private final ApproveFormUseCase approveFormUseCase;
