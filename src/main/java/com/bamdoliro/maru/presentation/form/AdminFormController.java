@@ -10,6 +10,7 @@ import com.bamdoliro.maru.presentation.form.dto.response.FormSimpleResponse;
 import com.bamdoliro.maru.presentation.form.dto.response.FormUrlResponse;
 import com.bamdoliro.maru.shared.auth.AuthenticationPrincipal;
 import com.bamdoliro.maru.shared.auth.Authority;
+import com.bamdoliro.maru.shared.auth.annotation.RoleCheck;
 import com.bamdoliro.maru.shared.response.CommonResponse;
 import com.bamdoliro.maru.shared.response.ListCommonResponse;
 import jakarta.validation.Valid;
@@ -48,8 +49,8 @@ public class AdminFormController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/{form-id}/approve")
+    @RoleCheck(Authority.ADMIN)
     public void approveForm(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user,
             @PathVariable(name = "form-id") Long formId
     ) {
         approveFormUseCase.execute(formId);
@@ -57,8 +58,8 @@ public class AdminFormController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/{form-id}/reject")
+    @RoleCheck(Authority.ADMIN)
     public void rejectForm(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user,
             @PathVariable(name = "form-id") Long formId
     ) {
         rejectFormUseCase.execute(formId);
@@ -66,25 +67,24 @@ public class AdminFormController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/{form-id}/receive")
+    @RoleCheck(Authority.ADMIN)
     public void receiveForm(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user,
             @PathVariable(name = "form-id") Long formId
     ) {
         receiveFormUseCase.execute(formId);
     }
 
     @GetMapping("/review")
-    public ListCommonResponse<FormSimpleResponse> getSubmittedFormList(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user
-    ) {
+    @RoleCheck(Authority.ADMIN)
+    public ListCommonResponse<FormSimpleResponse> getSubmittedFormList() {
         return ListCommonResponse.ok(
                 querySubmittedFormUseCase.execute()
         );
     }
 
     @GetMapping
+    @RoleCheck(Authority.ADMIN)
     public ListCommonResponse<FormSimpleResponse> getFormList(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user,
             @RequestParam(name = "status", required = false) FormStatus status,
             @RequestParam(name = "type", required = false) FormType.Category type,
             @RequestParam(name = "sort", required = false) String sort
@@ -95,18 +95,16 @@ public class AdminFormController {
     }
 
     @GetMapping("/admission-tickets")
-    public ResponseEntity<Resource> generateAllAdmissionTicket(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user
-    ) {
+    @RoleCheck(Authority.ADMIN)
+    public ResponseEntity<Resource> generateAllAdmissionTicket() {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(generateAllAdmissionTicketUseCase.execute());
     }
 
     @GetMapping("/second-round/format")
-    public ResponseEntity<Resource> downloadSecondRoundScoreFormatUseCase(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user
-    ) throws IOException {
+    @RoleCheck(Authority.ADMIN)
+    public ResponseEntity<Resource> downloadSecondRoundScoreFormatUseCase() throws IOException {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(downloadSecondRoundScoreFormatUseCase.execute());
@@ -114,44 +112,40 @@ public class AdminFormController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/second-round/score")
+    @RoleCheck(Authority.ADMIN)
     public void updateSecondRoundScore(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user,
             @RequestPart(value = "xlsx") MultipartFile file
     ) throws IOException {
         updateSecondRoundScoreUseCase.execute(file);
     }
 
     @GetMapping("/xlsx/final-passed")
-    public ResponseEntity<Resource> exportFinalPassedForm(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user
-    ) throws IOException {
+    @RoleCheck(Authority.ADMIN)
+    public ResponseEntity<Resource> exportFinalPassedForm() throws IOException {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(exportFinalPassedFormUseCase.execute());
     }
 
     @GetMapping("/xlsx/first-round")
-    public ResponseEntity<Resource> exportFirstRoundResult(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user
-    ) throws IOException {
+    @RoleCheck(Authority.ADMIN)
+    public ResponseEntity<Resource> exportFirstRoundResult() throws IOException {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(exportFirstRoundResultUseCase.execute());
     }
 
     @GetMapping("/xlsx/second-round")
-    public ResponseEntity<Resource> exportSecondRoundResult(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user
-    ) throws IOException {
+    @RoleCheck(Authority.ADMIN)
+    public ResponseEntity<Resource> exportSecondRoundResult() throws IOException {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(exportSecondRoundResultUseCase.execute());
     }
 
     @GetMapping("/xlsx/result")
-    public ResponseEntity<Resource> exportResult(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user
-    ) throws IOException {
+    @RoleCheck(Authority.ADMIN)
+    public ResponseEntity<Resource> exportResult() throws IOException {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(exportResultUseCase.execute());
@@ -159,16 +153,16 @@ public class AdminFormController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/second-round/result")
+    @RoleCheck(Authority.ADMIN)
     public void passOrFailForm(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user,
             @RequestBody @Valid PassOrFailFormListRequest request
     ) {
         passOrFailFormUseCase.execute(request);
     }
 
     @GetMapping("/form-url")
+    @RoleCheck(Authority.ADMIN)
     public ListCommonResponse<FormUrlResponse> getFormUrl(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user,
             @RequestParam(name = "id-list") List<Long> formIdList
     ) {
         return CommonResponse.ok(
@@ -178,8 +172,8 @@ public class AdminFormController {
 
 
     @GetMapping("/admission-and-pledges")
+    @RoleCheck(Authority.ADMIN)
     public ListCommonResponse<AdmissionAndPledgeUrlResponse> getAdmissionAndPledges(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user,
             @RequestParam(name = "id-list") List<Long> formIdList
     ) {
         return CommonResponse.ok(
@@ -189,9 +183,8 @@ public class AdminFormController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/second-round/select")
-    public void selectSecondPass(
-            @AuthenticationPrincipal(authority = Authority.ADMIN) User user
-    ) {
+    @RoleCheck(Authority.ADMIN)
+    public void selectSecondPass() {
         selectSecondPassUseCase.execute();
     }
 }
