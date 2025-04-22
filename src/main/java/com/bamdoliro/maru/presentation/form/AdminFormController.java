@@ -8,6 +8,7 @@ import com.bamdoliro.maru.presentation.form.dto.response.AdmissionAndPledgeUrlRe
 import com.bamdoliro.maru.presentation.form.dto.response.FormSimpleResponse;
 import com.bamdoliro.maru.presentation.form.dto.response.FormUrlResponse;
 import com.bamdoliro.maru.shared.auth.Authority;
+
 import com.bamdoliro.maru.shared.auth.annotation.RoleCheck;
 import com.bamdoliro.maru.shared.response.CommonResponse;
 import com.bamdoliro.maru.shared.response.ListCommonResponse;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+@RoleCheck(Authority.ADMIN)
 @RequiredArgsConstructor
 @RequestMapping("/forms/admin")
 @RestController
@@ -47,7 +49,6 @@ public class AdminFormController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/{form-id}/approve")
-    @RoleCheck(Authority.ADMIN)
     public void approveForm(
             @PathVariable(name = "form-id") Long formId
     ) {
@@ -56,7 +57,6 @@ public class AdminFormController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/{form-id}/reject")
-    @RoleCheck(Authority.ADMIN)
     public void rejectForm(
             @PathVariable(name = "form-id") Long formId
     ) {
@@ -65,7 +65,6 @@ public class AdminFormController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/{form-id}/receive")
-    @RoleCheck(Authority.ADMIN)
     public void receiveForm(
             @PathVariable(name = "form-id") Long formId
     ) {
@@ -73,7 +72,6 @@ public class AdminFormController {
     }
 
     @GetMapping("/review")
-    @RoleCheck(Authority.ADMIN)
     public ListCommonResponse<FormSimpleResponse> getSubmittedFormList() {
         return ListCommonResponse.ok(
                 querySubmittedFormUseCase.execute()
@@ -81,7 +79,6 @@ public class AdminFormController {
     }
 
     @GetMapping
-    @RoleCheck(Authority.ADMIN)
     public ListCommonResponse<FormSimpleResponse> getFormList(
             @RequestParam(name = "status", required = false) FormStatus status,
             @RequestParam(name = "type", required = false) FormType.Category type,
@@ -93,7 +90,6 @@ public class AdminFormController {
     }
 
     @GetMapping("/admission-tickets")
-    @RoleCheck(Authority.ADMIN)
     public ResponseEntity<Resource> generateAllAdmissionTicket() {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
@@ -101,7 +97,6 @@ public class AdminFormController {
     }
 
     @GetMapping("/second-round/format")
-    @RoleCheck(Authority.ADMIN)
     public ResponseEntity<Resource> downloadSecondRoundScoreFormatUseCase() throws IOException {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
@@ -110,7 +105,6 @@ public class AdminFormController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/second-round/score")
-    @RoleCheck(Authority.ADMIN)
     public void updateSecondRoundScore(
             @RequestPart(value = "xlsx") MultipartFile file
     ) throws IOException {
@@ -118,7 +112,6 @@ public class AdminFormController {
     }
 
     @GetMapping("/xlsx/final-passed")
-    @RoleCheck(Authority.ADMIN)
     public ResponseEntity<Resource> exportFinalPassedForm() throws IOException {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
@@ -126,7 +119,6 @@ public class AdminFormController {
     }
 
     @GetMapping("/xlsx/first-round")
-    @RoleCheck(Authority.ADMIN)
     public ResponseEntity<Resource> exportFirstRoundResult() throws IOException {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
@@ -134,7 +126,6 @@ public class AdminFormController {
     }
 
     @GetMapping("/xlsx/second-round")
-    @RoleCheck(Authority.ADMIN)
     public ResponseEntity<Resource> exportSecondRoundResult() throws IOException {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
@@ -142,7 +133,6 @@ public class AdminFormController {
     }
 
     @GetMapping("/xlsx/result")
-    @RoleCheck(Authority.ADMIN)
     public ResponseEntity<Resource> exportResult() throws IOException {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
@@ -151,7 +141,6 @@ public class AdminFormController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/second-round/result")
-    @RoleCheck(Authority.ADMIN)
     public void passOrFailForm(
             @RequestBody @Valid PassOrFailFormListRequest request
     ) {
@@ -159,7 +148,6 @@ public class AdminFormController {
     }
 
     @GetMapping("/form-url")
-    @RoleCheck(Authority.ADMIN)
     public ListCommonResponse<FormUrlResponse> getFormUrl(
             @RequestParam(name = "id-list") List<Long> formIdList
     ) {
@@ -170,7 +158,6 @@ public class AdminFormController {
 
 
     @GetMapping("/admission-and-pledges")
-    @RoleCheck(Authority.ADMIN)
     public ListCommonResponse<AdmissionAndPledgeUrlResponse> getAdmissionAndPledges(
             @RequestParam(name = "id-list") List<Long> formIdList
     ) {
@@ -181,7 +168,6 @@ public class AdminFormController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/second-round/select")
-    @RoleCheck(Authority.ADMIN)
     public void selectSecondPass() {
         selectSecondPassUseCase.execute();
     }

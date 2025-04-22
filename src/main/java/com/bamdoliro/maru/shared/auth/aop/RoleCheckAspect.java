@@ -16,7 +16,7 @@ import java.util.List;
 @Component
 public class RoleCheckAspect {
 
-    @Before("@annotation(roleCheck)")
+    @Before("@within(roleCheck) || @annotation(roleCheck)")
     public void checkRole(RoleCheck roleCheck) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
