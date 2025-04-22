@@ -1,5 +1,6 @@
 package com.bamdoliro.maru.shared.auth.aop;
 
+import com.bamdoliro.maru.domain.auth.exception.AuthorityMismatchException;
 import com.bamdoliro.maru.shared.auth.Authority;
 import com.bamdoliro.maru.shared.auth.annotation.RoleCheck;
 import org.aspectj.lang.annotation.Aspect;
@@ -34,7 +35,7 @@ public class RoleCheckAspect {
                 .anyMatch(userRoles::contains);
 
         if (!hasPermission) {
-            throw new AccessDeniedException("접근 권한이 없습니다.");
+            throw new AuthorityMismatchException();
         }
     }
 }
