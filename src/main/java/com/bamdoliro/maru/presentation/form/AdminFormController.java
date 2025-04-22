@@ -26,7 +26,7 @@ import java.util.List;
 
 @RoleCheck(Authority.ADMIN)
 @RequiredArgsConstructor
-@RequestMapping("/forms/admin")
+@RequestMapping("/admin/forms")
 @RestController
 public class AdminFormController {
     private final ApproveFormUseCase approveFormUseCase;
