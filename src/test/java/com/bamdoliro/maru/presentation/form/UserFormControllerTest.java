@@ -51,7 +51,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         willDoNothing().given(submitFormUseCase).execute(user, request);
 
 
-        mockMvc.perform(post("/forms/user")
+        mockMvc.perform(post("/user/forms")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -213,7 +213,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         willDoNothing().given(submitFormUseCase).execute(user, request);
 
 
-        mockMvc.perform(post("/forms/user")
+        mockMvc.perform(post("/user/forms")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -234,7 +234,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new OutOfApplicationFormPeriodException()).when(submitFormUseCase).execute(any(User.class), any(SubmitFormRequest.class));
 
-        mockMvc.perform(post("/forms/user")
+        mockMvc.perform(post("/user/forms")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -258,7 +258,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         doThrow(new FormAlreadySubmittedException()).when(submitFormUseCase).execute(any(User.class), any(SubmitFormRequest.class));
 
 
-        mockMvc.perform(post("/forms/user")
+        mockMvc.perform(post("/user/forms")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -279,7 +279,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
 
 
-        mockMvc.perform(post("/forms/user")
+        mockMvc.perform(post("/user/forms")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -301,7 +301,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         willDoNothing().given(submitFinalFormUseCase).execute(any(User.class));
 
-        mockMvc.perform(patch("/forms/user")
+        mockMvc.perform(patch("/user/forms")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -327,7 +327,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new OutOfApplicationFormPeriodException()).when(submitFinalFormUseCase).execute(any(User.class));
 
-        mockMvc.perform(patch("/forms/user")
+        mockMvc.perform(patch("/user/forms")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -348,7 +348,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new FormAlreadySubmittedException()).when(submitFinalFormUseCase).execute(any(User.class));
 
-        mockMvc.perform(patch("/forms/user")
+        mockMvc.perform(patch("/user/forms")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -370,7 +370,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(queryFormStatusUseCase.execute(user)).willReturn(FormFixture.createFormSimpleResponse(FormStatus.APPROVED));
 
 
-        mockMvc.perform(get("/forms/user/status")
+        mockMvc.perform(get("/user/forms/status")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -396,7 +396,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(queryFormStatusUseCase.execute(user)).willThrow(new FormNotFoundException());
 
 
-        mockMvc.perform(get("/forms/user/status")
+        mockMvc.perform(get("/user/forms/status")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -417,7 +417,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         willDoNothing().given(updateFormUseCase).execute(user, formId, request);
 
 
-        mockMvc.perform(put("/forms/user/{form-id}", formId)
+        mockMvc.perform(put("/user/forms/{form-id}", formId)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -585,7 +585,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new OutOfApplicationFormPeriodException()).when(updateFormUseCase).execute(any(User.class), anyLong(), any(UpdateFormRequest.class));
 
-        mockMvc.perform(put("/forms/user/{form-id}", formId)
+        mockMvc.perform(put("/user/forms/{form-id}", formId)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -609,7 +609,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         doThrow(new FormNotFoundException()).when(updateFormUseCase).execute(any(User.class), anyLong(), any(UpdateFormRequest.class));
 
 
-        mockMvc.perform(put("/forms/user/{form-id}", formId)
+        mockMvc.perform(put("/user/forms/{form-id}", formId)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -633,7 +633,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         doThrow(new AuthorityMismatchException()).when(updateFormUseCase).execute(any(User.class), anyLong(), any(UpdateFormRequest.class));
 
 
-        mockMvc.perform(put("/forms/user/{form-id}", formId)
+        mockMvc.perform(put("/user/forms/{form-id}", formId)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -657,7 +657,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         doThrow(new CannotUpdateNotRejectedFormException()).when(updateFormUseCase).execute(any(User.class), anyLong(), any(UpdateFormRequest.class));
 
 
-        mockMvc.perform(put("/forms/user/{form-id}", formId)
+        mockMvc.perform(put("/user/forms/{form-id}", formId)
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -684,7 +684,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(uploadIdentificationPictureUseCase.execute(any(User.class), any(FileMetadata.class))).willReturn(SharedFixture.createIdentificationPictureUrlResponse());
 
-        mockMvc.perform(post("/forms/user/identification-picture")
+        mockMvc.perform(post("/user/forms/identification-picture")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -724,7 +724,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new OutOfApplicationFormPeriodException()).when(uploadIdentificationPictureUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(post("/forms/user/identification-picture")
+        mockMvc.perform(post("/user/forms/identification-picture")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -751,7 +751,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new EmptyFileException()).when(uploadIdentificationPictureUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(post("/forms/user/identification-picture")
+        mockMvc.perform(post("/user/forms/identification-picture")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -778,7 +778,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new FileSizeLimitExceededException(2)).when(uploadIdentificationPictureUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(post("/forms/user/identification-picture")
+        mockMvc.perform(post("/user/forms/identification-picture")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -805,7 +805,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new MediaTypeMismatchException()).when(uploadIdentificationPictureUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(post("/forms/user/identification-picture")
+        mockMvc.perform(post("/user/forms/identification-picture")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -832,7 +832,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(uploadFormUseCase.execute(any(User.class), any(FileMetadata.class))).willReturn(SharedFixture.createFormUrlResponse());
 
-        mockMvc.perform(post("/forms/user/form-document")
+        mockMvc.perform(post("/user/forms/form-document")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -872,7 +872,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new OutOfApplicationFormPeriodException()).when(uploadFormUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(post("/forms/user/form-document")
+        mockMvc.perform(post("/user/forms/form-document")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -899,7 +899,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new EmptyFileException()).when(uploadFormUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(post("/forms/user/form-document")
+        mockMvc.perform(post("/user/forms/form-document")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -926,7 +926,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new FileSizeLimitExceededException(20)).when(uploadFormUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(post("/forms/user/form-document")
+        mockMvc.perform(post("/user/forms/form-document")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -953,7 +953,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new MediaTypeMismatchException()).when(uploadFormUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(post("/forms/user/form-document")
+        mockMvc.perform(post("/user/forms/form-document")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -981,7 +981,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(downloadAdmissionAndPledgeFormatUseCase.execute(user)).willReturn(new ByteArrayResource(file.getBytes()));
 
-        mockMvc.perform(get("/forms/user/admission-and-pledge")
+        mockMvc.perform(get("/user/forms/admission-and-pledge")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_PDF)
                 )
@@ -1005,7 +1005,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new InvalidFormStatusException()).when(downloadAdmissionAndPledgeFormatUseCase).execute(user);
 
-        mockMvc.perform(get("/forms/user/admission-and-pledge")
+        mockMvc.perform(get("/user/forms/admission-and-pledge")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -1024,7 +1024,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new FailedToExportPdfException()).when(downloadAdmissionAndPledgeFormatUseCase).execute(user);
 
-        mockMvc.perform(get("/forms/user/admission-and-pledge")
+        mockMvc.perform(get("/user/forms/admission-and-pledge")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -1049,7 +1049,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(uploadAdmissionAndPledgeUseCase.execute(any(User.class), any(FileMetadata.class))).willReturn(SharedFixture.createAdmissionAndPledgeUrlResponse());
 
-        mockMvc.perform(post("/forms/user/admission-and-pledge")
+        mockMvc.perform(post("/user/forms/admission-and-pledge")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -1089,7 +1089,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new OutOfAdmissionAndPledgePeriodException()).when(uploadAdmissionAndPledgeUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(post("/forms/user/admission-and-pledge")
+        mockMvc.perform(post("/user/forms/admission-and-pledge")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -1116,7 +1116,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new InvalidFormStatusException()).when(uploadAdmissionAndPledgeUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(post("/forms/user/admission-and-pledge")
+        mockMvc.perform(post("/user/forms/admission-and-pledge")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -1143,7 +1143,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new FileSizeLimitExceededException(20)).when(uploadAdmissionAndPledgeUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(post("/forms/user/admission-and-pledge")
+        mockMvc.perform(post("/user/forms/admission-and-pledge")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -1170,7 +1170,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new MediaTypeMismatchException()).when(uploadAdmissionAndPledgeUseCase).execute(any(User.class), any(FileMetadata.class));
 
-        mockMvc.perform(post("/forms/user/admission-and-pledge")
+        mockMvc.perform(post("/user/forms/admission-and-pledge")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -1192,7 +1192,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         willDoNothing().given(enterFormUseCase).execute(user);
 
-        mockMvc.perform(patch("/forms/user/enter")
+        mockMvc.perform(patch("/user/forms/enter")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -1215,7 +1215,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new InvalidFormStatusException()).when(enterFormUseCase).execute(user);
 
-        mockMvc.perform(patch("/forms/user/enter")
+        mockMvc.perform(patch("/user/forms/enter")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -1235,7 +1235,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new FormNotFoundException()).when(enterFormUseCase).execute(user);
 
-        mockMvc.perform(patch("/forms/user/enter")
+        mockMvc.perform(patch("/user/forms/enter")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -1261,7 +1261,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(exportFormUseCase.execute(user)).willReturn(new ByteArrayResource(file.getBytes()));
 
-        mockMvc.perform(get("/forms/user/export")
+        mockMvc.perform(get("/user/forms/export")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_PDF)
                 )
@@ -1286,7 +1286,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new FormNotFoundException()).when(exportFormUseCase).execute(user);
 
-        mockMvc.perform(get("/forms/user/export")
+        mockMvc.perform(get("/user/forms/export")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -1306,7 +1306,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new FormAlreadySubmittedException()).when(exportFormUseCase).execute(user);
 
-        mockMvc.perform(get("/forms/user/export")
+        mockMvc.perform(get("/user/forms/export")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -1326,7 +1326,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         doThrow(new FailedToExportPdfException()).when(exportFormUseCase).execute(user);
 
-        mockMvc.perform(get("/forms/user/export")
+        mockMvc.perform(get("/user/forms/export")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -1347,7 +1347,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(queryFirstFormResultUseCase.execute(user)).willReturn(new FormResultResponse(form, true));
 
-        mockMvc.perform(get("/forms/user/result/first")
+        mockMvc.perform(get("/user/forms/result/first")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -1372,7 +1372,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         willThrow(new FormNotFoundException()).given(queryFirstFormResultUseCase).execute(user);
 
-        mockMvc.perform(get("/forms/user/result/first")
+        mockMvc.perform(get("/user/forms/result/first")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -1393,7 +1393,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(queryFinalFormResultUseCase.execute(user)).willReturn(new FormResultResponse(form, false));
 
-        mockMvc.perform(get("/forms/user/result/final")
+        mockMvc.perform(get("/user/forms/result/final")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -1418,7 +1418,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         willThrow(new FormNotFoundException()).given(queryFinalFormResultUseCase).execute(user);
 
-        mockMvc.perform(get("/forms/user/result/final")
+        mockMvc.perform(get("/user/forms/result/final")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -1444,7 +1444,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(generateAdmissionTicketUseCase.execute(user)).willReturn(new ByteArrayResource(file.getBytes()));
 
-        mockMvc.perform(get("/forms/user/admission-ticket")
+        mockMvc.perform(get("/user/forms/admission-ticket")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_PDF)
                 )
@@ -1469,7 +1469,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         willThrow(new InvalidFormStatusException()).given(generateAdmissionTicketUseCase).execute(user);
 
-        mockMvc.perform(get("/forms/user/admission-ticket")
+        mockMvc.perform(get("/user/forms/admission-ticket")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -1489,7 +1489,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         willThrow(new FormNotFoundException()).given(generateAdmissionTicketUseCase).execute(user);
 
-        mockMvc.perform(get("/forms/user/admission-ticket")
+        mockMvc.perform(get("/user/forms/admission-ticket")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -1520,7 +1520,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         given(generateAdmissionTicketUseCase.execute(user)).willReturn(new ByteArrayResource(file.getBytes()));
 
-        mockMvc.perform(get("/forms/user/proof-of-application")
+        mockMvc.perform(get("/user/forms/proof-of-application")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_PDF)
                 )
@@ -1545,7 +1545,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         willThrow(new InvalidFormStatusException()).given(generateProofOfApplicationUseCase).execute(user);
 
-        mockMvc.perform(get("/forms/user/proof-of-application")
+        mockMvc.perform(get("/user/forms/proof-of-application")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -1565,7 +1565,7 @@ class UserFormControllerTest extends RestDocsTestSupport {
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
         willThrow(new FormNotFoundException()).given(generateProofOfApplicationUseCase).execute(user);
 
-        mockMvc.perform(get("/forms/user/proof-of-application")
+        mockMvc.perform(get("/user/forms/proof-of-application")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
