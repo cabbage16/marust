@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ public class SelectFirstPassUseCase {
 
     private final FormRepository formRepository;
     private final CalculateFormScoreService calculateFormScoreService;
+    private final AtomicInteger otherRegionCount = new AtomicInteger((int) (calculateMultiple(FixedNumber.TOTAL) * FixedNumber.OTHER_REGION_RATE));
 
     @Transactional
     public void execute() {
@@ -75,12 +77,20 @@ public class SelectFirstPassUseCase {
         if (formList.isEmpty())
             return;
 
-        Double lastScore = formList.get(Math.min(count, formList.size())-1).getScore().getFirstRoundScore();
+        Double lastScore = formList.get(Math.min(count, formList.size()) - 1).getScore().getFirstRoundScore();
 
-        for (Form form: formList) {
+        for (Form form : formList) {
             if (count > 0) {
-                form.firstPass();
-                count--;
+                if (form.getEducation().getSchool().isBusan()) {
+                    form.firstPass();
+                    count--;
+                } else if (otherRegionCount.intValue() > 0) {
+                    form.firstPass();
+                    otherRegionCount.getAndDecrement();
+                    count--;
+                } else {
+                    action.accept(form);
+                }
             } else if (form.getScore().getFirstRoundScore().equals(lastScore)) {
                 form.firstPass();
             } else {

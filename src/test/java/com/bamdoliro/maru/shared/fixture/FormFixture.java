@@ -149,7 +149,7 @@ public class FormFixture {
         return form;
     }
 
-    public static Form createRandomForm(User user) {
+    public static Form createRandomBusanForm(User user) {
         return new Form(
                 new Applicant(
                         "김밤돌",
@@ -170,7 +170,7 @@ public class FormFixture {
                 new Education(
                         GraduationType.EXPECTED,
                         "2021",
-                        new School("비전중학교", "경기도", "경기도 비전시 비전구 비전로 1", "7631003"),
+                        new School("부산중학교", "부산광역시", "부산광역시 동구 초량로40번길 29", "7631003"),
                         new Teacher("나교사", new PhoneNumber("0519701234"), new PhoneNumber("01012344321"))
                 ),
                 new Grade(
@@ -217,6 +217,83 @@ public class FormFixture {
                         randomNumber(0, 100),
                         new CertificateList(List.of(Certificate.COMPUTER_SPECIALIST_LEVEL_2, Certificate.CRAFTSMAN_COMPUTER))
                 ),
+                new Document(
+                        "하이난김밤돌",
+                        "공부열심히할게용"
+                ),
+                randomFormType(),
+                user
+        );
+    }
+
+    public static Form createRandomOtherRegionForm(User user) {
+        return new Form(
+                new Applicant(
+                        "김밤돌",
+                        new PhoneNumber("01085852525"),
+                        LocalDate.of(2005, 4, 15),
+                        Gender.FEMALE
+                ),
+                new Parent(
+                        "김이로",
+                        new PhoneNumber("01085852626"),
+                        "엄마",
+                        new Address(
+                                "18071",
+                                "부산광역시 가락대로1393",
+                                "부산소프트웨어마이스터고"
+                        )
+                ),
+                new Education(
+                        GraduationType.EXPECTED,
+                        "2021",
+                        new School("비전중학교", "경기도","경기도 비전시 비전구 비전로 1", "7631003"),
+        new Teacher("나교사", new PhoneNumber("0519701234"), new PhoneNumber("01012344321"))
+                ),
+        new Grade(
+                new SubjectList(
+                        List.of(
+                                new Subject(2, 1, "국어", randomAchievementLevel()),
+                                new Subject(2, 1, "도덕", randomAchievementLevel()),
+                                new Subject(2, 1, "역사", randomAchievementLevel()),
+                                new Subject(2, 1, "수학", randomAchievementLevel()),
+                                new Subject(2, 1, "과학", randomAchievementLevel()),
+                                new Subject(2, 1, "영어", randomAchievementLevel()),
+                                new Subject(2, 1, "체육", random3AchievementLevel()),
+                                new Subject(2, 1, "미술", random3AchievementLevel()),
+                                new Subject(2, 1, "음악", random3AchievementLevel()),
+
+                                new Subject(2, 2, "국어", randomAchievementLevel()),
+                                new Subject(2, 2, "도덕", randomAchievementLevel()),
+                                new Subject(2, 2, "역사", randomAchievementLevel()),
+                                new Subject(2, 2, "수학", randomAchievementLevel()),
+                                new Subject(2, 2, "과학", randomAchievementLevel()),
+                                new Subject(2, 2, "영어", randomAchievementLevel()),
+                                new Subject(2, 2, "체육", random3AchievementLevel()),
+                                new Subject(2, 2, "미술", random3AchievementLevel()),
+                                new Subject(2, 2, "음악", random3AchievementLevel()),
+                                new Subject(2, 2, "한문", randomAchievementLevel()),
+
+                                new Subject(3, 1, "국어", randomAchievementLevel()),
+                                new Subject(3, 1, "사회", randomAchievementLevel()),
+                                new Subject(3, 1, "역사", randomAchievementLevel()),
+                                new Subject(3, 1, "수학", randomAchievementLevel()),
+                                new Subject(3, 1, "과학", randomAchievementLevel()),
+                                new Subject(3, 1, "기가", randomAchievementLevel()),
+                                new Subject(3, 1, "영어", randomAchievementLevel()),
+                                new Subject(3, 1, "체육", random3AchievementLevel()),
+                                new Subject(3, 1, "미술", random3AchievementLevel()),
+                                new Subject(3, 1, "음악", random3AchievementLevel()),
+                                new Subject(3, 1, "한문", randomAchievementLevel())
+                        )),
+                new Attendance(randomNumber(0, 5), randomNumber(0, 5), randomNumber(0, 5), randomNumber(0, 5)),
+                new Attendance(randomNumber(0, 3), randomNumber(0, 3), randomNumber(0, 3), randomNumber(0, 3)),
+                new Attendance(randomNumber(0, 2), randomNumber(0, 2), randomNumber(0, 2), randomNumber(0, 2)),
+                randomNumber(0, 100),
+                randomNumber(0, 100),
+                randomNumber(0, 100),
+                new CertificateList(List.of(Certificate.COMPUTER_SPECIALIST_LEVEL_2, Certificate.CRAFTSMAN_COMPUTER))
+        ),
                 new Document(
                         "하이난김밤돌",
                         "공부열심히할게용"
@@ -564,12 +641,19 @@ public class FormFixture {
         );
     }
 
-    public static List<Form> generateFormList(List<User> userList) {
+    public static List<Form> generateBusanFormList(List<User> userList) {
         return userList.stream()
-                .map(FormFixture::createRandomForm)
+                .map(FormFixture::createRandomBusanForm)
                 .collect(Collectors.toList());
     }
 
+
+    public static List<Form> generateOtherRegionFormList(List<User> userList) {
+        return userList.stream()
+                .map(FormFixture::createRandomOtherRegionForm)
+                .collect(Collectors.toList());
+
+    }
     public static FormUrlVo createFormUrlVo() {
         return new FormUrlVo(
                 (long) randomNumber(1000, 5000),
