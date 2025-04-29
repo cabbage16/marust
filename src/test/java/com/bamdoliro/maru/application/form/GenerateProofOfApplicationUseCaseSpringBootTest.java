@@ -48,7 +48,7 @@ public class GenerateProofOfApplicationUseCaseSpringBootTest {
     @Test
     void 접수증을_저장한다() throws IOException {
         User user = userRepository.save(UserFixture.createUser());
-        Form form = FormFixture.createRandomForm(user);
+        Form form = FormFixture.createRandomBusanForm(user);
 
         File image = new ClassPathResource("images/id-picture.png").getFile();
         String presignedUrl = fileService.getUploadPresignedUrl(FolderConstant.IDENTIFICATION_PICTURE, user.getUuid().toString(), new FileMetadata("id-picture.png", "image/png", image.length()), metadata ->

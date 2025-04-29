@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 @ActiveProfiles("test")
@@ -56,7 +57,8 @@ public class SelectSecondPassUseCaseTest {
         List<User> userList = userRepository.saveAll(
                 UserFixture.generateUserList(FixedNumber.TOTAL * 2)
         );
-        List<Form> formList = FormFixture.generateFormList(userList);
+        List<Form> formList = FormFixture.generateBusanFormList(userList.subList(0, userList.size() / 2));
+        formList.addAll(FormFixture.generateOtherRegionFormList(userList.subList(userList.size() / 2, userList.size())));
         formList.forEach(form -> {
             assignExaminationNumberService.execute(form);
             form.receive();
@@ -73,11 +75,6 @@ public class SelectSecondPassUseCaseTest {
             }
             formRepository.save(form);
         });
-    }
-
-    @AfterEach
-    void tearDown() {
-        formRepository.deleteAll();
     }
 
     @Test
@@ -103,7 +100,9 @@ public class SelectSecondPassUseCaseTest {
             log.info("status: {}", form.getStatus());
         });
         int passedFormCount = (int) formList.stream().filter(Form::isPassedNow).count();
+        int passedOtherRegionFormCount = (int) formList.stream().filter(form -> form.isPassedNow() && !form.getEducation().getSchool().isBusan()).count();
         assertEquals(FixedNumber.TOTAL, passedFormCount);
+        assertTrue(FixedNumber.TOTAL / 2 >= passedOtherRegionFormCount);
     }
 
     @Test
