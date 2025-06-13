@@ -1,9 +1,9 @@
 package com.bamdoliro.maru.shared.config;
 
 import lombok.RequiredArgsConstructor;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
-import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
 import org.jasypt.salt.StringFixedSaltGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,15 +22,13 @@ public class JasyptConfig {
     @Bean
     public StringEncryptor stringEncryptor() {
         PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
-        SimpleStringPBEConfig config = new SimpleStringPBEConfig();
-        config.setPassword(key);
-        config.setAlgorithm("PBEWithMD5AndDES");
-        config.setKeyObtentionIterations("1000");
-        config.setPoolSize("1");
+        encryptor.setProvider(new BouncyCastleProvider());
+        encryptor.setPassword(key);
+        encryptor.setAlgorithm("PBEWithSHA256And256BitAES-CBC-BC");
+        encryptor.setKeyObtentionIterations(1000);
+        encryptor.setPoolSize(1);
 
-        config.setSaltGenerator(new StringFixedSaltGenerator(salt));
-        config.setIvGeneratorClassName("org.jasypt.iv.NoIvGenerator");
-        encryptor.setConfig(config);
+        encryptor.setSaltGenerator(new StringFixedSaltGenerator(salt));
         return encryptor;
     }
 
