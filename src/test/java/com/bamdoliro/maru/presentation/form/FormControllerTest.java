@@ -1,38 +1,543 @@
 package com.bamdoliro.maru.presentation.form;
 
 import com.bamdoliro.maru.domain.auth.exception.AuthorityMismatchException;
-import com.bamdoliro.maru.domain.form.exception.FormNotFoundException;
+import com.bamdoliro.maru.domain.form.domain.Form;
+import com.bamdoliro.maru.domain.form.domain.type.FormStatus;
+import com.bamdoliro.maru.domain.form.domain.type.FormType;
+import com.bamdoliro.maru.domain.form.exception.*;
 import com.bamdoliro.maru.domain.user.domain.User;
+import com.bamdoliro.maru.infrastructure.pdf.exception.FailedToExportPdfException;
+import com.bamdoliro.maru.infrastructure.s3.dto.request.FileMetadata;
+import com.bamdoliro.maru.infrastructure.s3.exception.EmptyFileException;
+import com.bamdoliro.maru.infrastructure.s3.exception.FileSizeLimitExceededException;
+import com.bamdoliro.maru.infrastructure.s3.exception.MediaTypeMismatchException;
+import com.bamdoliro.maru.presentation.form.dto.request.PassOrFailFormListRequest;
+import com.bamdoliro.maru.presentation.form.dto.request.PassOrFailFormRequest;
+import com.bamdoliro.maru.presentation.form.dto.request.SubmitFormRequest;
+import com.bamdoliro.maru.presentation.form.dto.request.UpdateFormRequest;
+import com.bamdoliro.maru.presentation.form.dto.response.FormResultResponse;
+import com.bamdoliro.maru.presentation.form.dto.response.FormSimpleResponse;
 import com.bamdoliro.maru.shared.fixture.AuthFixture;
 import com.bamdoliro.maru.shared.fixture.FormFixture;
+import com.bamdoliro.maru.shared.fixture.SharedFixture;
 import com.bamdoliro.maru.shared.fixture.UserFixture;
 import com.bamdoliro.maru.shared.util.RestDocsTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
+import static com.bamdoliro.maru.shared.constants.FileConstant.MB;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class FormControllerTest extends RestDocsTestSupport {
 
     @Test
-    void 원서를_상세_조회한다() throws Exception {
+    void 원서를_제출한다() throws Exception {
+        SubmitFormRequest request = FormFixture.createFormRequest(FormType.REGULAR);
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        willDoNothing().given(submitFormUseCase).execute(user, request);
+
+
+        mockMvc.perform(post("/forms")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(request))
+                )
+
+                .andExpect(status().isCreated())
+
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("Bearer token")
+                        ),
+                        requestFields(
+                                fieldWithPath("type")
+                                        .type(JsonFieldType.STRING)
+                                        .description("<<form-type,원서 유형>>"),
+                                fieldWithPath("applicant.name")
+                                        .type(JsonFieldType.STRING)
+                                        .description("지원자 이름"),
+                                fieldWithPath("applicant.phoneNumber")
+                                        .type(JsonFieldType.STRING)
+                                        .description("지원자 전화번호"),
+                                fieldWithPath("applicant.birthday")
+                                        .type(JsonFieldType.STRING)
+                                        .description("지원자 생년월일 (yyyy-MM-dd)"),
+                                fieldWithPath("applicant.gender")
+                                        .type(JsonFieldType.STRING)
+                                        .description("<<gender,지원자 성별>>"),
+                                fieldWithPath("parent.name")
+                                        .type(JsonFieldType.STRING)
+                                        .description("보호자 이름"),
+                                fieldWithPath("parent.phoneNumber")
+                                        .type(JsonFieldType.STRING)
+                                        .description("보호자 전화번호"),
+                                fieldWithPath("parent.relation")
+                                        .type(JsonFieldType.STRING)
+                                        .description("보호자 관계"),
+                                fieldWithPath("parent.zoneCode")
+                                        .type(JsonFieldType.STRING)
+                                        .description("보호자 주소지 우편번호"),
+                                fieldWithPath("parent.address")
+                                        .type(JsonFieldType.STRING)
+                                        .description("보호자 주소지"),
+                                fieldWithPath("parent.detailAddress")
+                                        .type(JsonFieldType.STRING)
+                                        .description("보호자 상세주소"),
+                                fieldWithPath("education.graduationType")
+                                        .type(JsonFieldType.STRING)
+                                        .description("<<graduation-type,졸업 유형>>"),
+                                fieldWithPath("education.graduationYear")
+                                        .type(JsonFieldType.STRING)
+                                        .description("졸업 연도, 합격 연도"),
+                                fieldWithPath("education.schoolName")
+                                        .type(JsonFieldType.STRING)
+                                        .description("출신 학교 이름  (없는 경우 null)"),
+                                fieldWithPath("education.schoolLocation")
+                                        .type(JsonFieldType.STRING)
+                                        .description("출신 학교 지역 (없는 경우 null)"),
+                                fieldWithPath("education.schoolAddress")
+                                        .type(JsonFieldType.STRING)
+                                        .description("출신 학교 주소지 (없는 경우 null)"),
+                                fieldWithPath("education.schoolCode")
+                                        .type(JsonFieldType.STRING)
+                                        .description("출신 학교 코드 (없는 경우 null)"),
+                                fieldWithPath("education.teacherName")
+                                        .type(JsonFieldType.STRING)
+                                        .description("작성 교사 (없는 경우 null)"),
+                                fieldWithPath("education.teacherPhoneNumber")
+                                        .type(JsonFieldType.STRING)
+                                        .description("작성 교사 전화번호 (없는 경우 null)"),
+                                fieldWithPath("education.teacherMobilePhoneNumber")
+                                        .type(JsonFieldType.STRING)
+                                        .description("작성 교사 휴대전화번호 (없는 경우 null)"),
+                                fieldWithPath("grade.subjectList[].subjectName")
+                                        .type(JsonFieldType.STRING)
+                                        .description("과목명"),
+                                fieldWithPath("grade.subjectList[].achievementLevel21")
+                                        .type(JsonFieldType.STRING)
+                                        .description("<<achievement-level,2학년 1학기 성취도 (성적이 없는 경우 null)>>")
+                                        .optional(),
+                                fieldWithPath("grade.subjectList[].achievementLevel22")
+                                        .type(JsonFieldType.STRING)
+                                        .description("<<achievement-level,2학년 2학기 성취도 (성적이 없는 경우 null)>>")
+                                        .optional(),
+                                fieldWithPath("grade.subjectList[].achievementLevel31")
+                                        .type(JsonFieldType.STRING)
+                                        .description("<<achievement-level,3학년 1학기 성취도 (성적이 없는 경우 null)>>")
+                                        .optional(),
+                                fieldWithPath("grade.subjectList[].score")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("검정고시인 경우 점수 (검정고시가 아닐시 무조건 null)")
+                                        .optional(),
+                                fieldWithPath("grade.certificateList[]")
+                                        .type(JsonFieldType.ARRAY)
+                                        .description("<<certificate,자격증 리스트>>"),
+                                fieldWithPath("grade.attendance1.absenceCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("1학년 미인정 결석 횟수 (출결 성적이 없는 경우 null)"),
+                                fieldWithPath("grade.attendance1.latenessCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("1학년 미인정 지각 횟수 (출결 성적이 없는 경우 null)"),
+                                fieldWithPath("grade.attendance1.earlyLeaveCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("1학년 미인정 조퇴 횟수 (출결 성적이 없는 경우 null)"),
+                                fieldWithPath("grade.attendance1.classAbsenceCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("1학년 미인정 결과 횟수 (출결 성적이 없는 경우 null)"),
+                                fieldWithPath("grade.attendance2.absenceCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("2학년 미인정 결석 횟수 (출결 성적이 없는 경우 null)"),
+                                fieldWithPath("grade.attendance2.latenessCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("2학년 미인정 지각 횟수 (출결 성적이 없는 경우 null)"),
+                                fieldWithPath("grade.attendance2.earlyLeaveCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("2학년 미인정 조퇴 횟수 (출결 성적이 없는 경우 null)"),
+                                fieldWithPath("grade.attendance2.classAbsenceCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("2학년 미인정 결과 횟수 (출결 성적이 없는 경우 null)"),
+                                fieldWithPath("grade.attendance3.absenceCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("3학년 미인정 결석 횟수 (출결 성적이 없는 경우 null)"),
+                                fieldWithPath("grade.attendance3.latenessCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("3학년 미인정 지각 횟수 (출결 성적이 없는 경우 null)"),
+                                fieldWithPath("grade.attendance3.earlyLeaveCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("3학년 미인정 조퇴 횟수 (출결 성적이 없는 경우 null)"),
+                                fieldWithPath("grade.attendance3.classAbsenceCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("3학년 미인정 결과 횟수 (출결 성적이 없는 경우 null)"),
+                                fieldWithPath("grade.volunteerTime1")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("1학년 봉사시간 (봉사 성적이 없는 경우 null)"),
+                                fieldWithPath("grade.volunteerTime2")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("2학년 봉사시간 (봉사 성적이 없는 경우 null)"),
+                                fieldWithPath("grade.volunteerTime3")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("3학년 봉사시간 (봉사 성적이 없는 경우 null)"),
+                                fieldWithPath("document.coverLetter")
+                                        .type(JsonFieldType.STRING)
+                                        .description("1600자 이내의 자기소개서"),
+                                fieldWithPath("document.statementOfPurpose")
+                                        .type(JsonFieldType.STRING)
+                                        .description("1600자 이내의 학업계획서")
+                        )
+                ));
+    }
+
+    @Test
+    void 중졸_껌정고시_합격자가_원서를_제출한다() throws Exception {
+        SubmitFormRequest request = FormFixture.createQualificationExaminationFormRequest(FormType.MEISTER_TALENT);
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        willDoNothing().given(submitFormUseCase).execute(user, request);
+
+
+        mockMvc.perform(post("/forms")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(request))
+                )
+
+                .andExpect(status().isCreated())
+
+                .andDo(restDocs.document());
+    }
+
+    @Test
+    void 원서를_제출할_때_원서_접수_기간이_아니면_에러가_발생한다() throws Exception {
+        SubmitFormRequest request = FormFixture.createFormRequest(FormType.REGULAR);
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new OutOfApplicationFormPeriodException()).when(submitFormUseCase).execute(any(User.class), any(SubmitFormRequest.class));
+
+        mockMvc.perform(post("/forms")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(request))
+                )
+
+                .andExpect(status().isForbidden())
+
+                .andDo(restDocs.document());
+
+        verify(submitFormUseCase, times(1)).execute(any(User.class), any(SubmitFormRequest.class));
+    }
+
+    @Test
+    void 원서를_제출할_때_이미_제출한_원서가_있으면_에러가_발생한다() throws Exception {
+        SubmitFormRequest request = FormFixture.createFormRequest(FormType.REGULAR);
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new FormAlreadySubmittedException()).when(submitFormUseCase).execute(any(User.class), any(SubmitFormRequest.class));
+
+
+        mockMvc.perform(post("/forms")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(request))
+                )
+
+                .andExpect(status().isConflict())
+
+                .andDo(restDocs.document());
+    }
+
+    @Test
+    void 원서를_제출할_때_잘못된_형식의_요청을_보내면_에러가_발생한다() throws Exception {
+        SubmitFormRequest request = new SubmitFormRequest();
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+
+
+        mockMvc.perform(post("/forms")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(request))
+                )
+
+                .andExpect(status().isBadRequest())
+
+                .andDo(restDocs.document());
+
+        verify(submitFormUseCase, never()).execute(any(User.class), any(SubmitFormRequest.class));
+    }
+
+    @Test
+    void 원서를_최종_제출한다() throws Exception {
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        willDoNothing().given(submitFinalFormUseCase).execute(any(User.class));
+
+        mockMvc.perform(patch("/forms")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+
+                .andExpect(status().isNoContent())
+
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("Bearer token")
+                        )
+                ));
+
+        verify(submitFinalFormUseCase, times(1)).execute(any(User.class));
+    }
+
+    @Test
+    void 원서를_최종_제출할_때_원서_접수_기간이_아니면_에러가_발생한다() throws Exception {
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new OutOfApplicationFormPeriodException()).when(submitFinalFormUseCase).execute(any(User.class));
+
+        mockMvc.perform(patch("/forms")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+
+                .andExpect(status().isForbidden())
+
+                .andDo(restDocs.document());
+
+        verify(submitFinalFormUseCase, times(1)).execute(any(User.class));
+    }
+
+    @Test
+    void 원서를_최종_제출할_때_이미_제출한_원서라면_에러가_발생한다() throws Exception {
+        User user = UserFixture.createUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new FormAlreadySubmittedException()).when(submitFinalFormUseCase).execute(any(User.class));
+
+        mockMvc.perform(patch("/forms")
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+
+                .andExpect(status().isConflict())
+
+                .andDo(restDocs.document());
+
+        verify(submitFinalFormUseCase, times(1)).execute(any(User.class));
+    }
+
+    @Test
+    void 원서를_승인한다() throws Exception {
         Long formId = 1L;
         User user = UserFixture.createAdminUser();
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        given(queryFormUseCase.execute(user, formId)).willReturn(FormFixture.createFormResponse());
+        willDoNothing().given(approveFormUseCase).execute(formId);
 
 
-        mockMvc.perform(get("/forms/{form-id}", formId)
+        mockMvc.perform(patch("/forms/{form-id}/approve", formId)
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+
+                .andExpect(status().isNoContent())
+
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("Bearer token")
+                        ),
+                        pathParameters(
+                                parameterWithName("form-id")
+                                        .description("승인할 원서의 id")
+                        )
+                ));
+
+        verify(approveFormUseCase, times(1)).execute(formId);
+    }
+
+    @Test
+    void 원서를_승인할_때_원서가_없으면_에러가_발생한다() throws Exception {
+        Long formId = 1L;
+        User user = UserFixture.createAdminUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new FormNotFoundException()).when(approveFormUseCase).execute(formId);
+
+
+        mockMvc.perform(patch("/forms/{form-id}/approve", formId)
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+
+                .andExpect(status().isNotFound())
+
+                .andDo(restDocs.document());
+
+        verify(approveFormUseCase, times(1)).execute(formId);
+    }
+
+    @Test
+    void 원서를_반려한다() throws Exception {
+        Long formId = 1L;
+        User user = UserFixture.createAdminUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        willDoNothing().given(rejectFormUseCase).execute(formId);
+
+
+        mockMvc.perform(patch("/forms/{form-id}/reject", formId)
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+
+                .andExpect(status().isNoContent())
+
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("Bearer token")
+                        ),
+                        pathParameters(
+                                parameterWithName("form-id")
+                                        .description("반려할 원서의 id")
+                        )
+                ));
+
+        verify(rejectFormUseCase, times(1)).execute(formId);
+    }
+
+    @Test
+    void 원서를_반려할_때_원서가_없으면_에러가_발생한다() throws Exception {
+        Long formId = 1L;
+        User user = UserFixture.createAdminUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new FormNotFoundException()).when(rejectFormUseCase).execute(formId);
+
+
+        mockMvc.perform(patch("/forms/{form-id}/reject", formId)
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+
+                .andExpect(status().isNotFound())
+
+                .andDo(restDocs.document());
+
+        verify(rejectFormUseCase, times(1)).execute(formId);
+    }
+
+    @Test
+    void 원서를_접수한다() throws Exception {
+        Long formId = 1L;
+        User user = UserFixture.createAdminUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        willDoNothing().given(receiveFormUseCase).execute(formId);
+
+
+        mockMvc.perform(patch("/forms/{form-id}/receive", formId)
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+
+                .andExpect(status().isNoContent())
+
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION)
+                                        .description("Bearer token")
+                        ),
+                        pathParameters(
+                                parameterWithName("form-id")
+                                        .description("접수할 원서의 id")
+                        )
+                ));
+
+        verify(receiveFormUseCase, times(1)).execute(formId);
+    }
+
+    @Test
+    void 원서를_접수할_때_원서가_없으면_에러가_발생한다() throws Exception {
+        Long formId = 1L;
+        User user = UserFixture.createAdminUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        doThrow(new FormNotFoundException()).when(receiveFormUseCase).execute(formId);
+
+
+        mockMvc.perform(patch("/forms/{form-id}/receive", formId)
+                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+
+                .andExpect(status().isNotFound())
+
+                .andDo(restDocs.document());
+
+        verify(receiveFormUseCase, times(1)).execute(formId);
+    }
+
+    @Test
+    void 검토해야_하는_원서를_조회한다() throws Exception {
+        User user = UserFixture.createAdminUser();
+
+        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
+        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
+        given(querySubmittedFormUseCase.execute()).willReturn(List.of(
+                FormFixture.createFormSimpleResponse(FormStatus.FINAL_SUBMITTED),
+                FormFixture.createFormSimpleResponse(FormStatus.REJECTED),
+                FormFixture.createFormSimpleResponse(FormStatus.FINAL_SUBMITTED)
+        ));
+
+
+        mockMvc.perform(get("/forms/review")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -43,52 +548,25 @@ class FormControllerTest extends RestDocsTestSupport {
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION)
                                         .description("Bearer token")
-                        ),
-                        pathParameters(
-                                parameterWithName("form-id")
-                                        .description("조회할 원서의 id")
                         )
                 ));
-
-        verify(queryFormUseCase, times(1)).execute(user, formId);
     }
 
     @Test
-    void 원서를_상세_조회할_때_원서가_없으면_에러가_발생한다() throws Exception {
-        Long formId = 1L;
+    void 검토해야_하는_원서가_없으면_빈_리스트를_반환한다() throws Exception {
         User user = UserFixture.createAdminUser();
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        given(queryFormUseCase.execute(user, formId)).willThrow(new FormNotFoundException());
+        given(querySubmittedFormUseCase.execute()).willReturn(List.of());
 
 
-        mockMvc.perform(get("/forms/{form-id}", formId)
+        mockMvc.perform(get("/forms/review")
                         .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
                         .accept(MediaType.APPLICATION_JSON)
                 )
 
-                .andExpect(status().isNotFound())
-
-                .andDo(restDocs.document());
-    }
-
-    @Test
-    void 원서를_상세_조회할_때_본인의_원서가_아니면_에러가_발생한다() throws Exception {
-        Long formId = 1L;
-        User user = UserFixture.createAdminUser();
-
-        given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
-        given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        given(queryFormUseCase.execute(user, formId)).willThrow(new AuthorityMismatchException());
-
-
-        mockMvc.perform(get("/forms/{form-id}", formId)
-                        .header(HttpHeaders.AUTHORIZATION, AuthFixture.createAuthHeader())
-                        .accept(MediaType.APPLICATION_JSON)
-                )
-
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isOk())
 
                 .andDo(restDocs.document());
     }
