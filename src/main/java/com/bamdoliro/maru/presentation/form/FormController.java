@@ -4,11 +4,11 @@ import com.bamdoliro.maru.application.form.*;
 import com.bamdoliro.maru.domain.form.domain.type.FormStatus;
 import com.bamdoliro.maru.domain.form.domain.type.FormType;
 import com.bamdoliro.maru.domain.user.domain.User;
+import com.bamdoliro.maru.infrastructure.s3.dto.request.FileMetadata;
 import com.bamdoliro.maru.infrastructure.s3.dto.response.UrlResponse;
 import com.bamdoliro.maru.presentation.form.dto.request.PassOrFailFormListRequest;
 import com.bamdoliro.maru.presentation.form.dto.request.SubmitFormRequest;
 import com.bamdoliro.maru.presentation.form.dto.request.UpdateFormRequest;
-import com.bamdoliro.maru.infrastructure.s3.dto.request.FileMetadata;
 import com.bamdoliro.maru.presentation.form.dto.response.*;
 import com.bamdoliro.maru.shared.auth.AuthenticationPrincipal;
 import com.bamdoliro.maru.shared.auth.Authority;
@@ -21,17 +21,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -278,13 +268,22 @@ public class FormController {
                 .body(downloadSecondRoundScoreFormatUseCase.execute());
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/second-round/score")
-    public void updateSecondRoundScore(
+    public ResponseEntity<Resource> updateSecondRoundScore(
             @AuthenticationPrincipal(authority = Authority.ADMIN) User user,
             @RequestPart(value = "xlsx") MultipartFile file
     ) throws IOException {
-        updateSecondRoundScoreUseCase.execute(file);
+        Resource response = updateSecondRoundScoreUseCase.execute(file);
+        if (response == null) {
+            return ResponseEntity
+                    .noContent()
+                    .build();
+        } else {
+            return ResponseEntity
+                    .badRequest()
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .body(response);
+        }
     }
 
     @GetMapping("/xlsx/final-passed")

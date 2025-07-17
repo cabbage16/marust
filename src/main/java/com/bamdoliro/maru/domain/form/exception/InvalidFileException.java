@@ -5,7 +5,7 @@ import com.bamdoliro.maru.shared.error.MaruException;
 
 public class InvalidFileException extends MaruException {
 
-    public InvalidFileException() {
-        super(FormErrorProperty.INVALID_FILE);
+    public InvalidFileException(String message) {
+        super(FormErrorProperty.INVALID_FILE, message);
     }
 }

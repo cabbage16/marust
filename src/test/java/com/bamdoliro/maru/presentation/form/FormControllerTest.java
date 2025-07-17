@@ -2028,7 +2028,7 @@ class FormControllerTest extends RestDocsTestSupport {
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        willDoNothing().given(updateSecondRoundScoreUseCase).execute(any(MultipartFile.class));
+        given(downloadSecondRoundScoreFormatUseCase.execute()).willReturn(null);
 
         mockMvc.perform(multipartPatch("/forms/second-round/score")
                         .file(file)
@@ -2063,7 +2063,7 @@ class FormControllerTest extends RestDocsTestSupport {
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        doThrow(new InvalidFileException()).when(updateSecondRoundScoreUseCase).execute(any(MultipartFile.class));
+        doThrow(new InvalidFileException("")).when(updateSecondRoundScoreUseCase).execute(any(MultipartFile.class));
 
         mockMvc.perform(multipartPatch("/forms/second-round/score")
                         .file(file)
@@ -2078,7 +2078,7 @@ class FormControllerTest extends RestDocsTestSupport {
     }
 
     @Test
-    void 입력한_2차_전형_점수가_범위를_초과한_경우_에러가_발생한다() throws Exception {
+    void 입력한_2차_전형_점수의_타입이_잘못되거나_범위를_초과한_경우_에러가_발생한다() throws Exception {
         User user = UserFixture.createAdminUser();
         MockMultipartFile file = new MockMultipartFile(
                 "xlsx",
@@ -2089,7 +2089,7 @@ class FormControllerTest extends RestDocsTestSupport {
 
         given(authenticationArgumentResolver.supportsParameter(any(MethodParameter.class))).willReturn(true);
         given(authenticationArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(user);
-        doThrow(new WrongScoreException()).when(updateSecondRoundScoreUseCase).execute(any(MultipartFile.class));
+        given(updateSecondRoundScoreUseCase.execute(file)).willReturn(new ByteArrayResource(file.getBytes()));
 
         mockMvc.perform(multipartPatch("/forms/second-round/score")
                         .file(file)
