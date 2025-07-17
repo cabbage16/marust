@@ -10,6 +10,7 @@ import com.bamdoliro.maru.infrastructure.persistence.user.UserRepository;
 import com.bamdoliro.maru.presentation.user.dto.request.DeleteUserRequest;
 import com.bamdoliro.maru.shared.annotation.UseCase;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -21,6 +22,7 @@ public class DeleteUserUseCase {
     private final LogOutUseCase logOutUseCase;
     private final UserRepository userRepository;
 
+    @Transactional
     public void execute(User user, DeleteUserRequest request) {
         validatePassword(request.getPassword(), user.getPassword());
         Optional<Form> form = formRepository.findByUser(user);
