@@ -80,6 +80,20 @@ dependencyManagement {
     }
 }
 
+def querydslDir = "$buildDir/generated/querydsl"
+
+sourceSets {
+    main.java.srcDirs += [querydslDir]
+}
+
+compileJava {
+    options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+}
+
+clean {
+    delete file(querydslDir)
+}
+
 test {
     outputs.dir snippetsDir
     useJUnitPlatform()
@@ -117,20 +131,6 @@ bootJar {
     from(asciidoctor.outputDir) {
         into 'static/docs'
     }
-}
-
-
-def querydslDir = "$buildDir/generated/querydsl"
-
-sourceSets {
-    main.java.srcDirs += [ querydslDir ]
-}
-
-tasks.withType(JavaCompile) {
-    options.generatedSourceOutputDirectory = file(querydslDir)}
-
-clean.doLast {
-    file(querydslDir).deleteDir()
 }
 
 jar.enabled = false

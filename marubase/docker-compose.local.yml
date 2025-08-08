@@ -1,6 +1,19 @@
 version: '3'
 
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: maru.local.app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+      - redis
+    env_file:
+      - .env
+
   mysql:
     container_name: maru.local.db
     image: postgres:15-alpine
