@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  mysql:
+    container_name: marust.local.db
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:5432"
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: marust.local.redis
+    command: /bin/sh -c "redis-server --requirepass ${REDIS_PASSWORD}"
+    ports:
+      - "${REDIS_PORT}:6379"
