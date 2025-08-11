@@ -58,6 +58,44 @@ pub async fn log_in(
 
     Ok(TokenResponse {
         access_token,
-        refresh_token,
+        refresh_token: Some(refresh_token),
     })
+}
+
+pub async fn refresh_token(
+    jwt_provider: &JwtProvider,
+    repo: &impl TokenRepository,
+    token: String,
+) -> Result<TokenResponse, AppError> {
+    let claims = jwt_provider.parse(&token)?;
+    if claims.token_type != "REFRESH_TOKEN" {
+        return Err(AppError::BadRequest("invalid token".into()));
+    }
+    let uuid = uuid::Uuid::parse_str(&claims.sub)
+        .map_err(|_| AppError::BadRequest("invalid token".into()))?;
+    let stored = repo
+        .find_refresh_token(&uuid)
+        .await
+        .map_err(|e| {
+            tracing::error!("failed to find refresh token: {:?}", e);
+            AppError::InternalServerError
+        })?
+        .ok_or_else(|| AppError::BadRequest("expired token".into()))?;
+    if stored != token {
+        return Err(AppError::BadRequest("expired token".into()));
+    }
+    let access_token =
+        jwt_provider.generate_access_token(&uuid, &claims.name, &claims.phone_number)?;
+    Ok(TokenResponse {
+        access_token,
+        refresh_token: None,
+    })
+}
+
+pub async fn log_out(repo: &impl TokenRepository, uuid: uuid::Uuid) -> Result<(), AppError> {
+    repo.delete_refresh_token(&uuid).await.map_err(|e| {
+        tracing::error!("failed to delete refresh token: {:?}", e);
+        AppError::InternalServerError
+    })?;
+    Ok(())
 }

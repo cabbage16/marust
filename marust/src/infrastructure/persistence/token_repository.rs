@@ -26,4 +26,22 @@ impl TokenRepository for RedisTokenRepository {
         let _: () = conn.set_ex(uuid.to_string(), token, ttl).await?;
         Ok(())
     }
+
+    async fn find_refresh_token(
+        &self,
+        uuid: &Uuid,
+    ) -> Result<Option<String>, Box<dyn std::error::Error + Send + Sync>> {
+        let mut conn = self.pool.get().await?;
+        let token: Option<String> = conn.get(uuid.to_string()).await?;
+        Ok(token)
+    }
+
+    async fn delete_refresh_token(
+        &self,
+        uuid: &Uuid,
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        let mut conn = self.pool.get().await?;
+        let _: () = conn.del(uuid.to_string()).await?;
+        Ok(())
+    }
 }

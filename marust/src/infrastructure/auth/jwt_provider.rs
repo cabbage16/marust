@@ -1,5 +1,5 @@
 use chrono::{Duration, Utc};
-use jsonwebtoken::{EncodingKey, Header, encode};
+use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 
 use crate::common::AppError;
 
@@ -79,4 +79,26 @@ impl JwtProvider {
     ) -> Result<String, AppError> {
         self.generate_token(uuid, name, phone_number, "REFRESH_TOKEN", self.refresh_exp)
     }
+
+    pub fn parse(&self, token: &str) -> Result<Claims, AppError> {
+        decode::<Claims>(
+            token,
+            &DecodingKey::from_secret(self.secret.as_bytes()),
+            &Validation::default(),
+        )
+        .map(|data| data.claims)
+        .map_err(|e| {
+            tracing::error!("failed to decode token: {:?}", e);
+            AppError::BadRequest("invalid token".into())
+        })
+    }
+}
+
+#[derive(serde::Deserialize)]
+pub struct Claims {
+    pub sub: String,
+    pub name: String,
+    pub phone_number: String,
+    #[serde(rename = "type")]
+    pub token_type: String,
 }

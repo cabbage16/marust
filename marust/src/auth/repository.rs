@@ -9,4 +9,14 @@ pub trait TokenRepository {
         token: &str,
         ttl: u64,
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
+
+    async fn find_refresh_token(
+        &self,
+        uuid: &Uuid,
+    ) -> Result<Option<String>, Box<dyn std::error::Error + Send + Sync>>;
+
+    async fn delete_refresh_token(
+        &self,
+        uuid: &Uuid,
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
 }
