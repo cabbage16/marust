@@ -1,13 +1,13 @@
-use bcrypt::{DEFAULT_COST, hash};
-use sqlx::PgPool;
+use bcrypt::{hash, DEFAULT_COST};
 use uuid::Uuid;
 
 use crate::common::AppError;
 
-use super::{dto::SignUpUserRequest, repository};
+use super::{dto::SignUpUserRequest, repository::UserRepository};
 
-pub async fn sign_up(pool: &PgPool, req: SignUpUserRequest) -> Result<(), AppError> {
-    let exists = repository::exists_by_phone(pool, &req.phone_number)
+pub async fn sign_up(repo: &impl UserRepository, req: SignUpUserRequest) -> Result<(), AppError> {
+    let exists = repo
+        .exists_by_phone(&req.phone_number)
         .await
         .map_err(|e| {
             tracing::error!("failed to check existing user: {:?}", e);
@@ -23,18 +23,17 @@ pub async fn sign_up(pool: &PgPool, req: SignUpUserRequest) -> Result<(), AppErr
         AppError::InternalServerError
     })?;
 
-    repository::insert_user(
-        pool,
+    repo.insert_user(
         Uuid::new_v4(),
         &req.phone_number,
         &req.name,
         &password_hash,
     )
-        .await
-        .map_err(|e| {
-            tracing::error!("failed to insert user: {:?}", e);
-            AppError::InternalServerError
-        })?;
+    .await
+    .map_err(|e| {
+        tracing::error!("failed to insert user: {:?}", e);
+        AppError::InternalServerError
+    })?;
 
     Ok(())
 }

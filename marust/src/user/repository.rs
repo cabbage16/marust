@@ -1,33 +1,19 @@
-use sqlx::PgPool;
+use async_trait::async_trait;
 use uuid::Uuid;
 
-pub async fn exists_by_phone(pool: &PgPool, phone_number: &str) -> Result<bool, sqlx::Error> {
-    let exists: bool = sqlx::query_scalar::<_, bool>(
-        "SELECT EXISTS(SELECT 1 FROM tbl_user WHERE phone_number = $1)"
-    )
-        .bind(phone_number)
-        .fetch_one(pool)
-        .await?;
+/// 사용자 도메인에서 사용할 저장소 추상화
+#[async_trait]
+pub trait UserRepository {
+    /// 주어진 전화번호를 가진 사용자가 존재하는지 확인합니다.
+    async fn exists_by_phone(&self, phone_number: &str) -> Result<bool, sqlx::Error>;
 
-    Ok(exists)
+    /// 새로운 사용자를 저장합니다.
+    async fn insert_user(
+        &self,
+        uuid: Uuid,
+        phone_number: &str,
+        name: &str,
+        password_hash: &str,
+    ) -> Result<(), sqlx::Error>;
 }
 
-pub async fn insert_user(
-    pool: &PgPool,
-    uuid: Uuid,
-    phone_number: &str,
-    name: &str,
-    password_hash: &str,
-) -> Result<(), sqlx::Error> {
-    sqlx::query(
-        r#"INSERT INTO tbl_user (uuid, phone_number, name, password, authority, created_at, updated_at)
-           VALUES ($1, $2, $3, $4, 'USER', NOW(), NOW())"#,
-    )
-        .bind(uuid)
-        .bind(phone_number)
-        .bind(name)
-        .bind(password_hash)
-        .execute(pool)
-        .await?;
-    Ok(())
-}

@@ -1,18 +1,20 @@
 pub mod dto;
-mod repository;
+pub mod repository;
 mod service;
 
 use crate::{
-    AppState,
     common::{ApiResponse, AppError},
+    infrastructure::persistence::user_repository::SqlxUserRepository,
+    AppState,
 };
-use axum::{Json, extract::State, http::StatusCode};
+use axum::{extract::State, http::StatusCode, Json};
 use dto::SignUpUserRequest;
 
 pub async fn sign_up(
     State(state): State<AppState>,
     Json(payload): Json<SignUpUserRequest>,
 ) -> Result<(StatusCode, Json<ApiResponse<()>>), AppError> {
-    service::sign_up(&state.pg_pool, payload).await?;
+    let repo = SqlxUserRepository::new(state.pg_pool.clone());
+    service::sign_up(&repo, payload).await?;
     Ok((StatusCode::CREATED, Json(ApiResponse::empty())))
 }

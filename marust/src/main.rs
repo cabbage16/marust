@@ -1,5 +1,7 @@
 // src/main.rs
+mod auth;
 mod common;
+mod infrastructure;
 mod user;
 
 use axum::{
@@ -20,8 +22,16 @@ async fn health_check() -> ApiResponse<&'static str> {
 
 #[derive(Clone)]
 pub struct AppState {
-    pg_pool: PgPool,
-    redis_pool: RedisPool,
+    pub pg_pool: PgPool,
+    pub redis_pool: RedisPool,
+    pub jwt: JwtConfig,
+}
+
+#[derive(Clone)]
+pub struct JwtConfig {
+    pub secret_key: String,
+    pub access_expiration: i64,
+    pub refresh_expiration: i64,
 }
 
 #[derive(Deserialize, Debug)]
@@ -35,6 +45,8 @@ struct Settings {
     redis_host: String,
     redis_port: u16,
     redis_password: String,
+
+    jwt_secret_key: String,
 
     port: u16,
 }
@@ -74,13 +86,21 @@ async fn main() {
         .create_pool(Some(Runtime::Tokio1))
         .expect("failed to create Redis pool");
 
+    let jwt = JwtConfig {
+        secret_key: cfg.jwt_secret_key.clone(),
+        access_expiration: 3600000, // 1시간
+        refresh_expiration: 1296000000, // 15일
+    };
+
     let state = AppState {
         pg_pool,
         redis_pool,
+        jwt,
     };
 
     let app = Router::new()
         .route("/health", get(health_check))
+        .route("/auth", post(auth::log_in))
         .route("/users", post(user::sign_up))
         .with_state(state);
 
