@@ -40,6 +40,8 @@ impl AppError {
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
+        tracing::error!("AppError occurred: {:?}", self);
+
         let body = ApiResponse::<()> {
             code: self.code().into(),
             message: self.message(),

@@ -15,7 +15,7 @@ async fn health_check() -> ApiResponse<&'static str> {
 }
 
 #[derive(Clone)]
-struct AppState {
+pub struct AppState {
     pg_pool: PgPool,
     redis_pool: RedisPool,
 }
@@ -44,6 +44,10 @@ fn load_settings() -> Settings {
 #[tokio::main]
 async fn main() {
     let cfg = load_settings();
+
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::DEBUG)
+        .init();
 
     let pg_options = PgConnectOptions::new()
         .host(&cfg.db_host)
