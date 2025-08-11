@@ -6,7 +6,8 @@ mod user;
 
 use axum::{
     Router,
-    routing::{get, post},
+    extract::State,
+    routing::get,
 };
 use common::ApiResponse;
 use deadpool_redis::{Config as RedisConfig, Pool as RedisPool, Runtime};
@@ -16,7 +17,7 @@ use std::net::SocketAddr;
 
 use dotenvy::dotenv;
 
-async fn health_check() -> ApiResponse<&'static str> {
+async fn health_check(State(_): State<AppState>) -> ApiResponse<&'static str> {
     ApiResponse::ok("ok")
 }
 
@@ -100,8 +101,8 @@ async fn main() {
 
     let app = Router::new()
         .route("/health", get(health_check))
-        .route("/auth", post(auth::log_in))
-        .route("/users", post(user::sign_up))
+        .merge(auth::router())
+        .merge(user::router())
         .with_state(state);
 
     let addr: SocketAddr = ([0, 0, 0, 0], cfg.port).into();

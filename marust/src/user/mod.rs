@@ -7,8 +7,12 @@ use crate::{
     infrastructure::persistence::user_repository::SqlxUserRepository,
     AppState,
 };
-use axum::{extract::State, http::StatusCode, Json};
+use axum::{extract::State, http::StatusCode, routing::post, Json, Router};
 use dto::SignUpUserRequest;
+
+pub fn router() -> Router<AppState> {
+    Router::new().route("/users", post(sign_up))
+}
 
 pub async fn sign_up(
     State(state): State<AppState>,
