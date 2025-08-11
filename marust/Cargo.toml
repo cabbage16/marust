@@ -14,3 +14,5 @@ dotenvy = "0.15"
 envy = "0.4"
 tracing = "0.1"
 tracing-subscriber = "0.3"
+uuid = { version = "1", features = ["v4"] }
+bcrypt = "0.15"

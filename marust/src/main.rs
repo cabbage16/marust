@@ -1,7 +1,11 @@
 // src/main.rs
 mod common;
+mod user;
 
-use axum::{routing::get, Router};
+use axum::{
+    Router,
+    routing::{get, post},
+};
 use common::ApiResponse;
 use deadpool_redis::{Config as RedisConfig, Pool as RedisPool, Runtime};
 use serde::Deserialize;
@@ -32,7 +36,7 @@ struct Settings {
     redis_port: u16,
     redis_password: String,
 
-    port: u16
+    port: u16,
 }
 
 fn load_settings() -> Settings {
@@ -70,10 +74,14 @@ async fn main() {
         .create_pool(Some(Runtime::Tokio1))
         .expect("failed to create Redis pool");
 
-    let state = AppState { pg_pool, redis_pool };
+    let state = AppState {
+        pg_pool,
+        redis_pool,
+    };
 
     let app = Router::new()
         .route("/health", get(health_check))
+        .route("/users", post(user::sign_up))
         .with_state(state);
 
     let addr: SocketAddr = ([0, 0, 0, 0], cfg.port).into();
