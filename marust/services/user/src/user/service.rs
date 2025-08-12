@@ -1,10 +1,9 @@
 use bcrypt::{DEFAULT_COST, hash};
 use uuid::Uuid;
 
-use crate::common::AppError;
+use common::{AppError, Authority};
 
 use super::{
-    authority::Authority,
     dto::{SignUpUserRequest, UserResponse},
     repository::UserRepository,
 };

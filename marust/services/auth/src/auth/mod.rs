@@ -1,6 +1,4 @@
 pub mod dto;
-pub mod extractor;
-pub mod repository;
 mod service;
 
 use axum::{
@@ -11,15 +9,13 @@ use axum::{
     routing::post,
 };
 
-use crate::{
-    AppState,
-    common::{ApiResponse, AppError},
-    infrastructure::{
-        auth::jwt_provider::JwtProvider, persistence::token_repository::RedisTokenRepository,
-    },
+use crate::AppState;
+use common::{ApiResponse, AppError};
+use infrastructure::{
+    auth::{jwt_provider::JwtProvider, AuthUser},
+    persistence::token_repository::RedisTokenRepository,
 };
 use dto::LogInRequest;
-use extractor::AuthUser;
 
 pub fn router() -> Router<AppState> {
     Router::new().route(

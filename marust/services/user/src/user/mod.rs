@@ -1,14 +1,11 @@
-pub mod authority;
 pub mod dto;
 pub mod repository;
 mod service;
 
-use crate::{
-    AppState,
-    auth::extractor::AuthUser,
-    common::{ApiResponse, AppError},
-    infrastructure::persistence::user_repository::SqlxUserRepository,
-};
+use crate::AppState;
+use common::{ApiResponse, AppError};
+use infrastructure::auth::AuthUser;
+use repository::SqlxUserRepository;
 use axum::{Json, Router, extract::State, http::StatusCode, routing::post};
 use dto::{SignUpUserRequest, UserResponse};
 

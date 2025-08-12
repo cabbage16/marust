@@ -1,0 +1,15 @@
+[package]
+name = "infrastructure"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = { workspace = true }
+deadpool-redis = { workspace = true }
+uuid = { workspace = true }
+jsonwebtoken = { workspace = true }
+chrono = { workspace = true }
+tracing = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+common = { path = "../common" }
+axum = { workspace = true }

@@ -1,4 +1,4 @@
-use crate::user::authority::Authority;
+use common::Authority;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize)]

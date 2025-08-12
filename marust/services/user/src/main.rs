@@ -1,12 +1,8 @@
-// src/main.rs
-mod auth;
-mod common;
-mod infrastructure;
 mod user;
 
 use axum::{
     Router,
-    extract::State,
+    extract::{FromRef, State},
     routing::get,
 };
 use common::ApiResponse;
@@ -14,6 +10,8 @@ use deadpool_redis::{Config as RedisConfig, Pool as RedisPool, Runtime};
 use serde::Deserialize;
 use sqlx::postgres::{PgConnectOptions, PgPool, PgPoolOptions};
 use std::net::SocketAddr;
+
+use infrastructure::auth::jwt_provider::JwtProvider;
 
 use dotenvy::dotenv;
 
@@ -49,12 +47,11 @@ struct Settings {
 
     jwt_secret_key: String,
 
-    port: u16,
+    user_port: u16,
 }
 
 fn load_settings() -> Settings {
-    dotenv().ok(); // .env 있으면 읽어옵니다 (없어도 무시)
-    // 필드명 기반으로 환경변수 매핑 (예: db_host -> DB_HOST)
+    dotenv().ok();
     envy::from_env::<Settings>().expect("failed to load environment variables into Settings")
 }
 
@@ -89,7 +86,7 @@ async fn main() {
 
     let jwt = JwtConfig {
         secret_key: cfg.jwt_secret_key.clone(),
-        access_expiration: 3600000, // 1시간
+        access_expiration: 3600000,     // 1시간
         refresh_expiration: 1296000000, // 15일
     };
 
@@ -101,13 +98,22 @@ async fn main() {
 
     let app = Router::new()
         .route("/health", get(health_check))
-        .merge(auth::router())
         .merge(user::router())
         .with_state(state);
 
-    let addr: SocketAddr = ([0, 0, 0, 0], cfg.port).into();
+    let addr: SocketAddr = ([0, 0, 0, 0], cfg.user_port).into();
     let listener = tokio::net::TcpListener::bind(addr)
         .await
         .expect("failed to bind listener");
     axum::serve(listener, app).await.expect("server error");
+}
+
+impl FromRef<AppState> for JwtProvider {
+    fn from_ref(state: &AppState) -> JwtProvider {
+        JwtProvider::new(
+            state.jwt.secret_key.clone(),
+            state.jwt.access_expiration,
+            state.jwt.refresh_expiration,
+        )
+    }
 }

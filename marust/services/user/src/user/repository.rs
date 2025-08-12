@@ -1,10 +1,35 @@
-use sqlx::PgPool;
+use async_trait::async_trait;
 use uuid::Uuid;
+use sqlx::PgPool;
 
-use crate::user::{
-    authority::Authority,
-    repository::{UserModel, UserRepository},
-};
+use common::Authority;
+
+/// 저장소에서 조회된 사용자 정보를 표현합니다.
+pub struct UserModel {
+    pub phone_number: String,
+    pub name: String,
+    pub authority: String,
+}
+
+/// 사용자 도메인에서 사용할 저장소 추상화
+#[async_trait]
+pub trait UserRepository {
+    /// 주어진 전화번호를 가진 사용자가 존재하는지 확인합니다.
+    async fn exists_by_phone(&self, phone_number: &str) -> Result<bool, sqlx::Error>;
+
+    /// 새로운 사용자를 저장합니다.
+    async fn insert_user(
+        &self,
+        uuid: Uuid,
+        phone_number: &str,
+        name: &str,
+        password_hash: &str,
+        authority: Authority,
+    ) -> Result<(), sqlx::Error>;
+
+    /// uuid로 사용자를 조회합니다.
+    async fn find_by_uuid(&self, uuid: Uuid) -> Result<Option<UserModel>, sqlx::Error>;
+}
 
 /// `SqlxUserRepository`는 PostgreSQL 데이터베이스에 대한 구현입니다.
 pub struct SqlxUserRepository {
@@ -17,7 +42,7 @@ impl SqlxUserRepository {
     }
 }
 
-#[async_trait::async_trait]
+#[async_trait]
 impl UserRepository for SqlxUserRepository {
     async fn exists_by_phone(&self, phone_number: &str) -> Result<bool, sqlx::Error> {
         let exists: bool = sqlx::query_scalar::<_, bool>(

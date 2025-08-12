@@ -1,23 +1,29 @@
 use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
+use axum::extract::FromRef;
 
-use crate::{
-    AppState, common::AppError, infrastructure::auth::jwt_provider::JwtProvider,
-    user::authority::Authority,
-};
+use common::{AppError, Authority};
 use std::str::FromStr;
 
+use super::jwt_provider::JwtProvider;
+
+/// 인증된 사용자를 표현하는 추출기입니다.
+#[derive(Debug, Clone)]
 pub struct AuthUser {
     pub uuid: uuid::Uuid,
     pub authority: Authority,
 }
 
 #[async_trait]
-impl FromRequestParts<AppState> for AuthUser {
+impl<S> FromRequestParts<S> for AuthUser
+where
+    JwtProvider: FromRef<S>,
+    S: Send + Sync,
+{
     type Rejection = AppError;
 
     async fn from_request_parts(
         parts: &mut Parts,
-        state: &AppState,
+        state: &S,
     ) -> Result<Self, Self::Rejection> {
         let auth_header = parts
             .headers
@@ -28,11 +34,7 @@ impl FromRequestParts<AppState> for AuthUser {
             .strip_prefix("Bearer ")
             .ok_or_else(|| AppError::BadRequest("invalid Authorization header".into()))?;
 
-        let jwt_provider = JwtProvider::new(
-            state.jwt.secret_key.clone(),
-            state.jwt.access_expiration,
-            state.jwt.refresh_expiration,
-        );
+        let jwt_provider = JwtProvider::from_ref(state);
         let claims = jwt_provider.parse(token)?;
         if claims.token_type != "ACCESS_TOKEN" {
             return Err(AppError::BadRequest("invalid token".into()));
@@ -45,3 +47,4 @@ impl FromRequestParts<AppState> for AuthUser {
         Ok(Self { uuid, authority })
     }
 }
+
