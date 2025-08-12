@@ -6,7 +6,6 @@ use std::str::FromStr;
 
 use super::jwt_provider::JwtProvider;
 
-/// 인증된 사용자를 표현하는 추출기입니다.
 #[derive(Debug, Clone)]
 pub struct AuthUser {
     pub uuid: uuid::Uuid,
