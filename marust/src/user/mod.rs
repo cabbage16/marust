@@ -1,17 +1,19 @@
+pub mod authority;
 pub mod dto;
 pub mod repository;
 mod service;
 
 use crate::{
+    AppState,
+    auth::extractor::AuthUser,
     common::{ApiResponse, AppError},
     infrastructure::persistence::user_repository::SqlxUserRepository,
-    AppState,
 };
-use axum::{extract::State, http::StatusCode, routing::post, Json, Router};
-use dto::SignUpUserRequest;
+use axum::{Json, Router, extract::State, http::StatusCode, routing::post};
+use dto::{SignUpUserRequest, UserResponse};
 
 pub fn router() -> Router<AppState> {
-    Router::new().route("/users", post(sign_up))
+    Router::new().route("/users", post(sign_up).get(get_user))
 }
 
 pub async fn sign_up(
@@ -21,4 +23,13 @@ pub async fn sign_up(
     let repo = SqlxUserRepository::new(state.pg_pool.clone());
     service::sign_up(&repo, payload).await?;
     Ok((StatusCode::CREATED, Json(ApiResponse::empty())))
+}
+
+pub async fn get_user(
+    State(state): State<AppState>,
+    auth_user: AuthUser,
+) -> Result<Json<ApiResponse<UserResponse>>, AppError> {
+    let repo = SqlxUserRepository::new(state.pg_pool.clone());
+    let user = service::get_user(&repo, auth_user.uuid).await?;
+    Ok(Json(ApiResponse::ok(user)))
 }

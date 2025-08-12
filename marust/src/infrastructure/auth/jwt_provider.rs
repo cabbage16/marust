@@ -1,7 +1,7 @@
 use chrono::{Duration, Utc};
-use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
+use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, decode, encode};
 
-use crate::common::AppError;
+use crate::{common::AppError, user::authority::Authority};
 
 #[derive(Clone)]
 pub struct JwtProvider {
@@ -22,8 +22,7 @@ impl JwtProvider {
     fn generate_token(
         &self,
         uuid: &uuid::Uuid,
-        name: &str,
-        phone_number: &str,
+        authority: &Authority,
         token_type: &str,
         exp_ms: i64,
     ) -> Result<String, AppError> {
@@ -31,8 +30,7 @@ impl JwtProvider {
         struct Claims<'a> {
             sub: &'a str,
             iss: &'static str,
-            name: &'a str,
-            phone_number: &'a str,
+            authority: &'a str,
             #[serde(rename = "type")]
             token_type: &'a str,
             exp: usize,
@@ -44,8 +42,7 @@ impl JwtProvider {
         let claims = Claims {
             sub: &uuid.to_string(),
             iss: "marust",
-            name,
-            phone_number,
+            authority: &authority.to_string(),
             token_type,
             iat: now.timestamp() as usize,
             exp: exp.timestamp() as usize,
@@ -65,19 +62,17 @@ impl JwtProvider {
     pub fn generate_access_token(
         &self,
         uuid: &uuid::Uuid,
-        name: &str,
-        phone_number: &str,
+        authority: &Authority,
     ) -> Result<String, AppError> {
-        self.generate_token(uuid, name, phone_number, "ACCESS_TOKEN", self.access_exp)
+        self.generate_token(uuid, authority, "ACCESS_TOKEN", self.access_exp)
     }
 
     pub fn generate_refresh_token(
         &self,
         uuid: &uuid::Uuid,
-        name: &str,
-        phone_number: &str,
+        authority: &Authority,
     ) -> Result<String, AppError> {
-        self.generate_token(uuid, name, phone_number, "REFRESH_TOKEN", self.refresh_exp)
+        self.generate_token(uuid, authority, "REFRESH_TOKEN", self.refresh_exp)
     }
 
     pub fn parse(&self, token: &str) -> Result<Claims, AppError> {
@@ -97,8 +92,7 @@ impl JwtProvider {
 #[derive(serde::Deserialize)]
 pub struct Claims {
     pub sub: String,
-    pub name: String,
-    pub phone_number: String,
+    pub authority: String,
     #[serde(rename = "type")]
     pub token_type: String,
 }
