@@ -1,7 +1,7 @@
 use axum::{
-    Json,
     http::StatusCode,
     response::{IntoResponse, Response},
+    Json,
 };
 use thiserror::Error;
 
@@ -11,6 +11,8 @@ use super::response::ApiResponse;
 pub enum AppError {
     #[error("bad request: {0}")]
     BadRequest(String),
+    #[error("not found: {0}")]
+    NotFound(String),
     #[error("internal server error")]
     InternalServerError,
 }
@@ -19,6 +21,7 @@ impl AppError {
     pub fn status(&self) -> StatusCode {
         match self {
             AppError::BadRequest(_) => StatusCode::BAD_REQUEST,
+            AppError::NotFound(_) => StatusCode::NOT_FOUND,
             AppError::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
@@ -26,6 +29,7 @@ impl AppError {
     pub fn code(&self) -> &'static str {
         match self {
             AppError::BadRequest(_) => "BAD_REQUEST",
+            AppError::NotFound(_) => "NOT_FOUND",
             AppError::InternalServerError => "INTERNAL_SERVER_ERROR",
         }
     }
@@ -33,6 +37,7 @@ impl AppError {
     pub fn message(&self) -> String {
         match self {
             AppError::BadRequest(msg) => msg.clone(),
+            AppError::NotFound(msg) => msg.clone(),
             AppError::InternalServerError => self.to_string(),
         }
     }

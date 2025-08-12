@@ -49,3 +49,19 @@ services:
       REDIS_HOST: redis
     ports:
       - "${USER_PORT}:${USER_PORT}"
+
+  question-service:
+    build:
+      context: .
+      dockerfile: services/question/Dockerfile
+    container_name: marust.local.question
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env
+    environment:
+      DB_HOST: postgres
+      REDIS_HOST: redis
+    ports:
+      - "${QUESTION_PORT}:${QUESTION_PORT}"
