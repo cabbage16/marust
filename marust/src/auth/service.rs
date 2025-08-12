@@ -1,17 +1,17 @@
 use crate::{
     AppState, auth::repository::TokenRepository, common::AppError,
-    infrastructure::auth::jwt_provider::JwtProvider,
+    infrastructure::auth::jwt_provider::JwtProvider, user::authority::Authority,
 };
 use bcrypt::verify;
+use std::str::FromStr;
 
 use super::dto::{LogInRequest, TokenResponse};
 
 #[derive(sqlx::FromRow)]
 struct UserRow {
     uuid: uuid::Uuid,
-    name: String,
-    phone_number: String,
     password: String,
+    authority: String,
 }
 
 pub async fn log_in(
@@ -21,7 +21,7 @@ pub async fn log_in(
     req: LogInRequest,
 ) -> Result<TokenResponse, AppError> {
     let user = sqlx::query_as::<_, UserRow>(
-        "SELECT uuid, name, phone_number, password FROM tbl_user WHERE phone_number = $1",
+        "SELECT uuid, password, authority FROM tbl_user WHERE phone_number = $1",
     )
     .bind(&req.phone_number)
     .fetch_optional(&state.pg_pool)
@@ -43,10 +43,10 @@ pub async fn log_in(
         ));
     }
 
-    let access_token =
-        jwt_provider.generate_access_token(&user.uuid, &user.name, &user.phone_number)?;
-    let refresh_token =
-        jwt_provider.generate_refresh_token(&user.uuid, &user.name, &user.phone_number)?;
+    let authority =
+        Authority::from_str(&user.authority).map_err(|_| AppError::InternalServerError)?;
+    let access_token = jwt_provider.generate_access_token(&user.uuid, &authority)?;
+    let refresh_token = jwt_provider.generate_refresh_token(&user.uuid, &authority)?;
 
     let ttl = (state.jwt.refresh_expiration / 1000) as u64;
     repo.save_refresh_token(&user.uuid, &refresh_token, ttl)
@@ -84,8 +84,9 @@ pub async fn refresh_token(
     if stored != token {
         return Err(AppError::BadRequest("expired token".into()));
     }
-    let access_token =
-        jwt_provider.generate_access_token(&uuid, &claims.name, &claims.phone_number)?;
+    let authority = Authority::from_str(&claims.authority)
+        .map_err(|_| AppError::BadRequest("invalid token".into()))?;
+    let access_token = jwt_provider.generate_access_token(&uuid, &authority)?;
     Ok(TokenResponse {
         access_token,
         refresh_token: None,

@@ -1,12 +1,14 @@
 use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
 
-use crate::{AppState, common::AppError, infrastructure::auth::jwt_provider::JwtProvider};
+use crate::{
+    AppState, common::AppError, infrastructure::auth::jwt_provider::JwtProvider,
+    user::authority::Authority,
+};
+use std::str::FromStr;
 
-#[allow(dead_code)]
 pub struct AuthUser {
     pub uuid: uuid::Uuid,
-    pub name: String,
-    pub phone_number: String,
+    pub authority: Authority,
 }
 
 #[async_trait]
@@ -37,11 +39,9 @@ impl FromRequestParts<AppState> for AuthUser {
         }
         let uuid = uuid::Uuid::parse_str(&claims.sub)
             .map_err(|_| AppError::BadRequest("invalid token".into()))?;
+        let authority = Authority::from_str(&claims.authority)
+            .map_err(|_| AppError::BadRequest("invalid token".into()))?;
 
-        Ok(Self {
-            uuid,
-            name: claims.name,
-            phone_number: claims.phone_number,
-        })
+        Ok(Self { uuid, authority })
     }
 }
