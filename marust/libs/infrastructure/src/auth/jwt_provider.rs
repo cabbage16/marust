@@ -1,7 +1,7 @@
 use chrono::{Duration, Utc};
-use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, decode, encode};
+use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 
-use crate::{common::AppError, user::authority::Authority};
+use common::{AppError, Authority};
 
 #[derive(Clone)]
 pub struct JwtProvider {

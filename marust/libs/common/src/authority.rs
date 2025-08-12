@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::{fmt, str::FromStr};
 
-/// 사용자 권한을 나타내는 열거형입니다.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum Authority {
@@ -11,7 +10,6 @@ pub enum Authority {
 
 #[allow(dead_code)]
 impl Authority {
-    /// 각 권한에 대한 설명을 반환합니다.
     pub fn description(&self) -> &'static str {
         match self {
             Authority::User => "일반 사용자",
