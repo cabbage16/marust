@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use deadpool_redis::{redis::AsyncCommands, Pool as RedisPool};
+use deadpool_redis::{Pool as RedisPool, redis::AsyncCommands};
 use uuid::Uuid;
 
 #[async_trait]

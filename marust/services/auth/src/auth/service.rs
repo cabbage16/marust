@@ -1,10 +1,8 @@
+use super::token_repository::TokenRepository;
 use crate::AppState;
-use common::{AppError, Authority};
-use infrastructure::{
-    auth::jwt_provider::JwtProvider,
-    persistence::token_repository::TokenRepository,
-};
 use bcrypt::verify;
+use common::{AppError, Authority};
+use infrastructure::auth::jwt_provider::JwtProvider;
 use std::str::FromStr;
 
 use super::dto::{LogInRequest, TokenResponse};

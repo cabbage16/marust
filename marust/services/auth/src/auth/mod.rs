@@ -1,9 +1,9 @@
 pub mod dto;
 mod service;
+pub mod token_repository;
 
 use axum::{
-    Json,
-    Router,
+    Json, Router,
     extract::State,
     http::{HeaderMap, StatusCode},
     routing::post,
@@ -11,17 +11,12 @@ use axum::{
 
 use crate::AppState;
 use common::{ApiResponse, AppError};
-use infrastructure::{
-    auth::{jwt_provider::JwtProvider, AuthUser},
-    persistence::token_repository::RedisTokenRepository,
-};
 use dto::LogInRequest;
+use infrastructure::auth::{AuthUser, jwt_provider::JwtProvider};
+use token_repository::RedisTokenRepository;
 
 pub fn router() -> Router<AppState> {
-    Router::new().route(
-        "/auth",
-        post(log_in).patch(refresh_token).delete(log_out),
-    )
+    Router::new().route("/auth", post(log_in).patch(refresh_token).delete(log_out))
 }
 
 pub async fn log_in(

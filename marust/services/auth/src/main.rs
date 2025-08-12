@@ -100,8 +100,6 @@ async fn main() {
         .merge(auth::router())
         .with_state(state);
 
-    println!("{}\n{}\n{}", cfg.db_host, cfg.redis_host, cfg.auth_port);
-
     let addr: SocketAddr = ([0, 0, 0, 0], cfg.auth_port).into();
     let listener = tokio::net::TcpListener::bind(addr)
         .await
