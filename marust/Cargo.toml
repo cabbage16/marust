@@ -1,4 +1,5 @@
 [workspace]
+resolver = "3"
 members = [
     "services/auth",
     "services/user",
@@ -11,7 +12,7 @@ axum = { version = "0.7", features = ["macros", "json"] }
 tokio = { version = "1", features = ["full"] }
 serde = { version = "1", features = ["derive"] }
 thiserror = "1"
-sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "uuid"] }
+sqlx = { version = "0.8.6", features = ["runtime-tokio-rustls", "postgres", "uuid"] }
 deadpool-redis = { version = "0.22" }
 dotenvy = "0.15"
 envy = "0.4"
