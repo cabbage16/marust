@@ -4,12 +4,13 @@ members = [
     "services/auth",
     "services/user",
     "services/question",
+    "services/notice",
     "libs/common",
     "libs/infrastructure",
 ]
 
 [workspace.dependencies]
-axum = { version = "0.7", features = ["macros", "json"] }
+axum = { version = "0.7", features = ["macros", "json", "multipart"] }
 tokio = { version = "1", features = ["full"] }
 serde = { version = "1", features = ["derive"] }
 thiserror = "1"
@@ -24,3 +25,4 @@ bcrypt = "0.15"
 jsonwebtoken = "9"
 chrono = { version = "0.4", features = ["serde"] }
 async-trait = "0.1"
+tower-http = { version = "0.5", features = ["fs"] }
