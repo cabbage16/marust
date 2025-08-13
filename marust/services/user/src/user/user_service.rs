@@ -4,8 +4,8 @@ use uuid::Uuid;
 use common::{AppError, Authority};
 
 use super::{
-    dto::{SignUpUserRequest, UserResponse},
-    repository::UserRepository,
+    user_dto::{SignUpUserRequest, UserResponse},
+    user_repository::UserRepository,
 };
 use std::str::FromStr;
 

@@ -1,6 +1,6 @@
-pub mod dto;
-pub mod repository;
-mod service;
+pub mod notice_dto;
+pub mod notice_repository;
+mod notice_service;
 
 use axum::{
     Json, Router,
@@ -13,8 +13,8 @@ use infrastructure::auth::AuthUser;
 use uuid::Uuid;
 
 use crate::AppState;
-use dto::{IdResponse, NoticeResponse, NoticeSimpleResponse};
-use repository::SqlxNoticeRepository;
+use notice_dto::{IdResponse, NoticeResponse, NoticeSimpleResponse};
+use notice_repository::SqlxNoticeRepository;
 
 pub fn router() -> Router<AppState> {
     Router::new()
@@ -94,7 +94,7 @@ async fn create_notice(
     }
     let (title, content, file_names) = save_multipart(&mut multipart, &state.storage_path).await?;
     let repo = SqlxNoticeRepository::new(state.pg_pool.clone());
-    let id = service::create_notice(&repo, title, content, file_names).await?;
+    let id = notice_service::create_notice(&repo, title, content, file_names).await?;
     Ok((
         StatusCode::CREATED,
         Json(ApiResponse::ok(IdResponse { id })),
@@ -112,7 +112,7 @@ async fn update_notice(
     }
     let (title, content, file_names) = save_multipart(&mut multipart, &state.storage_path).await?;
     let repo = SqlxNoticeRepository::new(state.pg_pool.clone());
-    let old_files = service::update_notice(&repo, id, title, content, file_names).await?;
+    let old_files = notice_service::update_notice(&repo, id, title, content, file_names).await?;
     for name in old_files {
         let path = std::path::Path::new(&state.storage_path).join(name);
         let _ = tokio::fs::remove_file(path).await;
@@ -124,7 +124,7 @@ async fn query_notice_list(
     State(state): State<AppState>,
 ) -> Result<Json<ApiResponse<Vec<NoticeSimpleResponse>>>, AppError> {
     let repo = SqlxNoticeRepository::new(state.pg_pool.clone());
-    let notices = service::get_notice_list(&repo).await?;
+    let notices = notice_service::get_notice_list(&repo).await?;
     Ok(Json(ApiResponse::ok(notices)))
 }
 
@@ -133,7 +133,7 @@ async fn query_notice(
     Path(id): Path<i64>,
 ) -> Result<Json<ApiResponse<NoticeResponse>>, AppError> {
     let repo = SqlxNoticeRepository::new(state.pg_pool.clone());
-    let notice = service::get_notice(&repo, id).await?;
+    let notice = notice_service::get_notice(&repo, id).await?;
     Ok(Json(ApiResponse::ok(notice)))
 }
 
@@ -146,7 +146,7 @@ async fn delete_notice(
         return Err(AppError::Forbidden("forbidden".into()));
     }
     let repo = SqlxNoticeRepository::new(state.pg_pool.clone());
-    let files = service::delete_notice(&repo, id).await?;
+    let files = notice_service::delete_notice(&repo, id).await?;
     for name in files {
         let path = std::path::Path::new(&state.storage_path).join(name);
         let _ = tokio::fs::remove_file(path).await;

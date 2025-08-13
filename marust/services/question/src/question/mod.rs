@@ -1,6 +1,6 @@
-pub mod dto;
-pub mod repository;
-mod service;
+pub mod question_dto;
+pub mod question_repository;
+mod question_service;
 
 use axum::{
     Json, Router,
@@ -13,10 +13,10 @@ use infrastructure::auth::AuthUser;
 use serde::Deserialize;
 
 use crate::AppState;
-use dto::{
+use question_dto::{
     CreateQuestionRequest, IdResponse, QuestionCategory, QuestionResponse, UpdateQuestionRequest,
 };
-use repository::SqlxQuestionRepository;
+use question_repository::SqlxQuestionRepository;
 
 #[derive(Deserialize)]
 struct QueryParams {
@@ -44,7 +44,7 @@ async fn create_question(
     }
 
     let repo = SqlxQuestionRepository::new(state.pg_pool.clone());
-    let id = service::create_question(&repo, payload).await?;
+    let id = question_service::create_question(&repo, payload).await?;
     Ok((
         StatusCode::CREATED,
         Json(ApiResponse::ok(IdResponse { id })),
@@ -61,7 +61,7 @@ async fn update_question(
         return Err(AppError::Forbidden("forbidden".into()));
     }
     let repo = SqlxQuestionRepository::new(state.pg_pool.clone());
-    service::update_question(&repo, id, payload).await?;
+    question_service::update_question(&repo, id, payload).await?;
     Ok(StatusCode::NO_CONTENT)
 }
 
@@ -70,7 +70,7 @@ async fn query_question_list(
     Query(query): Query<QueryParams>,
 ) -> Result<Json<ApiResponse<Vec<QuestionResponse>>>, AppError> {
     let repo = SqlxQuestionRepository::new(state.pg_pool.clone());
-    let questions = service::get_question_list(&repo, query.category).await?;
+    let questions = question_service::get_question_list(&repo, query.category).await?;
     Ok(Json(ApiResponse::ok(questions)))
 }
 
@@ -79,7 +79,7 @@ async fn query_question(
     Path(id): Path<i64>,
 ) -> Result<Json<ApiResponse<QuestionResponse>>, AppError> {
     let repo = SqlxQuestionRepository::new(state.pg_pool.clone());
-    let question = service::get_question(&repo, id).await?;
+    let question = question_service::get_question(&repo, id).await?;
     Ok(Json(ApiResponse::ok(question)))
 }
 
@@ -92,6 +92,6 @@ async fn delete_question(
         return Err(AppError::Forbidden("forbidden".into()));
     }
     let repo = SqlxQuestionRepository::new(state.pg_pool.clone());
-    service::delete_question(&repo, id).await?;
+    question_service::delete_question(&repo, id).await?;
     Ok(StatusCode::NO_CONTENT)
 }

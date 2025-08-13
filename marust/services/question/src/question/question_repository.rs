@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use chrono::NaiveDateTime;
 use sqlx::PgPool;
 
-use super::dto::QuestionCategory;
+use super::question_dto::QuestionCategory;
 
 pub struct QuestionModel {
     pub id: i64,

@@ -1,8 +1,8 @@
 use common::AppError;
 
 use super::{
-    dto::{DownloadFileResponse, NoticeResponse, NoticeSimpleResponse},
-    repository::{NoticeDetailModel, NoticeRepository, NoticeSimpleModel},
+    notice_dto::{DownloadFileResponse, NoticeResponse, NoticeSimpleResponse},
+    notice_repository::{NoticeDetailModel, NoticeRepository, NoticeSimpleModel},
 };
 
 pub async fn create_notice(

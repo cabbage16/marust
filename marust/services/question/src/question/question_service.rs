@@ -3,8 +3,8 @@ use std::str::FromStr;
 use common::AppError;
 
 use super::{
-    dto::{CreateQuestionRequest, QuestionCategory, QuestionResponse, UpdateQuestionRequest},
-    repository::{QuestionModel, QuestionRepository},
+    question_dto::{CreateQuestionRequest, QuestionCategory, QuestionResponse, UpdateQuestionRequest},
+    question_repository::{QuestionModel, QuestionRepository},
 };
 
 pub async fn create_question(
