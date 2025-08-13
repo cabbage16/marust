@@ -84,7 +84,7 @@ impl JwtProvider {
         .map(|data| data.claims)
         .map_err(|e| {
             tracing::error!("failed to decode token: {:?}", e);
-            AppError::BadRequest("invalid token".into())
+            AppError::Unauthorized("invalid token".into())
         })
     }
 }

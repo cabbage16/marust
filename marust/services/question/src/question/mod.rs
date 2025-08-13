@@ -40,7 +40,7 @@ async fn create_question(
     Json(payload): Json<CreateQuestionRequest>,
 ) -> Result<(StatusCode, Json<ApiResponse<IdResponse>>), AppError> {
     if auth_user.authority != Authority::Admin {
-        return Err(AppError::BadRequest("forbidden".into()));
+        return Err(AppError::Forbidden("forbidden".into()));
     }
 
     let repo = SqlxQuestionRepository::new(state.pg_pool.clone());
@@ -58,7 +58,7 @@ async fn update_question(
     Json(payload): Json<UpdateQuestionRequest>,
 ) -> Result<StatusCode, AppError> {
     if auth_user.authority != Authority::Admin {
-        return Err(AppError::BadRequest("forbidden".into()));
+        return Err(AppError::Forbidden("forbidden".into()));
     }
     let repo = SqlxQuestionRepository::new(state.pg_pool.clone());
     service::update_question(&repo, id, payload).await?;
@@ -89,7 +89,7 @@ async fn delete_question(
     Path(id): Path<i64>,
 ) -> Result<StatusCode, AppError> {
     if auth_user.authority != Authority::Admin {
-        return Err(AppError::BadRequest("forbidden".into()));
+        return Err(AppError::Forbidden("forbidden".into()));
     }
     let repo = SqlxQuestionRepository::new(state.pg_pool.clone());
     service::delete_question(&repo, id).await?;

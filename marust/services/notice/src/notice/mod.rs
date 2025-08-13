@@ -90,7 +90,7 @@ async fn create_notice(
     mut multipart: Multipart,
 ) -> Result<(StatusCode, Json<ApiResponse<IdResponse>>), AppError> {
     if auth_user.authority != Authority::Admin {
-        return Err(AppError::BadRequest("forbidden".into()));
+        return Err(AppError::Forbidden("forbidden".into()));
     }
     let (title, content, file_names) = save_multipart(&mut multipart, &state.storage_path).await?;
     let repo = SqlxNoticeRepository::new(state.pg_pool.clone());
@@ -108,7 +108,7 @@ async fn update_notice(
     mut multipart: Multipart,
 ) -> Result<StatusCode, AppError> {
     if auth_user.authority != Authority::Admin {
-        return Err(AppError::BadRequest("forbidden".into()));
+        return Err(AppError::Forbidden("forbidden".into()));
     }
     let (title, content, file_names) = save_multipart(&mut multipart, &state.storage_path).await?;
     let repo = SqlxNoticeRepository::new(state.pg_pool.clone());
@@ -143,7 +143,7 @@ async fn delete_notice(
     Path(id): Path<i64>,
 ) -> Result<StatusCode, AppError> {
     if auth_user.authority != Authority::Admin {
-        return Err(AppError::BadRequest("forbidden".into()));
+        return Err(AppError::Forbidden("forbidden".into()));
     }
     let repo = SqlxNoticeRepository::new(state.pg_pool.clone());
     let files = service::delete_notice(&repo, id).await?;
