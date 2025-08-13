@@ -40,7 +40,7 @@ pub async fn refresh_token(
     let refresh_token = headers
         .get("Refresh-Token")
         .and_then(|v| v.to_str().ok())
-        .ok_or_else(|| AppError::BadRequest("missing Refresh-Token header".into()))?
+        .ok_or_else(|| AppError::Unauthorized("missing Refresh-Token header".into()))?
         .to_string();
     let jwt_provider = JwtProvider::new(
         state.jwt.secret_key.clone(),

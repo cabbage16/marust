@@ -30,7 +30,7 @@ pub async fn log_in(
         tracing::error!("failed to fetch user: {:?}", e);
         AppError::InternalServerError
     })?
-    .ok_or_else(|| AppError::BadRequest("wrong phone number or password".into()))?;
+    .ok_or_else(|| AppError::Unauthorized("wrong phone number or password".into()))?;
 
     let is_valid = verify(&req.password, &user.password).map_err(|e| {
         tracing::error!("failed to verify password: {:?}", e);
@@ -38,7 +38,7 @@ pub async fn log_in(
     })?;
 
     if !is_valid {
-        return Err(AppError::BadRequest(
+        return Err(AppError::Unauthorized(
             "wrong phone number or password".into(),
         ));
     }
@@ -69,10 +69,10 @@ pub async fn refresh_token(
 ) -> Result<TokenResponse, AppError> {
     let claims = jwt_provider.parse(&token)?;
     if claims.token_type != "REFRESH_TOKEN" {
-        return Err(AppError::BadRequest("invalid token".into()));
+        return Err(AppError::Unauthorized("invalid token".into()));
     }
     let uuid = uuid::Uuid::parse_str(&claims.sub)
-        .map_err(|_| AppError::BadRequest("invalid token".into()))?;
+        .map_err(|_| AppError::Unauthorized("invalid token".into()))?;
     let stored = repo
         .find_refresh_token(&uuid)
         .await
@@ -80,12 +80,12 @@ pub async fn refresh_token(
             tracing::error!("failed to find refresh token: {:?}", e);
             AppError::InternalServerError
         })?
-        .ok_or_else(|| AppError::BadRequest("expired token".into()))?;
+        .ok_or_else(|| AppError::Unauthorized("expired token".into()))?;
     if stored != token {
-        return Err(AppError::BadRequest("expired token".into()));
+        return Err(AppError::Unauthorized("expired token".into()));
     }
     let authority = Authority::from_str(&claims.authority)
-        .map_err(|_| AppError::BadRequest("invalid token".into()))?;
+        .map_err(|_| AppError::Unauthorized("invalid token".into()))?;
     let access_token = jwt_provider.generate_access_token(&uuid, &authority)?;
     Ok(TokenResponse {
         access_token,
