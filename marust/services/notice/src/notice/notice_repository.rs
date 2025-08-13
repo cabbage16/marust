@@ -5,7 +5,7 @@ use sqlx::{PgPool, Postgres, Transaction};
 pub struct NoticeSimpleModel {
     pub id: i64,
     pub title: String,
-    pub updated_at: NaiveDateTime,
+    pub created_at: NaiveDateTime,
 }
 
 pub struct NoticeDetailModel {
@@ -137,10 +137,10 @@ impl NoticeRepository for SqlxNoticeRepository {
         struct Row {
             notice_id: i64,
             title: String,
-            updated_at: NaiveDateTime,
+            created_at: NaiveDateTime,
         }
         let rows = sqlx::query_as::<_, Row>(
-            r#"SELECT notice_id, title, updated_at FROM tbl_notice ORDER BY notice_id DESC"#,
+            r#"SELECT notice_id, title, created_at FROM tbl_notice ORDER BY created_at DESC"#,
         )
         .fetch_all(&self.pool)
         .await?;
@@ -150,7 +150,7 @@ impl NoticeRepository for SqlxNoticeRepository {
             .map(|r| NoticeSimpleModel {
                 id: r.notice_id,
                 title: r.title,
-                updated_at: r.updated_at,
+                created_at: r.created_at,
             })
             .collect())
     }

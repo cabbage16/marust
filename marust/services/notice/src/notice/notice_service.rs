@@ -70,7 +70,7 @@ fn to_simple_response(model: NoticeSimpleModel) -> NoticeSimpleResponse {
     NoticeSimpleResponse {
         id: model.id,
         title: model.title,
-        updated_at: model.updated_at,
+        created_at: model.created_at,
     }
 }
 

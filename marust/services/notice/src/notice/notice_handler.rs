@@ -11,7 +11,7 @@ use uuid::Uuid;
 use crate::AppState;
 
 use super::{
-    notice_dto::{IdResponse, NoticeResponse, NoticeSimpleResponse},
+    notice_dto::{IdResponse, NoticeRequest, NoticeResponse, NoticeSimpleResponse},
     notice_repository::SqlxNoticeRepository,
     notice_service,
 };
@@ -29,8 +29,7 @@ async fn save_multipart(
     multipart: &mut Multipart,
     storage_path: &str,
 ) -> Result<(String, String, Vec<String>), AppError> {
-    let mut title: Option<String> = None;
-    let mut content: Option<String> = None;
+    let mut request: Option<NoticeRequest> = None;
     let mut file_names = Vec::new();
 
     while let Some(field) = multipart.next_field().await.map_err(|e| {
@@ -39,21 +38,15 @@ async fn save_multipart(
     })? {
         let name = field.name().unwrap_or("");
         match name {
-            "title" => {
-                title = Some(
-                    field
-                        .text()
-                        .await
-                        .map_err(|_| AppError::BadRequest("invalid title".into()))?,
-                )
-            }
-            "content" => {
-                content = Some(
-                    field
-                        .text()
-                        .await
-                        .map_err(|_| AppError::BadRequest("invalid content".into()))?,
-                )
+            "request" => {
+                let text = field
+                    .text()
+                    .await
+                    .map_err(|_| AppError::BadRequest("invalid request".into()))?;
+                request = Some(
+                    serde_json::from_str(&text)
+                        .map_err(|_| AppError::BadRequest("invalid request".into()))?,
+                );
             }
             "files" => {
                 if let Some(filename) = field.file_name() {
@@ -78,10 +71,9 @@ async fn save_multipart(
         }
     }
 
-    let title = title.ok_or_else(|| AppError::BadRequest("missing title".into()))?;
-    let content = content.ok_or_else(|| AppError::BadRequest("missing content".into()))?;
+    let request = request.ok_or_else(|| AppError::BadRequest("missing request".into()))?;
 
-    Ok((title, content, file_names))
+    Ok((request.title, request.content, file_names))
 }
 
 async fn create_notice(
