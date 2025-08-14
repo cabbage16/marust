@@ -1,6 +1,9 @@
 use super::form_dto::*;
-use super::form_repository::{FormEntity, SqlxFormRepository, SubjectEntity};
+use super::form_repository::{
+    FormDetailRow, FormEntity, SqlxFormRepository, SubjectEntity,
+};
 use common::AppError;
+use std::cmp::Ordering;
 use uuid::Uuid;
 
 const MAX_BONUS_SCORE: i32 = 4;
@@ -122,6 +125,228 @@ pub async fn submit_form(
         .map_err(|e| AppError::InternalServerError(e.to_string()))?;
 
     Ok(())
+}
+
+pub async fn get_form_list(
+    repo: &SqlxFormRepository,
+    query: FormListQuery,
+) -> Result<Vec<FormSimpleResponse>, AppError> {
+    let status = query.status.map(|s| format!("{:?}", s).to_uppercase());
+    let mut rows = repo
+        .find_all(status.as_deref())
+        .await
+        .map_err(|e| AppError::InternalServerError(e.to_string()))?;
+
+    if let Some(category) = query.category {
+        rows.retain(|r| form_type_category(&r.r#type) == Some(category));
+    }
+
+    match query.sort {
+        Some(FormSort::TotalScoreAsc) => rows.sort_by(|a, b| match (a.total_score, b.total_score) {
+            (Some(x), Some(y)) => x.partial_cmp(&y).unwrap_or(Ordering::Equal),
+            (None, Some(_)) => Ordering::Greater,
+            (Some(_), None) => Ordering::Less,
+            (None, None) => Ordering::Equal,
+        }),
+        Some(FormSort::TotalScoreDesc) => rows.sort_by(|a, b| match (a.total_score, b.total_score) {
+            (Some(x), Some(y)) => y.partial_cmp(&x).unwrap_or(Ordering::Equal),
+            (None, Some(_)) => Ordering::Greater,
+            (Some(_), None) => Ordering::Less,
+            (None, None) => Ordering::Equal,
+        }),
+        Some(FormSort::FormId) => rows.sort_by_key(|r| r.id),
+        None => rows.sort_by_key(|r| r.examination_number),
+    }
+
+    Ok(rows
+        .into_iter()
+        .map(|r| FormSimpleResponse {
+            id: r.id,
+            examination_number: r.examination_number,
+            name: r.name,
+            birthday: r.birthday,
+            graduation_type: r.graduation_type,
+            school: r.school_name,
+            status: r.status.clone(),
+            r#type: r.r#type.clone(),
+            is_changed_to_regular: r.changed_to_regular,
+            total_score: r.total_score,
+            has_document: has_document(&r.status),
+            first_round_passed: first_round_passed(&r.status),
+            second_round_passed: second_round_passed(&r.status),
+        })
+        .collect())
+}
+
+pub async fn get_form(repo: &SqlxFormRepository, id: i64) -> Result<FormResponse, AppError> {
+    let row = repo
+        .find_by_id(id)
+        .await
+        .map_err(|e| AppError::InternalServerError(e.to_string()))?;
+    build_form_response(repo, row).await
+}
+
+pub async fn get_my_form(
+    repo: &SqlxFormRepository,
+    user_uuid: Uuid,
+) -> Result<FormResponse, AppError> {
+    let user_id = repo
+        .find_user_id_by_uuid(user_uuid)
+        .await
+        .map_err(|e| AppError::InternalServerError(e.to_string()))?;
+    let row = repo
+        .find_by_user_id(user_id)
+        .await
+        .map_err(|e| AppError::InternalServerError(e.to_string()))?;
+    build_form_response(repo, row).await
+}
+
+async fn build_form_response(
+    repo: &SqlxFormRepository,
+    row: FormDetailRow,
+) -> Result<FormResponse, AppError> {
+    let subjects = repo
+        .find_subjects(row.form_id)
+        .await
+        .map_err(|e| AppError::InternalServerError(e.to_string()))?;
+    let subject_list: Vec<SubjectResponse> = subjects
+        .into_iter()
+        .map(|s| SubjectResponse {
+            grade: s.grade,
+            semester: s.semester,
+            subject_name: s.subject_name,
+            achievement_level: s.achievement_level,
+        })
+        .collect();
+
+    let grade = GradeResponse {
+        subject_list,
+        attendance1: attendance_response(
+            row.attendance1_absence_count,
+            row.attendance1_lateness_count,
+            row.attendance1_early_leave_count,
+            row.attendance1_class_absence_count,
+        ),
+        attendance2: attendance_response(
+            row.attendance2_absence_count,
+            row.attendance2_lateness_count,
+            row.attendance2_early_leave_count,
+            row.attendance2_class_absence_count,
+        ),
+        attendance3: attendance_response(
+            row.attendance3_absence_count,
+            row.attendance3_lateness_count,
+            row.attendance3_early_leave_count,
+            row.attendance3_class_absence_count,
+        ),
+        volunteer_time1: row.volunteer_time1,
+        volunteer_time2: row.volunteer_time2,
+        volunteer_time3: row.volunteer_time3,
+    };
+
+    Ok(FormResponse {
+        id: row.form_id,
+        examination_number: row.examination_number,
+        applicant: ApplicantResponse {
+            name: row.name,
+            phone_number: row.phone_number,
+            birthday: row.birthday,
+            gender: row.gender,
+        },
+        parent: ParentResponse {
+            name: row.parent_name,
+            phone_number: row.parent_phone_number,
+            relation: row.parent_relation,
+            zone_code: row.zone_code,
+            address: row.address,
+            detail_address: row.detail_address,
+        },
+        education: EducationResponse {
+            graduation_type: row.graduation_type,
+            graduation_year: row.graduation_year,
+            school_name: row.school_name,
+            school_location: row.school_location,
+            school_code: row.school_code,
+            school_phone_number: row.teacher_phone_number,
+            school_address: row.school_address,
+            teacher_name: row.teacher_name,
+            teacher_mobile_phone_number: row.teacher_mobile_phone_number,
+        },
+        grade,
+        document: DocumentResponse {
+            cover_letter: row.cover_letter,
+            statement_of_purpose: row.statement_of_purpose,
+        },
+        score: ScoreResponse {
+            first_round_score: row.first_round_score,
+            total_score: row.total_score,
+        },
+        r#type: row.r#type,
+        status: row.status,
+        is_changed_to_regular: row.changed_to_regular,
+    })
+}
+
+fn attendance_response(
+    absence: Option<i32>,
+    lateness: Option<i32>,
+    early_leave: Option<i32>,
+    class_absence: Option<i32>,
+) -> AttendanceResponse {
+    AttendanceResponse {
+        absence_count: absence.unwrap_or(0),
+        lateness_count: lateness.unwrap_or(0),
+        early_leave_count: early_leave.unwrap_or(0),
+        class_absence_count: class_absence.unwrap_or(0),
+    }
+}
+
+fn has_document(status: &str) -> bool {
+    matches!(
+        status.to_uppercase().as_str(),
+        "RECEIVED"
+            | "FIRST_PASSED"
+            | "FIRST_FAILED"
+            | "PASSED"
+            | "FAILED"
+            | "NO_SHOW"
+            | "ENTERED"
+    )
+}
+
+fn first_round_passed(status: &str) -> Option<bool> {
+    match status.to_uppercase().as_str() {
+        "FIRST_PASSED" | "PASSED" | "FAILED" | "NO_SHOW" | "ENTERED" => Some(true),
+        "FIRST_FAILED" => Some(false),
+        _ => None,
+    }
+}
+
+fn second_round_passed(status: &str) -> Option<bool> {
+    match status.to_uppercase().as_str() {
+        "PASSED" | "ENTERED" => Some(true),
+        "FAILED" | "NO_SHOW" => Some(false),
+        _ => None,
+    }
+}
+
+fn form_type_category(s: &str) -> Option<FormCategory> {
+    match s.to_uppercase().as_str() {
+        "REGULAR" => Some(FormCategory::Regular),
+        "MEISTER_TALENT" | "MEISTERTALENT" => Some(FormCategory::MeisterTalent),
+        "NATIONAL_BASIC_LIVING" | "NATIONALBASICLIVING"
+        | "NEAR_POVERTY" | "NEARPOVERTY"
+        | "NATIONAL_VETERANS" | "NATIONALVETERANS"
+        | "ONE_PARENT" | "ONEPARENT"
+        | "FROM_NORTH_KOREA" | "FROMNORTHKOREA"
+        | "MULTICULTURAL"
+        | "TEEN_HOUSEHOLDER" | "TEENHOUSEHOLDER"
+        | "MULTI_CHILDREN" | "MULTICHILDREN"
+        | "FARMING_AND_FISHING" | "FARMINGANDFISHING" => Some(FormCategory::SocialIntegration),
+        "NATIONAL_VETERANS_EDUCATION" | "NATIONALVETERANSEDUCATION"
+        | "SPECIAL_ADMISSION" | "SPECIALADMISSION" => Some(FormCategory::Supernumerary),
+        _ => None,
+    }
 }
 
 struct Score {
@@ -410,7 +635,7 @@ fn get_total_attendance(grade: &GradeRequest) -> Option<Attendance> {
             lateness_count: a1.lateness_count + a2.lateness_count + a3.lateness_count,
             early_leave_count: a1.early_leave_count + a2.early_leave_count + a3.early_leave_count,
             class_absence_count:
-                a1.class_absence_count + a2.class_absence_count + a3.class_absence_count,
+            a1.class_absence_count + a2.class_absence_count + a3.class_absence_count,
         }),
         _ => None,
     }

@@ -1,4 +1,4 @@
-use sqlx::{PgPool, QueryBuilder};
+use sqlx::{FromRow, PgPool, QueryBuilder};
 use uuid::Uuid;
 
 pub struct FormEntity {
@@ -55,12 +55,74 @@ pub struct FormEntity {
     pub user_id: i64,
 }
 
+#[derive(FromRow, Clone)]
 pub struct SubjectEntity {
     pub grade: i32,
     pub semester: i32,
     pub subject_name: String,
     pub achievement_level: String,
     pub score: Option<i32>,
+}
+
+#[derive(FromRow)]
+pub struct FormSimpleRow {
+    pub id: i64,
+    pub examination_number: i64,
+    pub name: String,
+    pub birthday: String,
+    pub graduation_type: String,
+    pub school_name: Option<String>,
+    pub status: String,
+    pub r#type: String,
+    pub changed_to_regular: bool,
+    pub total_score: Option<f64>,
+}
+
+#[derive(FromRow)]
+pub struct FormDetailRow {
+    pub form_id: i64,
+    pub examination_number: i64,
+    pub birthday: String,
+    pub gender: String,
+    pub name: String,
+    pub phone_number: String,
+    pub changed_to_regular: bool,
+    pub cover_letter: String,
+    pub statement_of_purpose: String,
+    pub graduation_type: String,
+    pub graduation_year: String,
+    pub school_address: Option<String>,
+    pub school_code: Option<String>,
+    pub school_location: Option<String>,
+    pub school_name: Option<String>,
+    pub teacher_mobile_phone_number: Option<String>,
+    pub teacher_name: Option<String>,
+    pub teacher_phone_number: Option<String>,
+    pub attendance1_absence_count: Option<i32>,
+    pub attendance1_class_absence_count: Option<i32>,
+    pub attendance1_early_leave_count: Option<i32>,
+    pub attendance1_lateness_count: Option<i32>,
+    pub attendance2_absence_count: Option<i32>,
+    pub attendance2_class_absence_count: Option<i32>,
+    pub attendance2_early_leave_count: Option<i32>,
+    pub attendance2_lateness_count: Option<i32>,
+    pub attendance3_absence_count: Option<i32>,
+    pub attendance3_class_absence_count: Option<i32>,
+    pub attendance3_early_leave_count: Option<i32>,
+    pub attendance3_lateness_count: Option<i32>,
+    pub volunteer_time1: Option<i32>,
+    pub volunteer_time2: Option<i32>,
+    pub volunteer_time3: Option<i32>,
+    pub address: String,
+    pub detail_address: String,
+    pub zone_code: String,
+    pub parent_name: String,
+    pub parent_phone_number: String,
+    pub parent_relation: String,
+    pub first_round_score: f64,
+    pub total_score: Option<f64>,
+    pub r#type: String,
+    pub status: String,
 }
 
 pub struct SqlxFormRepository {
@@ -83,9 +145,9 @@ impl SqlxFormRepository {
         let exists: bool = sqlx::query_scalar(
             "SELECT EXISTS(SELECT 1 FROM tbl_form WHERE user_id = $1)",
         )
-        .bind(user_id)
-        .fetch_one(&self.pool)
-        .await?;
+            .bind(user_id)
+            .fetch_one(&self.pool)
+            .await?;
         Ok(exists)
     }
 
@@ -93,10 +155,10 @@ impl SqlxFormRepository {
         let max: Option<i64> = sqlx::query_scalar::<_, Option<i64>>(
             "SELECT MAX(examination_number) FROM tbl_form WHERE examination_number >= $1 AND examination_number <= $2",
         )
-        .bind(start)
-        .bind(start + 1000)
-        .fetch_one(&self.pool)
-        .await?;
+            .bind(start)
+            .bind(start + 1000)
+            .fetch_one(&self.pool)
+            .await?;
         Ok(max.map_or(start + 1, |m| m + 1))
     }
 
@@ -187,5 +249,55 @@ impl SqlxFormRepository {
         });
         qb.build().execute(&self.pool).await?;
         Ok(())
+    }
+
+    pub async fn find_all(
+        &self,
+        status: Option<&str>,
+    ) -> Result<Vec<FormSimpleRow>, sqlx::Error> {
+        if let Some(status) = status {
+            sqlx::query_as::<_, FormSimpleRow>(
+                "SELECT form_id as id, examination_number, name, birthday, graduation_type, school_name, status, type, changed_to_regular, total_score FROM tbl_form WHERE status = $1",
+            )
+                .bind(status)
+                .fetch_all(&self.pool)
+                .await
+        } else {
+            sqlx::query_as::<_, FormSimpleRow>(
+                "SELECT form_id as id, examination_number, name, birthday, graduation_type, school_name, status, type, changed_to_regular, total_score FROM tbl_form",
+            )
+                .fetch_all(&self.pool)
+                .await
+        }
+    }
+
+    pub async fn find_by_id(&self, id: i64) -> Result<FormDetailRow, sqlx::Error> {
+        sqlx::query_as::<_, FormDetailRow>(
+            "SELECT form_id, examination_number, birthday, gender, name, phone_number, changed_to_regular, cover_letter, statement_of_purpose, graduation_type, graduation_year, school_address, school_code, school_location, school_name, teacher_mobile_phone_number, teacher_name, teacher_phone_number, attendance1_absence_count, attendance1_class_absence_count, attendance1_early_leave_count, attendance1_lateness_count, attendance2_absence_count, attendance2_class_absence_count, attendance2_early_leave_count, attendance2_lateness_count, attendance3_absence_count, attendance3_class_absence_count, attendance3_early_leave_count, attendance3_lateness_count, volunteer_time1, volunteer_time2, volunteer_time3, address, detail_address, zone_code, parent_name, parent_phone_number, parent_relation, first_round_score, total_score, type, status FROM tbl_form WHERE form_id = $1",
+        )
+            .bind(id)
+            .fetch_one(&self.pool)
+            .await
+    }
+
+    pub async fn find_by_user_id(&self, user_id: i64) -> Result<FormDetailRow, sqlx::Error> {
+        sqlx::query_as::<_, FormDetailRow>(
+            "SELECT form_id, examination_number, birthday, gender, name, phone_number, changed_to_regular, cover_letter, statement_of_purpose, graduation_type, graduation_year, school_address, school_code, school_location, school_name, teacher_mobile_phone_number, teacher_name, teacher_phone_number, attendance1_absence_count, attendance1_class_absence_count, attendance1_early_leave_count, attendance1_lateness_count, attendance2_absence_count, attendance2_class_absence_count, attendance2_early_leave_count, attendance2_lateness_count, attendance3_absence_count, attendance3_class_absence_count, attendance3_early_leave_count, attendance3_lateness_count, volunteer_time1, volunteer_time2, volunteer_time3, address, detail_address, zone_code, parent_name, parent_phone_number, parent_relation, first_round_score, total_score, type, status FROM tbl_form WHERE user_id = $1",
+        )
+            .bind(user_id)
+            .fetch_one(&self.pool)
+            .await
+    }
+
+    pub async fn find_subjects(
+        &self,
+        form_id: i64,
+    ) -> Result<Vec<SubjectEntity>, sqlx::Error> {
+        sqlx::query_as::<_, SubjectEntity>(
+            "SELECT grade, semester, subject_name, achievement_level, score FROM tbl_subject WHERE form_id = $1",
+        )
+            .bind(form_id)
+            .fetch_all(&self.pool)
+            .await
     }
 }

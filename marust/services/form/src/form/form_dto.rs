@@ -100,12 +100,39 @@ impl FormType {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum FormCategory {
     Regular,
     MeisterTalent,
     SocialIntegration,
     Supernumerary,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum FormStatus {
+    Submitted,
+    FinalSubmitted,
+    Approved,
+    Rejected,
+    Received,
+    FirstPassed,
+    FirstFailed,
+    Passed,
+    Failed,
+    NoShow,
+    Entered,
+}
+
+#[derive(Clone, Copy, Deserialize)]
+pub enum FormSort {
+    #[serde(rename = "total-score-asc")]
+    TotalScoreAsc,
+    #[serde(rename = "total-score-desc")]
+    TotalScoreDesc,
+    #[serde(rename = "form-id")]
+    FormId,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -183,4 +210,114 @@ pub struct SubmitFormRequest {
     pub document: DocumentRequest,
     #[serde(rename = "type")]
     pub r#type: FormType,
+}
+
+#[derive(Deserialize)]
+pub struct FormListQuery {
+    pub status: Option<FormStatus>,
+    pub category: Option<FormCategory>,
+    pub sort: Option<FormSort>,
+}
+
+#[derive(Serialize)]
+pub struct FormSimpleResponse {
+    pub id: i64,
+    pub examination_number: i64,
+    pub name: String,
+    pub birthday: String,
+    pub graduation_type: String,
+    pub school: Option<String>,
+    pub status: String,
+    pub r#type: String,
+    pub is_changed_to_regular: bool,
+    pub total_score: Option<f64>,
+    pub has_document: bool,
+    pub first_round_passed: Option<bool>,
+    pub second_round_passed: Option<bool>,
+}
+
+#[derive(Serialize)]
+pub struct ApplicantResponse {
+    pub name: String,
+    pub phone_number: String,
+    pub birthday: String,
+    pub gender: String,
+}
+
+#[derive(Serialize)]
+pub struct ParentResponse {
+    pub name: String,
+    pub phone_number: String,
+    pub relation: String,
+    pub zone_code: String,
+    pub address: String,
+    pub detail_address: String,
+}
+
+#[derive(Serialize)]
+pub struct EducationResponse {
+    pub graduation_type: String,
+    pub graduation_year: String,
+    pub school_name: Option<String>,
+    pub school_location: Option<String>,
+    pub school_code: Option<String>,
+    pub school_phone_number: Option<String>,
+    pub school_address: Option<String>,
+    pub teacher_name: Option<String>,
+    pub teacher_mobile_phone_number: Option<String>,
+}
+
+#[derive(Serialize)]
+pub struct SubjectResponse {
+    pub grade: i32,
+    pub semester: i32,
+    pub subject_name: String,
+    pub achievement_level: String,
+}
+
+#[derive(Serialize)]
+pub struct AttendanceResponse {
+    pub absence_count: i32,
+    pub lateness_count: i32,
+    pub early_leave_count: i32,
+    pub class_absence_count: i32,
+}
+
+#[derive(Serialize)]
+pub struct GradeResponse {
+    pub subject_list: Vec<SubjectResponse>,
+    pub attendance1: AttendanceResponse,
+    pub attendance2: AttendanceResponse,
+    pub attendance3: AttendanceResponse,
+    pub volunteer_time1: Option<i32>,
+    pub volunteer_time2: Option<i32>,
+    pub volunteer_time3: Option<i32>,
+}
+
+#[derive(Serialize)]
+pub struct DocumentResponse {
+    pub cover_letter: String,
+    pub statement_of_purpose: String,
+}
+
+#[derive(Serialize)]
+pub struct ScoreResponse {
+    pub first_round_score: f64,
+    pub total_score: Option<f64>,
+}
+
+#[derive(Serialize)]
+pub struct FormResponse {
+    pub id: i64,
+    pub examination_number: i64,
+    pub applicant: ApplicantResponse,
+    pub parent: ParentResponse,
+    pub education: EducationResponse,
+    pub grade: GradeResponse,
+    pub document: DocumentResponse,
+    pub score: ScoreResponse,
+    #[serde(rename = "type")]
+    pub r#type: String,
+    pub status: String,
+    pub is_changed_to_regular: bool,
 }
