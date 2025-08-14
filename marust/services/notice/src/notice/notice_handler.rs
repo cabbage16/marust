@@ -54,15 +54,15 @@ async fn save_multipart(
                     let path = std::path::Path::new(storage_path).join(&saved_name);
                     tokio::fs::create_dir_all(storage_path).await.map_err(|e| {
                         tracing::error!("failed to create dir: {:?}", e);
-                        AppError::InternalServerError
+                        AppError::InternalServerError(e.to_string())
                     })?;
                     let bytes = field.bytes().await.map_err(|e| {
                         tracing::error!("failed to read bytes: {:?}", e);
-                        AppError::InternalServerError
+                        AppError::InternalServerError(e.to_string())
                     })?;
                     tokio::fs::write(&path, &bytes).await.map_err(|e| {
                         tracing::error!("failed to save file: {:?}", e);
-                        AppError::InternalServerError
+                        AppError::InternalServerError(e.to_string())
                     })?;
                     file_names.push(saved_name);
                 }

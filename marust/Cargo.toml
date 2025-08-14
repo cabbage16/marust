@@ -5,6 +5,7 @@ members = [
     "services/user",
     "services/question",
     "services/notice",
+    "services/form",
     "libs/common",
     "libs/infrastructure",
 ]

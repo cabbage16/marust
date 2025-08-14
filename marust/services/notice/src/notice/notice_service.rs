@@ -15,7 +15,7 @@ pub async fn create_notice(
         .await
         .map_err(|e| {
             tracing::error!("failed to insert notice: {:?}", e);
-            AppError::InternalServerError
+            AppError::InternalServerError(e.to_string())
         })
 }
 
@@ -31,7 +31,7 @@ pub async fn update_notice(
         .await
         .map_err(|e| {
             tracing::error!("failed to update notice: {:?}", e);
-            AppError::InternalServerError
+            AppError::InternalServerError(e.to_string())
         })?;
     old_files.ok_or_else(|| AppError::NotFound("notice not found".into()))
 }
@@ -41,7 +41,7 @@ pub async fn get_notice_list(
 ) -> Result<Vec<NoticeSimpleResponse>, AppError> {
     let notices = repo.find_all().await.map_err(|e| {
         tracing::error!("failed to fetch notice list: {:?}", e);
-        AppError::InternalServerError
+        AppError::InternalServerError(e.to_string())
     })?;
     Ok(notices.into_iter().map(to_simple_response).collect())
 }
@@ -52,7 +52,7 @@ pub async fn get_notice(repo: &impl NoticeRepository, id: i64) -> Result<NoticeR
         .await
         .map_err(|e| {
             tracing::error!("failed to fetch notice: {:?}", e);
-            AppError::InternalServerError
+            AppError::InternalServerError(e.to_string())
         })?
         .ok_or_else(|| AppError::NotFound("notice not found".into()))?;
     Ok(to_detail_response(notice))
@@ -61,7 +61,7 @@ pub async fn get_notice(repo: &impl NoticeRepository, id: i64) -> Result<NoticeR
 pub async fn delete_notice(repo: &impl NoticeRepository, id: i64) -> Result<Vec<String>, AppError> {
     let files = repo.delete(id).await.map_err(|e| {
         tracing::error!("failed to delete notice: {:?}", e);
-        AppError::InternalServerError
+        AppError::InternalServerError(e.to_string())
     })?;
     files.ok_or_else(|| AppError::NotFound("notice not found".into()))
 }

@@ -15,7 +15,7 @@ pub async fn create_question(
         .await
         .map_err(|e| {
             tracing::error!("failed to insert question: {:?}", e);
-            AppError::InternalServerError
+            AppError::InternalServerError(e.to_string())
         })
 }
 
@@ -29,7 +29,7 @@ pub async fn update_question(
         .await
         .map_err(|e| {
             tracing::error!("failed to update question: {:?}", e);
-            AppError::InternalServerError
+            AppError::InternalServerError(e.to_string())
         })?;
     if !updated {
         return Err(AppError::NotFound("question not found".into()));
@@ -43,7 +43,7 @@ pub async fn get_question_list(
 ) -> Result<Vec<QuestionResponse>, AppError> {
     let questions = repo.find_by_category(category).await.map_err(|e| {
         tracing::error!("failed to fetch questions: {:?}", e);
-        AppError::InternalServerError
+        AppError::InternalServerError(e.to_string())
     })?;
     Ok(questions.into_iter().map(to_response).collect())
 }
@@ -57,7 +57,7 @@ pub async fn get_question(
         .await
         .map_err(|e| {
             tracing::error!("failed to fetch question: {:?}", e);
-            AppError::InternalServerError
+            AppError::InternalServerError(e.to_string())
         })?
         .ok_or_else(|| AppError::NotFound("question not found".into()))?;
     Ok(to_response(question))
@@ -66,7 +66,7 @@ pub async fn get_question(
 pub async fn delete_question(repo: &impl QuestionRepository, id: i64) -> Result<(), AppError> {
     let deleted = repo.delete(id).await.map_err(|e| {
         tracing::error!("failed to delete question: {:?}", e);
-        AppError::InternalServerError
+        AppError::InternalServerError(e.to_string())
     })?;
     if !deleted {
         return Err(AppError::NotFound("question not found".into()));

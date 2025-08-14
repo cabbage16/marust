@@ -28,13 +28,13 @@ pub async fn log_in(
     .await
     .map_err(|e| {
         tracing::error!("failed to fetch user: {:?}", e);
-        AppError::InternalServerError
+        AppError::InternalServerError(e.to_string())
     })?
     .ok_or_else(|| AppError::Unauthorized("wrong phone number or password".into()))?;
 
     let is_valid = verify(&req.password, &user.password).map_err(|e| {
         tracing::error!("failed to verify password: {:?}", e);
-        AppError::InternalServerError
+        AppError::InternalServerError(e.to_string())
     })?;
 
     if !is_valid {
@@ -43,8 +43,8 @@ pub async fn log_in(
         ));
     }
 
-    let authority =
-        Authority::from_str(&user.authority).map_err(|_| AppError::InternalServerError)?;
+    let authority = Authority::from_str(&user.authority)
+        .map_err(|_| AppError::InternalServerError("invalid authority".into()))?;
     let access_token = jwt_provider.generate_access_token(&user.uuid, &authority)?;
     let refresh_token = jwt_provider.generate_refresh_token(&user.uuid, &authority)?;
 
@@ -53,7 +53,7 @@ pub async fn log_in(
         .await
         .map_err(|e| {
             tracing::error!("failed to save refresh token: {:?}", e);
-            AppError::InternalServerError
+            AppError::InternalServerError(e.to_string())
         })?;
 
     Ok(TokenResponse {
@@ -78,7 +78,7 @@ pub async fn refresh_token(
         .await
         .map_err(|e| {
             tracing::error!("failed to find refresh token: {:?}", e);
-            AppError::InternalServerError
+            AppError::InternalServerError(e.to_string())
         })?
         .ok_or_else(|| AppError::Unauthorized("expired token".into()))?;
     if stored != token {
@@ -96,7 +96,7 @@ pub async fn refresh_token(
 pub async fn log_out(repo: &impl TokenRepository, uuid: uuid::Uuid) -> Result<(), AppError> {
     repo.delete_refresh_token(&uuid).await.map_err(|e| {
         tracing::error!("failed to delete refresh token: {:?}", e);
-        AppError::InternalServerError
+        AppError::InternalServerError(e.to_string())
     })?;
     Ok(())
 }

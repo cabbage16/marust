@@ -12,7 +12,7 @@ use std::str::FromStr;
 pub async fn sign_up(repo: &impl UserRepository, req: SignUpUserRequest) -> Result<(), AppError> {
     let exists = repo.exists_by_phone(&req.phone_number).await.map_err(|e| {
         tracing::error!("failed to check existing user: {:?}", e);
-        AppError::InternalServerError
+        AppError::InternalServerError(e.to_string())
     })?;
 
     if exists {
@@ -21,7 +21,7 @@ pub async fn sign_up(repo: &impl UserRepository, req: SignUpUserRequest) -> Resu
 
     let password_hash = hash(&req.password, DEFAULT_COST).map_err(|e| {
         tracing::error!("failed to hash password: {:?}", e);
-        AppError::InternalServerError
+        AppError::InternalServerError(e.to_string())
     })?;
 
     repo.insert_user(
@@ -34,7 +34,7 @@ pub async fn sign_up(repo: &impl UserRepository, req: SignUpUserRequest) -> Resu
     .await
     .map_err(|e| {
         tracing::error!("failed to insert user: {:?}", e);
-        AppError::InternalServerError
+        AppError::InternalServerError(e.to_string())
     })?;
 
     Ok(())
@@ -46,12 +46,12 @@ pub async fn get_user(repo: &impl UserRepository, uuid: Uuid) -> Result<UserResp
         .await
         .map_err(|e| {
             tracing::error!("failed to fetch user: {:?}", e);
-            AppError::InternalServerError
+            AppError::InternalServerError(e.to_string())
         })?
-        .ok_or(AppError::InternalServerError)?;
+        .ok_or(AppError::InternalServerError("user not found".into()))?;
 
-    let authority =
-        Authority::from_str(&user.authority).map_err(|_| AppError::InternalServerError)?;
+    let authority = Authority::from_str(&user.authority)
+        .map_err(|_| AppError::InternalServerError("invalid authority".into()))?;
 
     Ok(UserResponse {
         phone_number: user.phone_number,

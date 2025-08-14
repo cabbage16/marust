@@ -17,8 +17,8 @@ pub enum AppError {
     Forbidden(String),
     #[error("not found: {0}")]
     NotFound(String),
-    #[error("internal server error")]
-    InternalServerError,
+    #[error("internal server error: {0}")]
+    InternalServerError(String),
 }
 
 impl AppError {
@@ -28,7 +28,7 @@ impl AppError {
             AppError::Unauthorized(_) => StatusCode::UNAUTHORIZED,
             AppError::Forbidden(_) => StatusCode::FORBIDDEN,
             AppError::NotFound(_) => StatusCode::NOT_FOUND,
-            AppError::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR,
+            AppError::InternalServerError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
@@ -38,7 +38,7 @@ impl AppError {
             AppError::Unauthorized(_) => "UNAUTHORIZED",
             AppError::Forbidden(_) => "FORBIDDEN",
             AppError::NotFound(_) => "NOT_FOUND",
-            AppError::InternalServerError => "INTERNAL_SERVER_ERROR",
+            AppError::InternalServerError(_) => "INTERNAL_SERVER_ERROR",
         }
     }
 
@@ -48,7 +48,7 @@ impl AppError {
             AppError::Unauthorized(msg) => msg.clone(),
             AppError::Forbidden(msg) => msg.clone(),
             AppError::NotFound(msg) => msg.clone(),
-            AppError::InternalServerError => self.to_string(),
+            AppError::InternalServerError(msg) => msg.clone(),
         }
     }
 }

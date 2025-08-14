@@ -55,7 +55,7 @@ impl JwtProvider {
         )
         .map_err(|e| {
             tracing::error!("failed to generate token: {:?}", e);
-            AppError::InternalServerError
+            AppError::InternalServerError(e.to_string())
         })
     }
 
